@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Reversi Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>Reversi Game</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-3">
+                <div class="container border border-primary">
+                    <div class="question">Mode</div>
+                    <div>
+                        <label><input type="radio" name="mode" value="manual" checked>vs Human</label>
+                        <label><input type="radio" name="mode" value="cp">vs AI</label>
+                    </div>
+            
+                    <div class="question">If you chose AI, first or second?</div>
+                    <div>
+                        <label><input type="radio" name="color" value="black" checked>First (Black)</label>
+                        <label><input type="radio" name="color" value="white">Second (White)</label>
+                    </div>
+            
+                    <div class="question">AI level</div>
+                    <div>
+                        <label><input type="radio" name="level" value=1 checked>Level 1</label>
+                        <label><input type="radio" name="level" value=2>Level 2</label>
+                    </div>
+            
+                    <button id="confirmed-btn">Confirm and Start!</button>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="board">
+                    <!-- Game board will be generated here. -->
+                </div>
+            </div>
+
+            <div class="col-3">
+                <div class="container">
+                    <div class="turn">
+                        <div class="info">Turn:</div>
+                        <div id="turn">Black</div>
+                    </div>
+                    <div class="score">
+                        <div class="info">Score</div>
+                        <div>Black: <span id="black-score">2</span></div>
+                        <div>White: <span id="white-score">2</span></div>
+                    </div>
+                    <div class="history">
+                        <div class="info">History</div>
+                        <ul id="history"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="javascript/script.js"></script>
+    </div>
+</body>
+</html>
+

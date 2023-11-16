@@ -1,0 +1,42 @@
+.container {
+    font-size: 1rem;
+}
+
+.question {
+    color: blue;
+}
+
+.info {
+    color: blue;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(8, 50px);
+    grid-template-rows: repeat(8, 50px);
+    gap: 0px;
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+}
+
+.cell {
+    background-color: #228B22;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+.piece {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.piece.black {
+    background-color: #000;
+}
+
+.piece.white {
+    background-color: #fff;
+}
+
