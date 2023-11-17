@@ -1,8 +1,9 @@
 name: ci
 
 on:
-  pull_request:
-    branches: [ push ]
+  push:
+    branches:
+      - '*'
 
 jobs:
   test:
@@ -20,5 +21,3 @@ jobs:
         run: |
           npm install
           npm test
-
-
