@@ -2,338 +2,373 @@
 
 import { getRandomInt } from './utilities.js';
 
-//　Declare global varialbes
-let counter, blackScore, whiteScore;
-let mode,color,level;
-let cells,currentPlayer;
-const board = document.querySelector(".board");
-const turn = document.getElementById("turn");
-const confirmedBtn = document.getElementById("confirmed-btn");
-const history = document.getElementById("history");
+const boardElement = document.querySelector(".board");
+const turnElement = document.getElementById("turn");
+const confirmedBtnElement = document.getElementById("confirmed-btn");
+const historyElement = document.getElementById("history");
+let state, settings, board, history;
 
-function getRadioValue(name){
-    let elements = document.getElementsByName(name);
-    let checkedValue = '';
-
-    for (let i = 0; i < elements.length; i++){
-        if (elements[i].checked) checkedValue = elements[i].value;
+class gameState{
+    constructor(){
+        this.turnCounter = 0;
+        this.blackScore = 2;
+        this.whiteScore = 2;
+        this.currentPlayer = "black";
     }
 
-    return checkedValue;
+    changeScores(blackChange, whiteChange){
+        this.blackScore += blackChange;
+        this.whiteScore += whiteChange;
+    }
+
+    updateScores() {
+        document.getElementById("black-score").textContent = this.blackScore;
+        document.getElementById("white-score").textContent = this.whiteScore;
+    }
+
+    counterIncrement(){
+        this.turnCounter++;
+    }
+
+    togglePlayer(){
+        this.currentPlayer = this.currentPlayer === "black" ? "white" : "black";
+    }
+
+    // displays a message if the game is terminated
+    displayEnd() {
+        let resultMessage = '';
+        if (this.blackScore > this.whiteScore) resultMessage = 'Black Wins!';
+        else if (this.blackScore < this.whiteScore) resultMessage = 'White Wins!';
+        else resultMessage = 'Draw!';
+
+        alert(`${resultMessage}\nBlack: ${this.blackScore}\nWhite: ${this.whiteScore}`);
+    }
+}
+
+class gameSettings{
+    constructor(){
+        this.mode = this.getRadioValue("mode");
+        this.color = this.getRadioValue("color");
+        this.level = this.getRadioValue("level");
+    }
+
+    getRadioValue(name){
+        let elements = document.getElementsByName(name);
+        let checkedValue = '';
+    
+        for (let i = 0; i < elements.length; i++){
+            if (elements[i].checked) checkedValue = elements[i].value;
+        }
+    
+        return checkedValue;
+    }
+}
+
+class boardInfo{
+    constructor(){
+        this.cells = [];
+        boardElement.innerHTML = "";
+    
+        // Generate a game board
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                boardElement.appendChild(cell);
+                this.cells.push(cell);
+    
+                // Add a click event
+                cell.addEventListener("click", createCellClickHandler(row, col));
+            }
+        }
+    
+        // Place the first 4 stones
+        const firstPositions = [27,28,36,35];
+        for (let i=0; i<firstPositions.length; i++){
+            const newPiece = document.createElement("div");
+            newPiece.classList.add("piece", (i % 2 == 0 ? "black": "white"));
+            this.cells[firstPositions[i]].appendChild(newPiece);
+        }
+    }
+
+    // check the position is valid for placement
+    isValidMove(row, col) {
+
+        if (row < 0 || row > 7 || col < 0 || col > 7) return false;
+
+        // impossible if some stone is already placed in the position
+        if (this.cells[row * 8 + col].childNodes.length == 1)  return false;
+
+        return this.getFlippedCells(row, col).length > 0;
+    }
+
+    // Place a stone
+    placePiece(row, col) {
+
+        history.add(row, col, false);
+
+        const newPiece = document.createElement("div");
+        newPiece.classList.add("piece", state.currentPlayer);
+        this.cells[row * 8 + col].appendChild(newPiece);
+
+        // update the number of stones
+        if (state.currentPlayer === "black") state.changeScores(1,0);
+        else state.changeScores(0,1);
+
+        state.counterIncrement();
+
+    }
+
+    // flip stones
+    flipPieces(row, col) {
+
+        const flippedCells = this.getFlippedCells(row, col);
+
+        flippedCells.forEach((cell) => {
+
+            if (cell.childNodes.length == 1){
+                cell.childNodes[0].classList.toggle("black");
+                cell.childNodes[0].classList.toggle("white");
+            }
+
+            // update the number of stones
+            if (state.currentPlayer === "black") state.changeScores(1,-1);
+            else state.changeScores(-1,1);
+
+        });
+    }
+
+    // return a possible cells
+    getPossibleCells(){
+        let possibleCells = [];
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                if (this.isValidMove(row, col)) possibleCells.push([row,col]);
+            }
+        }
+
+        return possibleCells;
+    }
+
+    // check if the current player has to pass (no valid place)
+    // terminate the game if the both player have to pass
+    checkPass(){
+        let possibleCells = this.getPossibleCells();
+
+        if (possibleCells.length == 0){
+
+            history.add(-1,-1,true);
+
+            state.togglePlayer();
+            turnElement.textContent = state.currentPlayer;
+
+            // two passses -> end the game
+            possibleCells = this.getPossibleCells()
+            if (possibleCells.length == 0) state.displayEnd();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // estimated the number of flipped stone if a new stone is placed on (row, col)
+    getFlippedCells(row, col){
+        const directions = [-1, 0, 1];
+        const flippedCells = [];
+
+        directions.forEach((dx) => {
+            directions.forEach((dy) => {
+                if (dx === 0 && dy === 0) return;
+
+                let currentRow = row + dx;
+                let currentCol = col + dy;
+                let flipTemp = [];
+
+                while (
+                    currentRow >= 0 &&
+                    currentRow < 8 &&
+                    currentCol >= 0 &&
+                    currentCol < 8
+                ) {
+                    const cell = this.cells[currentRow * 8 + currentCol];
+                    if (!cell) break;
+                    if (cell.childNodes.length == 0) break;
+                    if (cell.childNodes[0].classList.contains(state.currentPlayer)) {
+                        flippedCells.push(...flipTemp);
+                        break;
+                    }
+                    flipTemp.push(cell);
+                    currentRow += dx;
+                    currentCol += dy;
+                }
+            });
+        });
+
+        return flippedCells;
+    }
+}
+
+class gameHistory{
+    constructor(){
+        this.history = [];
+        historyElement.innerHTML = "";
+    }
+
+    add(row, col, isPass) {
+
+        this.history.push((row, col, isPass));
+
+        const item = document.createElement("li");
+    
+        const toReversiCol = {
+            0: "A",
+            1: "B",
+            2: "C",
+            3: "D",
+            4: "E",
+            5: "F",
+            6: "G",
+            7: "H"
+        }
+    
+        item.textContent = "";
+        item.textContent += state.currentPlayer === "black" ? "Black" : "White";
+        item.textContent += ` turn#${Math.floor(state.turnCounter/2)+1} `
+        item.textContent += isPass ? " Pass" : ` ${toReversiCol[col]}${row+1} `;
+    
+        if (historyElement.firstChild) historyElement.insertBefore(item, historyElement.firstChild);
+        else historyElement.appendChild(item);
+    }
+}
+
+function cellClickHandler(row, col){
+
+    const possibleCells = board.getPossibleCells();
+
+    if (possibleCells.length == 0){
+
+        history.add(-1,-1,true);
+
+        state.togglePlayer();
+        turnElement.textContent = state.currentPlayer;
+
+        return;
+    }
+
+    if (board.isValidMove(row, col)) {
+        board.placePiece(row, col);
+        board.flipPieces(row, col);
+
+        // update the number of stones
+        state.updateScores();
+
+        //　check if all stones are placed
+        if (state.blackScore + state.whiteScore == 64) state.displayEnd();
+
+        // update turn messages
+        state.togglePlayer();
+        turnElement.textContent = state.currentPlayer;
+
+        if (board.checkPass()) return;
+
+        // execute ai player's action
+        if (settings.mode == "cp") {
+
+            makeComputerMove();
+
+            //　check if terminated
+            if (state.blackScore + state.whiteScore == 64) state.displayEnd();
+
+        }
+    }
+}
+
+// Create a function that retains its arguments using a closure
+function createCellClickHandler(row, col) {
+    return function() {
+        cellClickHandler(row, col);
+    };
 }
 
 function initializeGame(){
 
-    // Load settings
-    mode = getRadioValue("mode");
-    color = getRadioValue("color");
-    level = getRadioValue("level");
+    settings = new gameSettings();
+    state = new gameState();
+    state.updateScores();
 
-    // How many turns are done
-    counter = 0;
+    board = new boardInfo();
+    history = new gameHistory();
 
-    // Initial scores
-    blackScore = 2;
-    whiteScore = 2;
+}
 
-    updateScores();
-
-    cells = [];
-
-    currentPlayer = "black"; // First player takes black pieces
-
-    history.innerHTML = "";
-    board.innerHTML = "";
-
-    // Generate a game board
-    for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-            const cell = document.createElement("div");
-            cell.classList.add("cell");
-            cell.dataset.row = row;
-            cell.dataset.col = col;
-            board.appendChild(cell);
-            cells.push(cell);
-
-            // Add a click event
-            cell.addEventListener("click", () => {
-
-                const possibleCells = getPossibleCells();
-
-                if (possibleCells.length == 0){
-
-                    addHistory(-1,-1,true);
-
-                    turn.textContent = currentPlayer === "black" ? "White" : "Black";
-                    currentPlayer = currentPlayer === "black" ? "white" : "black";
-
-                    return;
-                }
-
-                if (isValidMove(row, col)) {
-                    placePiece(row, col);
-                    flipPieces(row, col);
-
-                    // update the number of stones
-                    updateScores();
-
-                    //　check if all stones are placed
-                    if (blackScore + whiteScore == 64) displayEnd();
-
-                    // update turn messages
-                    turn.textContent = currentPlayer === "black" ? "White" : "Black";
-                    currentPlayer = currentPlayer === "black" ? "white" : "black";
-
-                    if (checkPass()) return;
-
-                    // execute ai player's action
-                    if (mode == "cp") {
-
-                        makeComputerMove();
-
-                        //　check if terminated
-                        if (blackScore + whiteScore == 64) displayEnd();
-
-                    }
-                }
-            });
-        }
+class Agent{
+    move(board){
+        // should be implemented explicitly in each sub-class.
     }
+}
 
-    // Place the first 4 stones
-    const firstPositions = [27,28,36,35];
-    for (let i=0; i<firstPositions.length; i++){
-        const newPiece = document.createElement("div");
-        newPiece.classList.add("piece", (i % 2 == 0 ? "black": "white"));
-        cells[firstPositions[i]].appendChild(newPiece);
+// simple random player
+class randomAgent extends Agent{
+    move(board){
+        let aiMove = [-1, -1];
+        while (!board.isValidMove(...aiMove)) aiMove = [getRandomInt(7), getRandomInt(7)];
+        return aiMove;
     }
-
 }
 
-// check the position is valid for placement
-function isValidMove(row, col) {
-
-    if (row < 0 || row > 7 || col < 0 || col > 7) return false;
-
-    const cell = cells[row * 8 + col];
-
-    // impossible if some stone is already placed in the position
-    if (cell.childNodes.length == 1)  return false;
-
-    const flippedCells = getFlippedCells(row, col);
-
-    return flippedCells.length > 0;
-}
-
-// Place a stone
-function placePiece(row, col) {
-
-    addHistory(row, col, false);
-
-    const newPiece = document.createElement("div");
-    newPiece.classList.add("piece", currentPlayer);
-    cells[row * 8 + col].appendChild(newPiece);
-
-    // update the number of stones
-    if (currentPlayer === "black") blackScore++;
-    else whiteScore++;
-
-    counter++;
-
-}
-
-// displays a message if the game is terminated
-function displayEnd() {
-    let resultMessage = '';
-    if (blackScore > whiteScore) resultMessage = 'Black Wins!';
-    else if (blackScore < whiteScore) resultMessage = 'White Wins!';
-    else resultMessage = 'Draw!';
-
-    alert(`${resultMessage}\nBlack: ${blackScore}\nWhite: ${whiteScore}`);
-}
-
-// Add data to history in each turn
-function addHistory(row, col, isPass) {
-    const item = document.createElement("li");
-
-    const toOthelloCol = {
-        0: "A",
-        1: "B",
-        2: "C",
-        3: "D",
-        4: "E",
-        5: "F",
-        6: "G",
-        7: "H"
-    }
-
-    item.textContent = "";
-    item.textContent += currentPlayer === "black" ? "Black" : "White";
-    item.textContent += ` turn#${Math.floor(counter/2)+1} `
-    item.textContent += isPass ? " Pass" : ` ${toOthelloCol[col]}${row+1} `;
-
-    if (history.firstChild) history.insertBefore(item, history.firstChild);
-    else history.appendChild(item);
-}
-
-// flip stones
-function flipPieces(row, col) {
-
-    const flippedCells = getFlippedCells(row, col);
-
-    flippedCells.forEach((cell) => {
-
-        if (cell.childNodes.length == 1){
-            cell.childNodes[0].classList.toggle("black");
-            cell.childNodes[0].classList.toggle("white");
-        }
-
-        // update the number of stones
-        if (currentPlayer === "black") {
-            blackScore++;
-            whiteScore--;
-        } else {
-            blackScore--;
-            whiteScore++;
-        }
-
-    });
-}
-
-// update and display the scores
-function updateScores() {
-    const blackScoreElement = document.getElementById("black-score");
-    const whiteScoreElement = document.getElementById("white-score");
+// greedy strategy that place a piece so that the maximum number of stones are flipped
+class simpleGreedyAgent extends Agent{
+    move(board){
+        let possibleCells = board.getPossibleCells();
+        let MAX = 0;
+        let argmax = [-1,-1];
     
-    blackScoreElement.textContent = blackScore;
-    whiteScoreElement.textContent = whiteScore;
-}
-
-// return a possible cells
-function getPossibleCells(){
-    let possibleCells = [];
-    for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-            if (isValidMove(row, col)) possibleCells.push([row,col]);
-        }
+        possibleCells.forEach(([row, col]) => {
+    
+            const flippedCells = board.getFlippedCells(row, col);
+    
+            if (flippedCells.length > MAX){
+                MAX = flippedCells.length;
+                argmax = [row, col];
+            }
+    
+        });
+    
+        return argmax;
     }
-
-    return possibleCells;
-}
-
-// check if the current player has to pass (no valid place)
-// terminate the game if the both player have to pass
-function checkPass(){
-
-    let possibleCells = getPossibleCells();
-
-    if (possibleCells.length == 0){
-
-        addHistory(-1,-1,true);
-
-        turn.textContent = currentPlayer === "black" ? "White" : "Black";
-        currentPlayer = currentPlayer === "black" ? "white" : "black";
-
-        // two passses -> end the game
-        possibleCells = getPossibleCells()
-        if (possibleCells.length == 0) displayEnd();
-
-        return true;
-    }
-
-    return false;
 }
 
 // AI's move
 function makeComputerMove(){
 
-    let aiMove = [-1,-1];
-    if (level == 1) aiMove = randomMove();
-    else if (level == 2) aiMove = simpleGreedyMove();
+    let agent;
+    if (settings.level == 1) agent = new randomAgent();
+    else if (settings.level == 2) agent = new simpleGreedyAgent();
 
-    placePiece(...aiMove);
-    flipPieces(...aiMove);
+    const aiMove = agent.move(board);
 
-    turn.textContent = currentPlayer === "black" ? "White" : "Black";
+    board.placePiece(...aiMove);
+    board.flipPieces(...aiMove);
 
     // update the number of stones
-    updateScores();
+    state.updateScores();
 
     // update the turn messages
-    currentPlayer = currentPlayer === "black" ? "white" : "black";
+    state.togglePlayer();
+    turnElement.textContent = state.currentPlayer;
 
-}
-
-// simple random player
-function randomMove(){
-    let aiMove = [-1, -1];
-    while (!isValidMove(...aiMove)) aiMove = [getRandomInt(7), getRandomInt(7)];
-    return aiMove;
-}
-
-// greedy strategy that place a piece so that the maximum number of stones are flipped
-function simpleGreedyMove(){
-    let possibleCells = getPossibleCells();
-    let MAX = 0;
-    let argmax = [-1,-1];
-
-    possibleCells.forEach(([row, col]) => {
-
-        const flippedCells = getFlippedCells(row, col);
-
-        if (flippedCells.length > MAX){
-            MAX = flippedCells.length;
-            argmax = [row, col];
-        }
-
-    });
-
-    return argmax;
-}
-
-// estimated the number of flipped stone if a new stone is placed on (row, col)
-function getFlippedCells(row, col){
-    const directions = [-1, 0, 1];
-    const flippedCells = [];
-
-    directions.forEach((dx) => {
-        directions.forEach((dy) => {
-            if (dx === 0 && dy === 0) return;
-
-            let currentRow = row + dx;
-            let currentCol = col + dy;
-            let flipTemp = [];
-
-            while (
-                currentRow >= 0 &&
-                currentRow < 8 &&
-                currentCol >= 0 &&
-                currentCol < 8
-            ) {
-                const cell = cells[currentRow * 8 + currentCol];
-                if (!cell) break;
-                if (cell.childNodes.length == 0) break;
-                if (cell.childNodes[0].classList.contains(currentPlayer)) {
-                    flippedCells.push(...flipTemp);
-                    break;
-                }
-                flipTemp.push(cell);
-                currentRow += dx;
-                currentCol += dy;
-            }
-        });
-    });
-
-    return flippedCells;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    confirmedBtn.addEventListener("click", () => {
+    confirmedBtnElement.addEventListener("click", () => {
 
         initializeGame();
 
-        if (mode == "cp" && color == "white") makeComputerMove();
+        if (settings.mode == "cp" && settings.color == "white") makeComputerMove();
 
     });
 
