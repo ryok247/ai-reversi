@@ -7,38 +7,38 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <title>Reversi Game</title>
+    <title>AI Reversi</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>Reversi Game</h1>
+    <h1>AI Reversi</h1>
     <div class="container">
         <div class="row">
-            <div class="col-3">
+            <div class="col-4">
                 <div class="container border border-primary">
                     <div class="question">Mode</div>
                     <div>
-                        <label><input type="radio" name="mode" value="manual" checked>vs Human</label>
-                        <label><input type="radio" name="mode" value="cp">vs AI</label>
+                        <label><input type="radio" name="mode" value="cp" checked> vs AI</label>
+                        <label><input type="radio" name="mode" value="manual"> vs Human</label>
                     </div>
             
                     <div class="question">If vs AI, you are</div>
                     <div>
-                        <label><input type="radio" name="color" value="black" checked>First player (Black)</label>
-                        <label><input type="radio" name="color" value="white">Second player (White)</label>
+                        <label><input type="radio" name="color" value="black" checked> First player (Black)</label>
+                        <label><input type="radio" name="color" value="white"> Second player (White)</label>
                     </div>
             
                     <div class="question">AI level</div>
                     <div>
-                        <label><input type="radio" name="level" value=1 checked>Level 1</label>
-                        <label><input type="radio" name="level" value=2>Level 2</label>
+                        <label><input type="radio" name="level" value=1 checked> Level 1</label>
+                        <label><input type="radio" name="level" value=2> Level 2</label>
                     </div>
             
                     <button id="confirmed-btn">Confirm and Start!</button>
                 </div>
             </div>
 
-            <div class="col-6">
+            <div class="col-5">
                 <div class="board">
                     <!-- Game board will be generated here. -->
                 </div>
@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-        <script src="javascript/main.js"></script>
+        <script type="module" src="./javascript/main.js"></script>
     </div>
 </body>
 </html>

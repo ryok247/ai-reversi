@@ -1,3 +1,7 @@
+"use strict";
+
+import { getRandomInt } from './utilities.js';
+
 //　Declare global varialbes
 let counter, blackScore, whiteScore;
 let mode,color,level;
@@ -16,11 +20,6 @@ function getRadioValue(name){
     }
 
     return checkedValue;
-}
-
-// generate random integer between [0,max]
-function getRandomInt(max) {
-    return Math.floor(Math.random() * (max + 1));
 }
 
 function initializeGame(){
@@ -85,8 +84,7 @@ function initializeGame(){
                     turn.textContent = currentPlayer === "black" ? "White" : "Black";
                     currentPlayer = currentPlayer === "black" ? "white" : "black";
 
-                    let isPass = checkPass();
-                    if (isPass) return;
+                    if (checkPass()) return;
 
                     // execute ai player's action
                     if (mode == "cp") {
@@ -106,7 +104,7 @@ function initializeGame(){
     const firstPositions = [27,28,36,35];
     for (let i=0; i<firstPositions.length; i++){
         const newPiece = document.createElement("div");
-        newPiece.classList.add("piece", (i%2==0 ? "black": "white"));
+        newPiece.classList.add("piece", (i % 2 == 0 ? "black": "white"));
         cells[firstPositions[i]].appendChild(newPiece);
     }
 
@@ -169,11 +167,10 @@ function addHistory(row, col, isPass) {
         7: "H"
     }
 
-    let text = "";
-    text += currentPlayer === "black" ? "Black" : "White";
-    text += ` turn#${Math.floor(counter/2)+1} `
-    text += isPass ? " Pass" : ` ${toOthelloCol[col]}${row+1} `;
-    item.textContent = text;
+    item.textContent = "";
+    item.textContent += currentPlayer === "black" ? "Black" : "White";
+    item.textContent += ` turn#${Math.floor(counter/2)+1} `
+    item.textContent += isPass ? " Pass" : ` ${toOthelloCol[col]}${row+1} `;
 
     if (history.firstChild) history.insertBefore(item, history.firstChild);
     else history.appendChild(item);
@@ -214,7 +211,7 @@ function updateScores() {
 
 // return a possible cells
 function getPossibleCells(){
-    possibleCells = [];
+    let possibleCells = [];
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             if (isValidMove(row, col)) possibleCells.push([row,col]);
@@ -254,11 +251,8 @@ function makeComputerMove(){
     if (level == 1) aiMove = randomMove();
     else if (level == 2) aiMove = simpleGreedyMove();
 
-    const aiRow = aiMove[0];
-    const aiCol = aiMove[1];
-
-    placePiece(aiRow, aiCol);
-    flipPieces(aiRow, aiCol);
+    placePiece(...aiMove);
+    flipPieces(...aiMove);
 
     turn.textContent = currentPlayer === "black" ? "White" : "Black";
 
@@ -272,15 +266,9 @@ function makeComputerMove(){
 
 // simple random player
 function randomMove(){
-    let aiRow = -1;
-    let aiCol = -1;
-
-    while (!isValidMove(aiRow, aiCol)){
-        aiRow = getRandomInt(7);
-        aiCol = getRandomInt(7);
-    }
-
-    return [aiRow, aiCol];
+    let aiMove = [-1, -1];
+    while (!isValidMove(...aiMove)) aiMove = [getRandomInt(7), getRandomInt(7)];
+    return aiMove;
 }
 
 // greedy strategy that place a piece so that the maximum number of stones are flipped
@@ -345,9 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         initializeGame();
 
-        if (mode == "cp" && color == "white"){
-            makeComputerMove();
-        }
+        if (mode == "cp" && color == "white") makeComputerMove();
 
     });
 
