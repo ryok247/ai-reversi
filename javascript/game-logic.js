@@ -39,6 +39,10 @@ export class boardInfo{
             newPiece.classList.add("piece", (i % 2 == 0 ? "black": "white"));
             this.cells[firstPositions[i]].appendChild(newPiece);
         }
+
+        if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
+        else if (this.settings.mode == "manual") this.highlightPossibleCells();
+    
     }
 
     // check the position is valid for placement
@@ -174,6 +178,7 @@ export class boardInfo{
         if (this.isValidMove(row, col)) {
             this.placePiece(row, col);
             this.flipPieces(row, col);
+            this.removeHighlight();
     
             // update the number of stones
             this.state.updateScores();
@@ -194,8 +199,13 @@ export class boardInfo{
     
                 //　check if terminated
                 if (this.state.blackScore + this.state.whiteScore == 64) this.state.displayEnd();
+
+                this.highlightPossibleCells();
     
             }
+
+            else this.highlightPossibleCells();
+
         }
     }
     
@@ -220,7 +230,24 @@ export class boardInfo{
         // update the turn messages
         this.state.togglePlayer();
         this.state.displayTurn();
+    }
 
-}
+    // Highlight places where the current player can place a stone
+    highlightPossibleCells(){
+
+        if (this.settings.highlight != "checked") return;
+
+        const possibleCells = this.getPossibleCells();
+        possibleCells.forEach((cell) => {
+            this.cells[cell[0] * 8 + cell[1]].classList.add("possible");
+        });
+    }
+
+    // Remove the highlight
+    removeHighlight(){
+        this.cells.forEach((cell) => {
+            cell.classList.remove("possible");
+        });
+    }
 
 }

@@ -1,13 +1,13 @@
 "use strict";
 
 export class gameSettings{
-    constructor(){
-        this.mode = this.getRadioValue("mode");
-        this.color = this.getRadioValue("color");
-        this.level = this.getRadioValue("level");
+    constructor(...settingKeywords){
+        settingKeywords.forEach(keyword => {
+            this[keyword] = this.getInputValue(keyword);
+        });
     }
 
-    getRadioValue(name){
+    getInputValue(name){
         let elements = document.getElementsByName(name);
         let checkedValue = '';
     
