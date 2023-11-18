@@ -13,7 +13,7 @@ let state, settings, board, history;
 
 function initializeGame(historyElement){
 
-    settings = new gameSettings();
+    settings = new gameSettings("mode", "color", "level", "highlight");
     state = new gameState(turnElement);
     history = new gameHistory(historyElement, state);
     board = new boardInfo(state, settings, history, boardElement, turnElement);
@@ -27,6 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
         initializeGame(historyElement);
 
         if (settings.mode == "cp" && settings.color == "white") board.makeComputerMove();
+        
+        board.highlightPossibleCells();
 
     });
 
