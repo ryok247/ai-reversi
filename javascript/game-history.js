@@ -6,13 +6,17 @@ export class gameHistory{
         this.boardHistory = [];
         this.historyElement = historyElement;
         this.state = state;
+
+        let tableBodyAll = document.querySelectorAll(".history-table tbody");
+
+        tableBodyAll.forEach((tableBody) => {
+            tableBody.innerHTML = "";
+        });
     }
 
     add(row, col, isPass, board) {
 
         this.history.push([row, col, isPass]);
-
-        const item = document.createElement("li");
     
         const toReversiCol = {
             0: "A",
@@ -43,19 +47,22 @@ export class gameHistory{
 
     addRowToHistory(color, turnNumber, position) {
         // Get the table body
-        let tableBody = document.querySelector('.table tbody');
+        let tableBodyAll = document.querySelectorAll(".history-table tbody");
 
-        // Create a new row
-        let newRow = tableBody.insertRow(0);
+        tableBodyAll.forEach((tableBody) => {
 
-        // Create cells for the new row
-        let cell1 = newRow.insertCell(0);
-        let cell2 = newRow.insertCell(1);
-        let cell3 = newRow.insertCell(2);
+            // Create a new row
+            let newRow = tableBody.insertRow(0);
 
-        // Set content for each cell (you can modify this as needed)
-        cell1.textContent = turnNumber;
-        cell2.textContent = color;
-        cell3.textContent = position;
+            // Create cells for the new row
+            let cell1 = newRow.insertCell(0);
+            let cell2 = newRow.insertCell(1);
+            let cell3 = newRow.insertCell(2);
+
+            // Set content for each cell (you can modify this as needed)
+            cell1.textContent = turnNumber;
+            cell2.textContent = color;
+            cell3.textContent = position;
+        });
     }
 }

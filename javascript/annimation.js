@@ -60,6 +60,7 @@ function constructBoard(eachBoardHistory){
 function displayTurn(currentTurnIndex){
     if (currentTurnIndex >= window.gamehistory.history.length) return;
     constructBoard(window.gamehistory.boardHistory[currentTurnIndex]);
+    hightlightCurrentTurn(currentTurnIndex);
 }
 
 function startAnimation(){
@@ -123,4 +124,18 @@ function seek(event) {
     }
 
     updateProgressBar();
+}
+
+function hightlightCurrentTurn(currentTurnIndex) {
+    const currentTurn = document.querySelector(".current-turn");
+    if (currentTurn) currentTurn.classList.remove("current-turn");
+    const currentTurnElement = document.querySelector(`.history-replay table tbody tr:nth-child(${
+        window.gamehistory.history.length - currentTurnIndex
+    })`);
+    currentTurnElement.classList.add("current-turn");
+
+    // Scroll to the highlighted row within the overflow-auto container
+    const overflowContainer = document.querySelector('.history-replay .overflow-auto');
+    const scrollTo = currentTurnElement.offsetTop - overflowContainer.offsetTop;
+    overflowContainer.scrollTop = scrollTo;
 }
