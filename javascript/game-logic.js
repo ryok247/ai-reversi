@@ -59,8 +59,6 @@ export class boardInfo{
     // Place a stone
     placePiece(row, col) {
 
-        this.history.add(row, col, false);
-
         const newPiece = document.createElement("div");
         newPiece.classList.add("piece", this.state.currentPlayer);
         this.cells[row * 8 + col].appendChild(newPiece);
@@ -111,7 +109,8 @@ export class boardInfo{
 
         if (possibleCells.length == 0){
 
-            this.history.add(-1,-1,true);
+            this.state.counterIncrement
+            this.history.add(-1,-1,true, this);
 
             this.state.togglePlayer();
             this.state.displayTurn();
@@ -119,6 +118,8 @@ export class boardInfo{
             // two passses -> end the game
             possibleCells = this.getPossibleCells()
             if (possibleCells.length == 0) this.state.displayEnd();
+
+            this.highlightPossibleCells();
 
             return true;
         }
@@ -168,7 +169,7 @@ export class boardInfo{
     
         if (possibleCells.length == 0){
     
-            this.history.add(-1,-1,true);
+            this.history.add(-1,-1,true, this);
     
             this.state.togglePlayer();
             this.state.displayTurn();
@@ -176,9 +177,11 @@ export class boardInfo{
         }
     
         if (this.isValidMove(row, col)) {
-            this.placePiece(row, col);
+            this.placePiece(row, col, this.state.currentPlayer);
             this.flipPieces(row, col);
             this.removeHighlight();
+
+            this.history.add(row, col, false, this);
     
             // update the number of stones
             this.state.updateScores();
@@ -221,8 +224,10 @@ export class boardInfo{
 
         const aiMove = this.agent.move(this);
 
-        this.placePiece(...aiMove);
+        this.placePiece(...aiMove, this.state.currentPlayer);
         this.flipPieces(...aiMove);
+
+        this.history.add(...aiMove, false, this);
 
         // update the number of stones
         this.state.updateScores();
