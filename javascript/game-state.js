@@ -37,6 +37,10 @@ export class gameState{
     }
 
     getTurnCount(){
+        return this.turnCounter["black"] + this.turnCounter["white"];
+    }
+
+    getTurnCountForEach(){
         return this.turnCounter[this.currentPlayer];
     }
 

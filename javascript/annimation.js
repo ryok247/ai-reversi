@@ -1,10 +1,7 @@
 "use strict";
 
-// const animatedShape = document.getElementById('animatedShape');
 const progressElement = document.getElementById('progress');
 const animatedBoardElement = document.querySelector(".board.animated");
-// const shapes = ['square', 'circle', 'triangle'];
-// let currentShapeIndex = 0;
 let currentTurnIndex = 0;
 let animationInterval;
 let isPlaying = false;
@@ -62,12 +59,6 @@ function constructBoard(eachBoardHistory){
 
 function displayTurn(currentTurnIndex){
     if (currentTurnIndex >= window.gamehistory.history.length) return;
-    //const [row, col, isPass] = window.gamehistory.history[currentTurnIndex];
-    //console.log(window.gamehistory.boardHistory[currentTurnIndex]);
-    //if (isPass) return;
-    //const newPiece = document.createElement("div");
-    //newPiece.classList.add("piece", (currentTurnIndex % 2 == 0 ? "black": "white"));
-    //cells[row * 8 + col].appendChild(newPiece);
     constructBoard(window.gamehistory.boardHistory[currentTurnIndex]);
 }
 
@@ -79,18 +70,6 @@ function startAnimation(){
         updateProgressBar();
     }, 2000);
 }
-
-/*
-function startAnimation() {
-    isPlaying = true;
-    animationInterval = setInterval(() => {
-        currentShapeIndex = (currentShapeIndex + 1) % shapes.length;
-        const nextShape = shapes[currentShapeIndex];
-        animatedShape.className = `shape ${nextShape}`;
-        updateProgressBar();
-    }, 2000); // Change shape every 2 seconds
-}
-*/
 
 function pauseAnimation() {
     isPlaying = false;
@@ -104,40 +83,29 @@ function restartAnimation() {
     updateProgressBar();
 }
 
-/*
-function restartAnimation() {
-    currentShapeIndex = 0;
-    const nextShape = shapes[currentShapeIndex];
-    animatedShape.className = `shape ${nextShape}`;
-    updateProgressBar();
-}
-*/
-
 function skipToEnd() {
     currentTurnIndex = window.gamehistory.history.length - 1;
     updateProgressBar();
 }
 
-/*
-function skipToEnd() {
-    currentShapeIndex = shapes.length - 1;
-    const nextShape = shapes[currentShapeIndex];
-    animatedShape.className = `shape ${nextShape}`;
+function forwardStep(){
+    if (currentTurnIndex >= window.gamehistory.history.length) return;
+    displayTurn(currentTurnIndex);
+    currentTurnIndex++;
     updateProgressBar();
 }
-*/
+
+function backwardStep(){
+    if (currentTurnIndex <= 0) return;
+    currentTurnIndex--;
+    displayTurn(currentTurnIndex);
+    updateProgressBar();
+}
 
 function updateProgressBar() {
     const progress = (currentTurnIndex + 1) / window.gamehistory.history.length * 100;
     progressElement.style.width = `${progress}%`;
 }
-
-/*
-function updateProgressBar() {
-    const progress = (currentShapeIndex + 1) / shapes.length * 100;
-    progressElement.style.width = `${progress}%`;
-}
-*/
 
 function seek(event) {
     if (isPlaying) {
@@ -156,19 +124,3 @@ function seek(event) {
 
     updateProgressBar();
 }
-
-/*
-function seek(event) {
-    if (isPlaying) {
-        pauseAnimation();
-    }
-
-    const progressBar = event.currentTarget;
-    const clickX = event.clientX - progressBar.getBoundingClientRect().left;
-    const progress = (clickX / progressBar.clientWidth) * shapes.length;
-    currentShapeIndex = Math.floor(progress);
-    const nextShape = shapes[currentShapeIndex];
-    animatedShape.className = `shape ${nextShape}`;
-    updateProgressBar();
-}
-*/

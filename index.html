@@ -74,7 +74,7 @@
                             </form>
                         </div>
                 
-                        <button id="confirmed-btn">Confirm and Start!</button>
+                        <button type="button" class="btn btn-primary" id="confirmed-btn">Confirm and Start!</button>
                     </div>
                 </div>
     
@@ -86,18 +86,31 @@
     
                 <div class="col-3">
                     <div class="container">
-                        <div class="turn">
+                        <div class="turn subsection">
                             <div class="info">Turn:</div>
                             <div id="turn">Black</div>
                         </div>
-                        <div class="score">
+                        <div class="score subsection">
                             <div class="info">Score</div>
                             <div>Black: <span id="black-score">2</span></div>
                             <div>White: <span id="white-score">2</span></div>
                         </div>
-                        <div class="history">
+                        <div class="history subsection">
                             <div class="info">History</div>
-                            <ul id="history"></ul>
+                            <!-- <ul id="history"></ul> -->
+                            <div class="overflow-auto" style="max-height: 400px;">
+                                <table class="table table-striped table-bordered border-primary table-sm">
+                                    <thead>
+                                    <tr>   
+                                        <th scope="col">#</th>
+                                        <th scope="col">Player</th>
+                                        <th scope="col">Position</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                              </div>
                         </div>
                     </div>
                 </div>
@@ -110,17 +123,22 @@
         <div class="board animated"></div>
 
         <div class="controls">
-            <button onclick="reloadPage()">Reload</button>
-            <button onclick="startAnimation()">Play</button>
-            <button onclick="pauseAnimation()">Pause</button>
-            <button onclick="restartAnimation()">Restart</button>
-            <button onclick="skipToEnd()">Skip to End</button>
+            <!-- <button onclick="reloadPage()">Reload</button> -->
+            
+            <button type="button" class="btn btn-primary" onclick="restartAnimation()"><i class="fa-solid fa-backward-fast"></i></button>
+            <button type="button" class="btn btn-primary" onclick="backwordStep()"><i class="fa-solid fa-backward-step"></i></button>
+            <button type="button" class="btn btn-primary" onclick="startAnimation()"><i class="fa-solid fa-play"></i></button>
+            <button type="button" class="btn btn-primary" onclick="pauseAnimation()"><i class="fa-solid fa-pause"></i></button>
+            <button type="button" class="btn btn-primary" onclick="forwardStep()"><i class="fa-solid fa-forward-step"></i></button>
+            <button type="button" class="btn btn-primary" onclick="skipToEnd()"><i class="fa-solid fa-forward-fast"></i></button>
+            
         </div>
     
         <div class="progress-bar" onclick="seek(event)">
             <div class="progress" id="progress"></div>
         </div>
         <script src="javascript/annimation.js"></script>
+        <script src="https://kit.fontawesome.com/e95821f2a6.js" crossorigin="anonymous"></script>
     </div>
 
     <script>

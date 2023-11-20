@@ -5,7 +5,6 @@ export class gameHistory{
         this.history = [];
         this.boardHistory = [];
         this.historyElement = historyElement;
-        this.historyElement.innerHTML = "";
         this.state = state;
     }
 
@@ -25,14 +24,12 @@ export class gameHistory{
             6: "G",
             7: "H"
         }
-    
-        item.textContent = "";
-        item.textContent += this.state.currentPlayer === "black" ? "Black" : "White";
-        item.textContent += ` turn#${this.state.getTurnCount()} `
-        item.textContent += isPass ? " Pass" : ` ${toReversiCol[col]}${row + 1} `;
-    
-        if (this.historyElement.firstChild) this.historyElement.insertBefore(item, this.historyElement.firstChild);
-        else this.historyElement.appendChild(item);
+
+        this.addRowToHistory(
+            this.state.currentPlayer === "black" ? "Black" : "White", 
+            this.state.getTurnCount(), 
+            isPass ? " Pass" : ` ${toReversiCol[col]}${row + 1} `
+            );
 
         let boardColor = [];
         board.cells.forEach((cell) => {
@@ -42,5 +39,23 @@ export class gameHistory{
             else console.assert(false);
         })
         this.boardHistory.push(boardColor);
+    }
+
+    addRowToHistory(color, turnNumber, position) {
+        // Get the table body
+        let tableBody = document.querySelector('.table tbody');
+
+        // Create a new row
+        let newRow = tableBody.insertRow(0);
+
+        // Create cells for the new row
+        let cell1 = newRow.insertCell(0);
+        let cell2 = newRow.insertCell(1);
+        let cell3 = newRow.insertCell(2);
+
+        // Set content for each cell (you can modify this as needed)
+        cell1.textContent = turnNumber;
+        cell2.textContent = color;
+        cell3.textContent = position;
     }
 }
