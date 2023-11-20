@@ -203,6 +203,8 @@ export class boardInfo{
                 //　check if terminated
                 if (this.state.blackScore + this.state.whiteScore == 64) this.state.displayEnd();
 
+                this.checkPass();
+
                 this.highlightPossibleCells();
     
             }

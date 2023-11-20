@@ -97,9 +97,8 @@
                         </div>
                         <div class="history subsection">
                             <div class="info">History</div>
-                            <!-- <ul id="history"></ul> -->
                             <div class="overflow-auto" style="max-height: 400px;">
-                                <table class="table table-striped table-bordered border-primary table-sm">
+                                <table class="history-table table table-striped table-bordered border-primary table-sm">
                                     <thead>
                                     <tr>   
                                         <th scope="col">#</th>
@@ -120,22 +119,45 @@
 
     <div id="Analysis" class="tab-content">
 
-        <div class="board animated"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-8">
+                    <div class="board animated"></div>
 
-        <div class="controls">
-            <!-- <button onclick="reloadPage()">Reload</button> -->
-            
-            <button type="button" class="btn btn-primary" onclick="restartAnimation()"><i class="fa-solid fa-backward-fast"></i></button>
-            <button type="button" class="btn btn-primary" onclick="backwordStep()"><i class="fa-solid fa-backward-step"></i></button>
-            <button type="button" class="btn btn-primary" onclick="startAnimation()"><i class="fa-solid fa-play"></i></button>
-            <button type="button" class="btn btn-primary" onclick="pauseAnimation()"><i class="fa-solid fa-pause"></i></button>
-            <button type="button" class="btn btn-primary" onclick="forwardStep()"><i class="fa-solid fa-forward-step"></i></button>
-            <button type="button" class="btn btn-primary" onclick="skipToEnd()"><i class="fa-solid fa-forward-fast"></i></button>
-            
-        </div>
-    
-        <div class="progress-bar" onclick="seek(event)">
-            <div class="progress" id="progress"></div>
+                    <div class="controls">
+                        
+                        <button type="button" class="btn btn-primary" onclick="restartAnimation()"><i class="fa-solid fa-backward-fast"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="backwardStep()"><i class="fa-solid fa-backward-step"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="startAnimation()"><i class="fa-solid fa-play"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="pauseAnimation()"><i class="fa-solid fa-pause"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="forwardStep()"><i class="fa-solid fa-forward-step"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="skipToEnd()"><i class="fa-solid fa-forward-fast"></i></button>
+                        
+                    </div>
+                
+                    <div class="progress-bar" onclick="seek(event)">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="history-replay">
+                        <div class="info">History</div>
+                        <div class="overflow-auto" style="max-height: 400px;">
+                            <table class="history-table table table-striped table-bordered border-primary table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Player</th>
+                                    <th scope="col">Position</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                          </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <script src="javascript/annimation.js"></script>
         <script src="https://kit.fontawesome.com/e95821f2a6.js" crossorigin="anonymous"></script>
