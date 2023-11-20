@@ -109,7 +109,7 @@ export class boardInfo{
 
         if (possibleCells.length == 0){
 
-            this.state.counterIncrement
+            this.state.counterIncrement();
             this.history.add(-1,-1,true, this);
 
             this.state.togglePlayer();

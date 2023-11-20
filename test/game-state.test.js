@@ -66,10 +66,10 @@ test("gameState: increment counter and toggle players", () => {
 
     expect(state.turnElement.innerHTML).toBe("white");
 
-    expect(state.getTurnCount()).toBe(2);
+    expect(state.getTurnCountForEach()).toBe(2);
 
     state.togglePlayer();
 
-    expect(state.getTurnCount()).toBe(3);
+    expect(state.getTurnCountForEach()).toBe(3);
 
 })
