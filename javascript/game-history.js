@@ -1,5 +1,7 @@
 "use strict";
 
+import { fromHistoryRowDisplayBoard } from "./annimation.js";
+
 export class gameHistory{
     constructor(historyElement, state){
         this.history = [];
@@ -63,6 +65,10 @@ export class gameHistory{
             cell1.textContent = turnNumber;
             cell2.textContent = color;
             cell3.textContent = position;
+
+            if (tableBody.id == "replay-table-body") {
+                newRow.addEventListener("click", fromHistoryRowDisplayBoard);
+            }
         });
     }
 }

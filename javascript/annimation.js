@@ -139,3 +139,9 @@ function hightlightCurrentTurn(currentTurnIndex) {
     const scrollTo = currentTurnElement.offsetTop - overflowContainer.offsetTop;
     overflowContainer.scrollTop = scrollTo;
 }
+
+export function fromHistoryRowDisplayBoard(event){
+    const currentTurnElement = event.currentTarget;
+    const currentTurnIndex = parseInt(currentTurnElement.childNodes[0].textContent)-1;
+    displayTurn(currentTurnIndex);
+}
