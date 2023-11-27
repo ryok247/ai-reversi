@@ -1,6 +1,6 @@
 "use strict";
 
-import { gameState } from '../javascript/game-state.js';
+import { gameState } from '../loginApp/static/js/game-state.js';
 
 document.body.innerHTML = '<div id="turn"></div>';
 document.body.innerHTML += '<div id="black-score"></div>';

@@ -1,6 +1,6 @@
 "use strict";
 
-import { getRandomInt } from '../javascript/utilities';
+import { getRandomInt } from '../loginApp/static/js/utilities';
 
 const testData = [
   { testCase: "0 <= getRandomInt(5) <= 5", value: 5, expected: [0, 5] },
