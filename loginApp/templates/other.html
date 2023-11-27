@@ -1,0 +1,13 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block title %}Other{% endblock %}
+
+{% block content %}
+<h1>Other users' info</h1>
+{% for user in users %}
+<h2>{{user.username}}</h2>
+<p>Contact: {{user.email}}</p>
+{% endfor %}
+{% endblock %}
