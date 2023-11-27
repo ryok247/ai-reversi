@@ -1,46 +1,49 @@
-# loginApp/views.py
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-
-def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, 'Invalid login credentials.')
-    return render(request, 'login.html')
-
-def user_logout(request):
-    logout(request)
-    return redirect('login')
-
-# loginApp/views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib import messages
-from .forms import RegistrationForm
+from .forms import SignupForm
+from .forms import SignupForm, LoginForm
+from django.contrib.auth import login
+from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic import TemplateView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 def index(request):
     return render(request, 'index.html')
 
 home = index
 
-def user_registration(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            # フォームが妥当な場合はユーザーを作成
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, 'Invalid registration data.')
-    else:
-        form = RegistrationForm()
+class MySignupView(CreateView):
+    template_name = 'signup.html'
+    form_class = SignupForm
+    success_url = '/user/'
+    
+    def form_valid(self, form):
+        result = super().form_valid(form)
+        user = self.object
+        login(self.request, user)
+        return result
 
-    return render(request, 'registration.html', {'form': form})
+class MyLoginView(LoginView):
+    template_name = 'login.html'
+    form_class = LoginForm
+
+class MyLogoutView(LogoutView):
+    template_name = 'logout.html'
+
+class MyUserView(LoginRequiredMixin, TemplateView):
+    template_name = 'user.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+
+class MyOtherView(LoginRequiredMixin, TemplateView):
+    template_name = 'other.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['users'] = User.objects.exclude(username=self.request.user.username)
+        return context

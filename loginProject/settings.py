@@ -32,13 +32,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'loginApp',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'loginApp',
 ]
 
 MIDDLEWARE = [
@@ -124,5 +124,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# loginProject/settings.py
-AUTH_USER_MODEL = 'loginApp.CustomUser'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/user/'
