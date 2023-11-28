@@ -26,10 +26,15 @@ SECRET_KEY = config('SECRET_KEY', default='your_default_secret_key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False)
 
+LOCAL = config('LOCAL', default=False, cast=bool)
+
 ALLOWED_HOSTS = [
-    config('ALLOWED_HOST1', default='00.000.000.000'),
+    config('ALLOWED_HOST1', default='127.0.0.1'),
+    config('ALLOWED_HOST2', default='127.0.0.1'),
 ]
 
+if LOCAL:
+    ALLOWED_HOSTS += ['localhost', '127.0.0.1', '[::1]']
 
 # Application definition
 
@@ -128,3 +133,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/user/'
+
+AUTH_USER_MODEL = 'loginApp.CustomUser'
