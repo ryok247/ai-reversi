@@ -1,8 +1,6 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib import messages
 from .forms import SignupForm
 from .forms import SignupForm, LoginForm
+from django.shortcuts import render
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView

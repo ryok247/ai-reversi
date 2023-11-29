@@ -1,0 +1,23 @@
+server {
+
+    listen 80;
+
+    server_name 52.68.59.20;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    location /static/ {
+
+        alias /home/ubuntu/ai-reversi/loginApp/static/;
+
+    }
+
+    location / {
+
+        include proxy_params;
+
+        proxy_pass http://unix:/home/ubuntu/ai-reversi/loginProject.sock;
+
+    }
+
+}
