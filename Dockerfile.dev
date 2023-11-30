@@ -1,0 +1,18 @@
+# Base image
+FROM python:3
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+COPY requirements-dev.txt /app/
+RUN pip install -r requirements-dev.txt
+
+# Copy the application
+COPY . /app
+
+# Expose port
+EXPOSE 8000
+
+# Start the Django server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

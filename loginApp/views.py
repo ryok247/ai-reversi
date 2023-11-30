@@ -1,10 +1,8 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib import messages
 from .forms import SignupForm
 from .forms import SignupForm, LoginForm
+from .models import CustomUser
+from django.shortcuts import render
 from django.contrib.auth import login
-from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -45,5 +43,5 @@ class MyOtherView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = User.objects.exclude(username=self.request.user.username)
+        context['users'] = CustomUser.objects.exclude(username=self.request.user.username)
         return context

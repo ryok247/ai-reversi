@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000:8000"
+  nginx:
+    image: nginx:1.18.0
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/proxy_params:/etc/nginx/proxy_params
+      - static_volume:/app/staticfiles
+    depends_on:
+      - web
+volumes:
+  static_volume:

@@ -1,5 +1,7 @@
 from . import views
 from django.urls import path
+from django.conf.urls.static import static
+from loginProject import settings
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -9,4 +11,4 @@ urlpatterns = [
     path('logout/', views.MyLogoutView.as_view(), name='logout'),
     path('user/', views.MyUserView.as_view(), name='user'),
     path('other/', views.MyOtherView.as_view(), name='other'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
