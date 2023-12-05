@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template for EC2 and RDS instances with associated security groups and Elastic IP.
+
+Resources:
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-09a81b370b76de6a2 # Ubuntu Server 22.04 LTS AMI
+      KeyName: ai-reversi
+      SubnetId: subnet-00f244f854eae69f4
+      SecurityGroupIds:
+        - sg-02de48bd82e689962 # Security group for EC2 instance
+      Tags:
+        - Key: Name
+          Value: ai-reversi
+
+  ElasticIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref EC2Instance
+
+  RDSInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: 20 # Adjust the storage size as needed
+      Engine: postgres
+      EngineVersion: '15.4' # Specify the version you are using
+      DBInstanceIdentifier: ai-reversi-postgre
+      MasterUsername: db_rds_admin # Change to your master username
+      MasterUserPassword: 'your_master_password' # Set your master password
+      DBSubnetGroupName: rds-ec2-db-subnet-group-1
+      VPCSecurityGroups:
+        - sg-0c3b0ebbe15063d05 # Security group for RDS
+      Tags:
+        - Key: Name
+          Value: ai-reversi-postgre
+
+Outputs:
+  EC2InstancePublicIP:
+    Description: Public IP of the EC2 instance
+    Value: !GetAtt ElasticIP.PublicIp
+
+  RDSInstanceEndpoint:
+    Description: Connection endpoint of the RDS instance
+    Value: !GetAtt RDSInstance.Endpoint.Address
+

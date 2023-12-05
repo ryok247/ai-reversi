@@ -89,10 +89,12 @@ DATABASES = {
         'USER': config('DB_USER', default='ryok'),
         'PASSWORD': config('DB_PASSWORD', default='your_db_password'),
         'HOST': 'postgres',
-        'PORT': '5432',
+        'PORT': config('DB_PORT', default=5432),
     }
 }
 
+if (not LOCAL):
+    DATABASES['default']['HOST'] = config('RDS_HOSTNAME', default='your_db_host')
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -141,3 +143,4 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/user/'
 
 AUTH_USER_MODEL = 'loginApp.CustomUser'
+
