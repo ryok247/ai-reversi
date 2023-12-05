@@ -1,6 +1,7 @@
 "use strict";
 
 import { randomAgent, simpleGreedyAgent} from './agents.js'
+import { getCookie } from './utilities.js'
 
 export class boardInfo{
     constructor(state, settings, history, boardElement){
@@ -9,6 +10,8 @@ export class boardInfo{
         this.settings = settings;
         this.history = history;
         this.boardElement = boardElement;
+
+        this.isGameEnd = false;
 
         if (this.settings.level == 1) this.agent = new randomAgent();
         else if (this.settings.level == 2) this.agent = new simpleGreedyAgent();
@@ -117,7 +120,7 @@ export class boardInfo{
 
             // two passses -> end the game
             possibleCells = this.getPossibleCells()
-            if (possibleCells.length == 0) this.state.displayEnd();
+            if (possibleCells.length == 0) this.endGame();
 
             this.highlightPossibleCells();
 
@@ -187,7 +190,7 @@ export class boardInfo{
             this.state.updateScores();
     
             //　check if all stones are placed
-            if (this.state.blackScore + this.state.whiteScore == 64) this.state.displayEnd();
+            if (this.state.blackScore + this.state.whiteScore == 64) this.endGame();
     
             // update turn messages
             this.state.togglePlayer();
@@ -201,7 +204,7 @@ export class boardInfo{
                 this.makeComputerMove();
     
                 //　check if terminated
-                if (this.state.blackScore + this.state.whiteScore == 64) this.state.displayEnd();
+                if (this.state.blackScore + this.state.whiteScore == 64) this.endGame();
 
                 this.checkPass();
 
@@ -257,4 +260,65 @@ export class boardInfo{
         });
     }
 
+    endGame(){
+        if (this.isGameEnd) return;
+
+        this.state.displayEnd();
+        this.saveGameToDatabase();
+
+        this.isGameEnd = true;
+    }
+
+    createGameData() {
+
+        let name = "";
+        let description = "";
+        let player_color = this.settings.color;
+        let ai_level = this.settings.level;
+        let game_datetime = new Date().toISOString();
+        let is_favorite = false;
+        let moves = [];
+
+        for (let i=0; i<this.history.history.length; i++){
+            let row = this.history.history[i][0];
+            if (row == -1) row = 9;
+            let col = this.history.history[i][1]
+            if (col == -1) col = 9;
+            let is_pass = this.history.history[i][2];
+            let comment = "";
+            moves.push({
+                move_number: i+1,
+                row: row,
+                col: col,
+                is_pass: is_pass,
+                comment: comment
+            });
+        }
+
+        return JSON.stringify({
+            name: name,
+            description: description,
+            player_color: player_color,
+            ai_level: ai_level,
+            game_datetime: game_datetime,
+            is_favorite: is_favorite,
+            moves: moves
+        });
+    }
+
+    saveGameToDatabase() {
+        const gameJsonData = this.createGameData();
+        
+        fetch('/save_game/', {
+            method: 'POST',
+            body: gameJsonData,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+    }
 }

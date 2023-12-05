@@ -12,3 +12,6 @@ db.sqlite3
 **/migrations/
 
 staticfiles/
+
+# temporary scripts for development
+comprun.sh
