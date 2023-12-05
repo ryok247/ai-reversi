@@ -1,7 +1,7 @@
 "use strict";
 
 import { randomAgent, simpleGreedyAgent} from './agents.js'
-import { getCookie } from './utilities.js'
+import { getCookie, setCookie, getCsrfToken } from './utilities.js'
 
 export class boardInfo{
     constructor(state, settings, history, boardElement){
@@ -276,6 +276,8 @@ export class boardInfo{
         let player_color = this.settings.color;
         let ai_level = this.settings.level;
         let game_datetime = new Date().toISOString();
+        let black_score = this.state.blackScore;
+        let white_score = this.state.whiteScore;
         let is_favorite = false;
         let moves = [];
 
@@ -301,6 +303,8 @@ export class boardInfo{
             player_color: player_color,
             ai_level: ai_level,
             game_datetime: game_datetime,
+            black_score: black_score,
+            white_score: white_score,
             is_favorite: is_favorite,
             moves: moves
         });
@@ -308,17 +312,43 @@ export class boardInfo{
 
     saveGameToDatabase() {
         const gameJsonData = this.createGameData();
-        
+
         fetch('/save_game/', {
             method: 'POST',
             body: gameJsonData,
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCsrfToken()
             }
         })
         .then(response => response.json())
-        .then(data => console.log(data))
+        .then(data => {
+            if (data.status === 'success') {
+                this.updateGameHistoryCookie(data.game_id);
+            }
+            console.log(data);
+        })
         .catch(error => console.error('Error:', error));
     }
+
+    updateGameHistoryCookie(gameId) {
+        const history = getCookie('game_history');
+        let gameHistory = history ? JSON.parse(history) : [];
+
+        gameHistory.push(gameId);
+        if (gameHistory.length > 10) {
+            gameHistory = gameHistory.slice(-10);
+        }
+
+        setCookie('game_history', JSON.stringify(gameHistory), 365);
+    }
 }
+
+// ページロード時にCookieからゲームIDを読み込む
+document.addEventListener('DOMContentLoaded', function() {
+    const gameHistory = getCookie('game_history');
+    if (gameHistory) {
+        // ゲーム履歴を使って何かする
+        console.log('Game History:', JSON.parse(gameHistory));
+    }
+});

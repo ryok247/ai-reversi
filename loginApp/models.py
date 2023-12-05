@@ -13,6 +13,8 @@ class Game(models.Model):
     player_color = models.CharField(max_length=5, choices=[('black', 'Black'), ('white', 'White')])
     ai_level = models.IntegerField()
     game_datetime = models.DateTimeField(default=timezone.now)
+    black_score = models.PositiveIntegerField(default=0)
+    white_score = models.PositiveIntegerField(default=0)
     is_favorite = models.BooleanField(default=False)
 
     def __str__(self):

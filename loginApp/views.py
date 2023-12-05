@@ -64,6 +64,8 @@ class SaveGameView(CreateView):
             player_color=data['player_color'],
             ai_level=data['ai_level'],
             game_datetime=data['game_datetime'],
+            black_score=data['black_score'],
+            white_score=data['white_score'],
             is_favorite=data['is_favorite']
         )
 
@@ -78,7 +80,7 @@ class SaveGameView(CreateView):
                 comment=move['comment']
             )
 
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'success', 'game_id': game.id})
 
     def get(self, request, *args, **kwargs):
         return JsonResponse({'status': 'error'}, status=400)

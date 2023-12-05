@@ -16,7 +16,7 @@ class LoginForm(AuthenticationForm):
 class GameForm(forms.ModelForm):
     class Meta:
         model = Game
-        fields = ['user', 'name', 'description', 'player_color', 'ai_level', 'is_favorite']
+        fields = ['user', 'name', 'description', 'player_color', 'ai_level', 'black_score', 'white_score', 'is_favorite']
 
 class MoveForm(forms.ModelForm):
     class Meta:
