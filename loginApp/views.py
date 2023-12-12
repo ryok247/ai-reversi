@@ -85,3 +85,16 @@ class SaveGameView(CreateView):
     def get(self, request, *args, **kwargs):
         return JsonResponse({'status': 'error'}, status=400)
 
+class GameDetailsView(CreateView):
+    def get(self, request, game_id):
+        try:
+            game = Game.objects.get(id=game_id)
+            return JsonResponse({
+                'player_color': game.player_color,
+                'game_datetime': game.game_datetime.isoformat(),
+                'ai_level': game.ai_level,
+                'black_score': game.black_score,
+                'white_score': game.white_score
+            })
+        except Game.DoesNotExist:
+            return JsonResponse({'error': 'Game not found'}, status=404)
