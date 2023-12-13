@@ -136,7 +136,7 @@ class UserGamesView(TemplateView):
                     'ai_level': game.ai_level,
                     'black_score': game.black_score,
                     'white_score': game.white_score,
-                    # その他必要なデータ
+                    'is_favorite': game.is_favorite,
                 })
 
             return JsonResponse({
