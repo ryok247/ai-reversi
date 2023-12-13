@@ -5,6 +5,30 @@
 {% block title %}AI Reversi{% endblock %}
 
 {% block content %}
+    <div>
+        {% if request.user.is_authenticated %}
+        <p id="user-status" style="display: none;">Logged In</p>
+        <p>Welcome, {{ request.user.username }}!</p>
+        <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+        <p id="user-status" style="display: none;">Not Logged In</p>
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'signup' %}">Signup</a>
+        {% endif %}
+    </div>
+
+
+    <script type="module">
+        import { updateGameRecordsWithUser } from '{% static "js/main.js" %}';
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            const userIsLoggedIn = {{ request.user.is_authenticated|yesno:"true,false" }};
+            if (userIsLoggedIn) {
+                updateGameRecordsWithUser();
+            }
+        });
+    </script>
+
     <div class="tabs">
         <div class="tab-button" data-tab="Game" onclick="openTab('Game')">Game</div>
         <div class="tab-button active" data-tab="Analysis" onclick="openTab('Analysis')">Analysis</div>
@@ -129,9 +153,9 @@
         <script src="https://kit.fontawesome.com/e95821f2a6.js" crossorigin="anonymous"></script>
     </div>
 
-    <div>
+    <div id="recent-games">
         <h2>Recent Games:</h2>
-        <div class="recent-game">
+        <div class="recent-game" id="recent-games-list">
             <table class="table table-striped table-bordered border-primary table-sm">
                 <thead>
                 <tr>
@@ -147,6 +171,8 @@
                 <tbody id="recent-game-table-body">
                 </tbody>
             </table>
+            <button id="load-prev-games" style="display: none;">See Prev</button>
+            <button id="load-more-games" style="display: none;">See More</button>
         </div>
     </div>
 

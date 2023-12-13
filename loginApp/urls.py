@@ -13,4 +13,6 @@ urlpatterns = [
     path('other/', views.MyOtherView.as_view(), name='other'),
     path('save_game/', views.SaveGameView.as_view(), name='save_game'),
     path('get_game_details/<int:game_id>/', views.GameDetailsView.as_view(), name='game_details'),
+    path('update_game_records/', views.UpdateGameRecordsView.as_view(), name='update_game_records'),
+    path('user_games/', views.UserGamesView.as_view(), name='user_games'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
