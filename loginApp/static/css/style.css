@@ -211,3 +211,16 @@ body {
         flex-direction: column;
     }
 }
+
+.arrow-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.arrow-button i {
+    font-size: 1.2rem;
+}
