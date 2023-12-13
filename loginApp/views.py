@@ -147,3 +147,48 @@ class UserGamesView(TemplateView):
 
         else:
             return JsonResponse({'error': 'Not authenticated'}, status=403)
+        
+class FavoriteGamesView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            games = Game.objects.filter(user=request.user, is_favorite=True).order_by('-game_datetime')
+            paginator = Paginator(games, 10)  # 1ページあたりのアイテム数
+
+            page_number = request.GET.get('page', 1)
+            page_obj = paginator.get_page(page_number)
+
+            games_data = []
+            for game in page_obj:
+                # 必要なゲームデータを整形してgames_dataに追加
+                games_data.append({
+                    'id': game.id,
+                    'player_color': game.player_color,
+                    'game_datetime': game.game_datetime.isoformat(),
+                    'ai_level': game.ai_level,
+                    'black_score': game.black_score,
+                    'white_score': game.white_score,
+                    'is_favorite': game.is_favorite,
+                })
+
+            return JsonResponse({
+                'games': games_data,
+                'has_next': page_obj.has_next(),
+                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None
+            })
+
+        else:
+            return JsonResponse({'error': 'Not authenticated'}, status=403)
+        
+class ToggleFavoriteView(CreateView):
+    def post(self, request, game_id):
+        data = json.loads(request.body)
+        if request.user.is_authenticated:
+            try:
+                game = Game.objects.get(id=game_id, user=request.user)
+                game.is_favorite = not game.is_favorite
+                game.save()
+                return JsonResponse({'status': 'success', 'is_favorite': game.is_favorite})
+            except Game.DoesNotExist:
+                return JsonResponse({'error': 'Game not found'}, status=404)
+        else:
+            return JsonResponse({'error': 'Not authenticated'}, status=403)

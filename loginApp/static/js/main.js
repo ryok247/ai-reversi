@@ -79,7 +79,7 @@ export function loadRecentGames(page = 1) {
                 // ログイン状態に応じてFavoriteカラムを追加
                 let favoriteColumn = '';
                 if (isUserLoggedIn()) {
-                    favoriteColumn = `<td>${game.is_favorite ? 'Yes' : 'No'}</td>`;
+                    favoriteColumn = `<td class="favorite-column" data-game-id="${game.id}">${game.is_favorite ? 'Yes' : 'No'}</td>`;
                 }
 
                 row.innerHTML = `
@@ -92,6 +92,13 @@ export function loadRecentGames(page = 1) {
                     <td>${game.white_score}</td>
                     <td>Level ${game.ai_level}</td>
                 `;
+
+                if (isUserLoggedIn()) {
+                    const favoriteCell = row.querySelector('.favorite-column');
+                    favoriteCell.addEventListener('click', function() {
+                        toggleFavorite(game.id);
+                    });
+                }
 
                 recentGamesList.appendChild(row);
             });
@@ -188,16 +195,60 @@ export function loadFavoriteGames() {
         .then(response => response.json())
         .then(data => {
             const favoriteGamesList = document.getElementById('favorite-game-table-body');
+
             favoriteGamesList.innerHTML = '';
 
             data.games.forEach(game => {
                 const row = document.createElement('tr');
+
+                let favoriteColumn = '';
+                if (isUserLoggedIn()) {
+                    favoriteColumn = `<td class="favorite-column" data-game-id="${game.id}">${game.is_favorite ? 'Yes' : 'No'}</td>`;
+                }
+
                 row.innerHTML = `
-                    <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
-                    <!-- 他のカラム -->
+                ${favoriteColumn}
+                <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
+                <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
+                <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
+                <td>${game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw'}</td>
+                <td>${game.black_score}</td>
+                <td>${game.white_score}</td>
+                <td>Level ${game.ai_level}</td>
                 `;
+
+                if (isUserLoggedIn()) {
+                    const favoriteCell = row.querySelector('.favorite-column');
+                    favoriteCell.addEventListener('click', function() {
+                        toggleFavorite(game.id);
+                    });
+                }
+
                 favoriteGamesList.appendChild(row);
             });
         })
         .catch(error => console.error('Error:', error));
+}
+
+// お気に入りの状態を切り替える関数
+function toggleFavorite(gameId) {
+    fetch(`/toggle_favorite/${gameId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({})
+    }) // サーバーサイドのエンドポイント
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // すべての該当するセルのDOMを更新
+            const favoriteCells = document.querySelectorAll(`.favorite-column[data-game-id="${gameId}"]`);
+            favoriteCells.forEach(cell => {
+                cell.textContent = data.is_favorite ? 'Yes' : 'No';
+            });
+        }
+    })
+    .catch(error => console.error('Error:', error));
 }
