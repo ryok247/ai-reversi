@@ -65,11 +65,25 @@ export function loadRecentGames(page = 1) {
         .then(data => {
             const recentGamesList = document.getElementById('recent-game-table-body');
 
+            // ログイン状態をチェック
+            if (isUserLoggedIn()) {
+                // ユーザーがログインしている場合、Favoriteヘッダーを表示
+                document.getElementById('favorite-header').style.display = 'table-cell';
+            }
+
             recentGamesList.innerHTML = '';
 
             data.games.forEach(game => {
                 const row = document.createElement('tr');
+
+                // ログイン状態に応じてFavoriteカラムを追加
+                let favoriteColumn = '';
+                if (isUserLoggedIn()) {
+                    favoriteColumn = `<td>${game.is_favorite ? 'Yes' : 'No'}</td>`;
+                }
+
                 row.innerHTML = `
+                    ${favoriteColumn}
                     <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
                     <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
                     <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
