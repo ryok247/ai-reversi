@@ -2,6 +2,7 @@
 
 import { randomAgent, simpleGreedyAgent} from './agents.js'
 import { getCookie, setCookie, getCsrfToken } from './utilities.js'
+import { loadRecentGames } from './main.js';
 
 export class boardInfo{
     constructor(state, settings, history, boardElement){
@@ -260,12 +261,15 @@ export class boardInfo{
         });
     }
 
-    endGame(){
+    endGame() {
         if (this.isGameEnd) return;
-
+    
         this.state.displayEnd();
-        this.saveGameToDatabase();
-
+        this.saveGameToDatabase().then(() => {
+            // ゲームの保存後、Recent Games の更新を行う
+            loadRecentGames(window.nextPage);
+        });
+    
         this.isGameEnd = true;
     }
 
@@ -312,8 +316,9 @@ export class boardInfo{
 
     saveGameToDatabase() {
         const gameJsonData = this.createGameData();
-
-        fetch('/save_game/', {
+    
+        // Promise を return する
+        return fetch('/save_game/', {
             method: 'POST',
             body: gameJsonData,
             headers: {
@@ -353,6 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+/*
 document.addEventListener('DOMContentLoaded', function() {
     const gameHistory = getCookie('game_history');
     if (gameHistory) {
@@ -399,3 +405,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(error => console.error('Global Error:', error));
     }
 });
+*/

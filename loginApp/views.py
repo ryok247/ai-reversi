@@ -20,7 +20,7 @@ home = index
 class MySignupView(CreateView):
     template_name = 'signup.html'
     form_class = SignupForm
-    success_url = '/user/'
+    success_url = '/'
     
     def form_valid(self, form):
         result = super().form_valid(form)
@@ -31,6 +31,7 @@ class MySignupView(CreateView):
 class MyLoginView(LoginView):
     template_name = 'login.html'
     form_class = LoginForm
+    success_url = '/'
 
 class MyLogoutView(LogoutView):
     template_name = 'logout.html'
@@ -98,3 +99,48 @@ class GameDetailsView(CreateView):
             })
         except Game.DoesNotExist:
             return JsonResponse({'error': 'Game not found'}, status=404)
+        
+class UpdateGameRecordsView(CreateView):
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        game_ids = data.get('game_ids', [])
+        if request.user.is_authenticated:
+            Game.objects.filter(id__in=game_ids).update(user=request.user)
+            return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=403)
+    
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.views.generic import TemplateView
+from .models import Game
+
+class UserGamesView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            games = Game.objects.filter(user=request.user).order_by('-game_datetime')
+            paginator = Paginator(games, 10)  # 1ページあたりのアイテム数
+
+            page_number = request.GET.get('page', 1)
+            page_obj = paginator.get_page(page_number)
+
+            games_data = []
+            for game in page_obj:
+                # 必要なゲームデータを整形してgames_dataに追加
+                games_data.append({
+                    'id': game.id,
+                    'player_color': game.player_color,
+                    'game_datetime': game.game_datetime.isoformat(),
+                    'ai_level': game.ai_level,
+                    'black_score': game.black_score,
+                    'white_score': game.white_score,
+                    # その他必要なデータ
+                })
+
+            return JsonResponse({
+                'games': games_data,
+                'has_next': page_obj.has_next(),
+                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None
+            })
+
+        else:
+            return JsonResponse({'error': 'Not authenticated'}, status=403)
