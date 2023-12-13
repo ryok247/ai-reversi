@@ -191,12 +191,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-export function loadFavoriteGames() {
-    fetch(`/favorite_games/`)  // お気に入りゲームを取得するエンドポイント
+window.favoriteCurrentPage = 1;
+
+export function loadFavoriteGames(page = 1) {
+    fetch(`/favorite_games/?page=${page}`)
         .then(response => response.json())
         .then(data => {
             const favoriteGamesList = document.getElementById('favorite-game-table-body');
-
             favoriteGamesList.innerHTML = '';
 
             data.games.forEach(game => {
@@ -228,9 +229,24 @@ export function loadFavoriteGames() {
 
                 favoriteGamesList.appendChild(row);
             });
+
+            window.favoriteCurrentPage = page;
+
+            // ボタンの表示・非表示を管理
+            document.getElementById('load-prev-favorite-games').style.display = window.favoriteCurrentPage > 1 ? 'block' : 'none';
+            document.getElementById('load-more-favorite-games').style.display = data.has_next ? 'block' : 'none';
         })
         .catch(error => console.error('Error:', error));
-}
+    }
+
+// ボタンのイベントリスナーを設定
+document.getElementById('load-more-favorite-games').addEventListener('click', function() {
+    loadFavoriteGames(window.favoriteCurrentPage + 1);
+});
+
+document.getElementById('load-prev-favorite-games').addEventListener('click', function() {
+    loadFavoriteGames(window.favoriteCurrentPage - 1);
+});
 
 // お気に入りの状態を切り替える関数
 function toggleFavorite(gameId) {
