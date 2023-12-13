@@ -175,8 +175,29 @@ function isUserLoggedIn() {
 
 document.addEventListener('DOMContentLoaded', function() {
     if (isUserLoggedIn()) {
+        document.getElementById('favorite-games').style.display = 'block';
+        loadFavoriteGames();
         loadRecentGames(window.nextPage);
     } else {
         loadRecentGamesFromCookie();
     }
 });
+
+export function loadFavoriteGames() {
+    fetch(`/favorite_games/`)  // お気に入りゲームを取得するエンドポイント
+        .then(response => response.json())
+        .then(data => {
+            const favoriteGamesList = document.getElementById('favorite-game-table-body');
+            favoriteGamesList.innerHTML = '';
+
+            data.games.forEach(game => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
+                    <!-- 他のカラム -->
+                `;
+                favoriteGamesList.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
