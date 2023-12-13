@@ -224,3 +224,16 @@ body {
 .arrow-button i {
     font-size: 1.2rem;
 }
+
+.toggle-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.toggle-button i {
+    font-size: 1.2rem;
+}

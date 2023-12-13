@@ -194,6 +194,33 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         loadRecentGamesFromCookie();
     }
+
+    /*
+    document.querySelectorAll('.toggle-section').forEach(header => {
+        header.addEventListener('click', function() {
+            const contentId = this.getAttribute('data-target');
+            const content = document.getElementById(contentId);
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+    */
+
+    // セクションのトグル機能
+    document.querySelectorAll('.toggle-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const header = this.parentElement;
+            const contentId = header.getAttribute('data-target');
+            const content = document.getElementById(contentId);
+            const isExpanded = content.style.display === 'block';
+
+            // コンテンツの表示/非表示を切り替え
+            content.style.display = isExpanded ? 'none' : 'block';
+            
+            // ボタンのテキストを+/-に切り替え
+            this.textContent = isExpanded ? '+' : '-';
+        });
+    });
+    
 });
 
 window.favoriteCurrentPage = 1;
