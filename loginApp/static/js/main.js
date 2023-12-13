@@ -75,6 +75,7 @@ export function loadRecentGames(page = 1) {
 
             data.games.forEach(game => {
                 const row = document.createElement('tr');
+                row.setAttribute('data-game-id', game.id);
 
                 // ログイン状態に応じてFavoriteカラムを追加
                 let favoriteColumn = '';
@@ -200,6 +201,7 @@ export function loadFavoriteGames() {
 
             data.games.forEach(game => {
                 const row = document.createElement('tr');
+                row.setAttribute('data-game-id', game.id);
 
                 let favoriteColumn = '';
                 if (isUserLoggedIn()) {
@@ -239,16 +241,46 @@ function toggleFavorite(gameId) {
             'X-CSRFToken': getCsrfToken()
         },
         body: JSON.stringify({})
-    }) // サーバーサイドのエンドポイント
+    })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
             // すべての該当するセルのDOMを更新
             const favoriteCells = document.querySelectorAll(`.favorite-column[data-game-id="${gameId}"]`);
             favoriteCells.forEach(cell => {
-                cell.textContent = data.is_favorite ? 'Yes' : 'No';
+                const isFavorite = data.is_favorite ? 'Yes' : 'No';
+                cell.textContent = isFavorite;
+
+                // お気に入り状態に応じて表を更新
+                updateFavoriteGamesTable(gameId, isFavorite);
             });
         }
     })
     .catch(error => console.error('Error:', error));
+}
+
+// Favorite Gamesの表を更新する関数
+function updateFavoriteGamesTable(gameId, isFavorite) {
+    const favoriteGamesTableBody = document.getElementById('favorite-game-table-body');
+    const rowInFavoriteGames = favoriteGamesTableBody.querySelector(`tr[data-game-id="${gameId}"]`);
+    const rowInRecentGames = document.querySelector(`#recent-game-table-body tr[data-game-id="${gameId}"]`);
+
+    if (!rowInRecentGames) {
+        // Recent Gamesに該当する行がない場合、処理を中断
+        console.error('No corresponding row found in Recent Games');
+        return;
+    }
+
+    if (isFavorite === 'Yes') {
+        if (!rowInFavoriteGames) {
+            // Favorite Gamesに行を追加
+            const newRow = rowInRecentGames.cloneNode(true);
+            favoriteGamesTableBody.appendChild(newRow);
+        }
+    } else {
+        if (rowInFavoriteGames) {
+            // Favorite Gamesから行を削除
+            favoriteGamesTableBody.removeChild(rowInFavoriteGames);
+        }
+    }
 }
