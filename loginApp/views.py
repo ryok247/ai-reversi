@@ -1,15 +1,18 @@
 from .forms import SignupForm
 from .forms import SignupForm, LoginForm
 from .models import CustomUser, Game, Move
-from django.shortcuts import render
-from django.contrib.auth import login
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.core.paginator import Paginator
+
 import json
 
 def index(request):
@@ -31,10 +34,15 @@ class MySignupView(CreateView):
 class MyLoginView(LoginView):
     template_name = 'login.html'
     form_class = LoginForm
-    success_url = '/'
 
-class MyLogoutView(LogoutView):
-    template_name = 'logout.html'
+    def get_success_url(self):
+        """ ユーザーがログイン後にリダイレクトされるURLを指定 """
+        return self.request.GET.get('next', '/')
+
+class MyLogoutView(CreateView):
+    def get(self, request):
+        logout(request)
+        return redirect('/')
 
 class MyUserView(LoginRequiredMixin, TemplateView):
     template_name = 'user.html'
@@ -108,11 +116,6 @@ class UpdateGameRecordsView(CreateView):
             Game.objects.filter(id__in=game_ids).update(user=request.user)
             return JsonResponse({'status': 'success'})
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=403)
-    
-from django.core.paginator import Paginator
-from django.http import JsonResponse
-from django.views.generic import TemplateView
-from .models import Game
 
 class UserGamesView(TemplateView):
     def get(self, request, *args, **kwargs):
