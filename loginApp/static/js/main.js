@@ -4,8 +4,8 @@ import { gameState } from './game-state.js';
 import { gameSettings } from './game-settings.js';
 import { gameHistory } from './game-history.js';
 import { boardInfo } from './game-logic.js';
-import { getCookie, getCsrfToken } from './utilities.js'
-import { sharedState } from './game-shared.js'
+import { getCookie, getCsrfToken } from './utilities.js';
+import { sharedState } from './game-shared.js';
 
 const boardElement = document.querySelector(".board");
 const turnElement = document.getElementById("turn");
@@ -21,21 +21,9 @@ function initializeGame(historyElement){
 
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    confirmedBtnElement.addEventListener("click", () => {
-
-        initializeGame(historyElement);
-
-        if (settings.mode == "cp" && settings.color == "white") board.makeComputerMove();
-        
-        board.highlightPossibleCells();
-
-    });
-
-    initializeGame(historyElement);
-
-});
+function isUserLoggedIn() {
+    return document.getElementById('user-status').innerText === 'Logged In';
+}
 
 export function updateGameRecordsWithUser() {
     const gameHistory = getCookie('game_history');
@@ -54,6 +42,61 @@ export function updateGameRecordsWithUser() {
         .then(response => response.json())
         .then(data => console.log(data))
         .catch(error => console.error('Error:', error));
+    }
+}
+
+// お気に入りの状態を切り替える関数
+function toggleFavorite(gameId) {
+    fetch(`/toggle_favorite/${gameId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const favoriteCells = document.querySelectorAll(`.favorite-column[data-game-id="${gameId}"]`);
+            favoriteCells.forEach(cell => {
+                // starColor変数の定義をforEachループ内に移動
+                const starColor = data.is_favorite ? 'orange' : 'grey';
+                cell.innerHTML = `<i class="fa fa-star" style="color: ${starColor};"></i>`;
+    
+                // お気に入り状態に応じて表を更新
+                const isFavorite = data.is_favorite ? 'Yes' : 'No';
+                updateFavoriteGamesTable(gameId, isFavorite);
+            });
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateFavoriteGamesTable(gameId, isFavorite) {
+    const favoriteGamesTableBody = document.getElementById('favorite-game-table-body');
+    const rowInFavoriteGames = favoriteGamesTableBody.querySelector(`tr[data-game-id="${gameId}"]`);
+    const rowInRecentGames = document.querySelector(`#recent-game-table-body tr[data-game-id="${gameId}"]`);
+
+    if (!rowInRecentGames) {
+        console.error('No corresponding row found in Recent Games');
+        return;
+    }
+
+    if (isFavorite === 'Yes') {
+        if (!rowInFavoriteGames) {
+            const newRow = rowInRecentGames.cloneNode(true);
+            // 新しい行の星アイコンにイベントリスナーを設定
+            const newFavoriteCell = newRow.querySelector('.favorite-column');
+            newFavoriteCell.addEventListener('click', function() {
+                toggleFavorite(gameId);
+            });
+            favoriteGamesTableBody.appendChild(newRow);
+        }
+    } else {
+        if (rowInFavoriteGames) {
+            favoriteGamesTableBody.removeChild(rowInFavoriteGames);
+        }
     }
 }
 
@@ -163,6 +206,24 @@ function createRowFromDatabase(game) {
     return row;
 }
 
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    confirmedBtnElement.addEventListener("click", () => {
+
+        initializeGame(historyElement);
+
+        if (settings.mode == "cp" && settings.color == "white") board.makeComputerMove();
+        
+        board.highlightPossibleCells();
+
+    });
+
+    initializeGame(historyElement);
+
+});
+
+
 document.getElementById('load-more-games').addEventListener('click', function() {
     loadGames('recent', sharedState.nextPage);
 });
@@ -170,10 +231,6 @@ document.getElementById('load-more-games').addEventListener('click', function() 
 document.getElementById('load-prev-games').addEventListener('click', function() {
     loadGames('recent', sharedState.currentPage - 1);
 });
-
-function isUserLoggedIn() {
-    return document.getElementById('user-status').innerText === 'Logged In';
-}
 
 document.addEventListener('DOMContentLoaded', function() {
     if (isUserLoggedIn()) {
@@ -210,58 +267,3 @@ document.getElementById('load-more-favorite-games').addEventListener('click', fu
 document.getElementById('load-prev-favorite-games').addEventListener('click', function() {
     loadGames('favorite', sharedState.favoriteCurrentPage - 1);
 });
-
-// お気に入りの状態を切り替える関数
-function toggleFavorite(gameId) {
-    fetch(`/toggle_favorite/${gameId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCsrfToken()
-        },
-        body: JSON.stringify({})
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            const favoriteCells = document.querySelectorAll(`.favorite-column[data-game-id="${gameId}"]`);
-            favoriteCells.forEach(cell => {
-                // starColor変数の定義をforEachループ内に移動
-                const starColor = data.is_favorite ? 'orange' : 'grey';
-                cell.innerHTML = `<i class="fa fa-star" style="color: ${starColor};"></i>`;
-    
-                // お気に入り状態に応じて表を更新
-                const isFavorite = data.is_favorite ? 'Yes' : 'No';
-                updateFavoriteGamesTable(gameId, isFavorite);
-            });
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function updateFavoriteGamesTable(gameId, isFavorite) {
-    const favoriteGamesTableBody = document.getElementById('favorite-game-table-body');
-    const rowInFavoriteGames = favoriteGamesTableBody.querySelector(`tr[data-game-id="${gameId}"]`);
-    const rowInRecentGames = document.querySelector(`#recent-game-table-body tr[data-game-id="${gameId}"]`);
-
-    if (!rowInRecentGames) {
-        console.error('No corresponding row found in Recent Games');
-        return;
-    }
-
-    if (isFavorite === 'Yes') {
-        if (!rowInFavoriteGames) {
-            const newRow = rowInRecentGames.cloneNode(true);
-            // 新しい行の星アイコンにイベントリスナーを設定
-            const newFavoriteCell = newRow.querySelector('.favorite-column');
-            newFavoriteCell.addEventListener('click', function() {
-                toggleFavorite(gameId);
-            });
-            favoriteGamesTableBody.appendChild(newRow);
-        }
-    } else {
-        if (rowInFavoriteGames) {
-            favoriteGamesTableBody.removeChild(rowInFavoriteGames);
-        }
-    }
-}
