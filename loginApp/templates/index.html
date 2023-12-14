@@ -17,21 +17,9 @@
         {% endif %}
     </div>
 
-
-    <script type="module">
-        import { updateGameRecordsWithUser } from '{% static "js/main.js" %}';
-    
-        document.addEventListener('DOMContentLoaded', function() {
-            const userIsLoggedIn = {{ request.user.is_authenticated|yesno:"true,false" }};
-            if (userIsLoggedIn) {
-                updateGameRecordsWithUser();
-            }
-        });
-    </script>
-
     <div class="tabs">
-        <div class="tab-button" data-tab="Game" onclick="openTab('Game')">Game</div>
-        <div class="tab-button active" data-tab="Analysis" onclick="openTab('Analysis')">Analysis</div>
+        <div class="tab-button active" data-tab="Game" onclick="openTab('Game')">Game</div>
+        <div class="tab-button" data-tab="Analysis" onclick="openTab('Analysis')">Analysis</div>
     </div>
 
     <div id="Game" class="tab-content active">
@@ -218,7 +206,6 @@
             </div>
         </div>
     </div>
-
     <script>
         function openTab(tabId) {
             // Hide all tabs

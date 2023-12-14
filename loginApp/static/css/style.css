@@ -1,5 +1,15 @@
-.container {
-    font-size: 1rem;
+:root {
+    --primary-color: #007bff; /* メインのカラー */
+    --secondary-color: #6c757d; /* サブのカラー */
+    --background-color: #f8f9fa; /* 背景色 */
+    --text-color: #333; /* テキストの色 */
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    overflow-x: hidden; /* Hide the horizontal scrollbar */
 }
 
 /* Blue text color for questions */
@@ -52,11 +62,6 @@
     background-color: #00ff00;
 }
 
-/* Controls section styling */
-.controls {
-    margin-top: 20px;
-}
-
 /* Styling for the progress bar */
 .progress-bar {
     width: 100%;
@@ -85,11 +90,6 @@
 /* Subsection styling with bottom margin */
 .subsection {
     margin-bottom: 30px;
-}
-
-/* Hide the horizontal scrollbar */
-body {
-    overflow-x: hidden;
 }
 
 /* Style for the vertical scrollbar */
@@ -124,6 +124,7 @@ body {
 .controls {
     display: flex;
     justify-content: center;
+    margin-top: 20px; /* Controls section styling */
 }
 
 /* Margin for buttons in the controls section */
@@ -150,7 +151,8 @@ body {
 
 /* アクティブなタブボタンのスタイル */
 .tab-button.active {
-    background-color: #ddd; /* アクティブ時の背景色 */
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
 }
 
 /* タブボタンのホバー時のスタイル */
@@ -158,20 +160,16 @@ body {
     background-color: #e7e7e7; /* ホバー時の背景色 */
 }
 
-:root {
-    --primary-color: #007bff; /* メインのカラー */
-    --secondary-color: #6c757d; /* サブのカラー */
-    --background-color: #f8f9fa; /* 背景色 */
-    --text-color: #333; /* テキストの色 */
+.tab-content {
+    display: none;
 }
 
-body {
-    font-family: 'Arial', sans-serif;
-    color: var(--text-color);
-    background-color: var(--background-color);
+.tab-content.active {
+    display: block;
 }
 
 .container {
+    font-size: 1rem;
     max-width: 1200px;
     margin: 0 auto;
     padding: 15px;
@@ -212,7 +210,7 @@ body {
     }
 }
 
-.arrow-button {
+.arrow-button, .toggle-button {
     background-color: #007bff;
     color: white;
     border: none;
@@ -221,19 +219,6 @@ body {
     cursor: pointer;
 }
 
-.arrow-button i {
-    font-size: 1.2rem;
-}
-
-.toggle-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.toggle-button i {
+.arrow-button i, .toggle-button i {
     font-size: 1.2rem;
 }
