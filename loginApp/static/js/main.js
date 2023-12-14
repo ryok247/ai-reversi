@@ -75,40 +75,7 @@ export function loadGames(type = "recent", page = 1) {
             gamesList.innerHTML = '';
 
             data.games.forEach(game => {
-                const row = document.createElement('tr');
-                row.setAttribute('data-game-id', game.id);
-
-                let favoriteColumn = '';
-
-                if (isUserLoggedIn()) {
-                    const starColor = game.is_favorite ? 'orange' : 'grey';
-                    favoriteColumn = `
-                    <td class="favorite-column" data-game-id="${game.id}">
-                        <i class="fa fa-star" style="color: ${starColor};"></i>
-                    </td>
-                `;
-                }
-
-                row.innerHTML = `
-                ${favoriteColumn}
-                <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
-                <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
-                <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
-                <td>${game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw'}</td>
-                <td>${game.black_score}</td>
-                <td>${game.white_score}</td>
-                <td>Level ${game.ai_level}</td>
-                `;
-
-                if (isUserLoggedIn()) {
-                    // 星のアイコンを持つセルにイベントリスナーを追加
-                    const favoriteCell = row.querySelector('.favorite-column');
-                    favoriteCell.addEventListener('click', function() {
-                        toggleFavorite(game.id);
-                    });
-                }
-
-                gamesList.appendChild(row);
+                gamesList.appendChild(createRowFromDatabase(game));
             });
 
             if (type == "recent") {
@@ -124,9 +91,7 @@ export function loadGames(type = "recent", page = 1) {
             if (data.has_next) {
                 if (type == "recent") {
                     window.nextPage = window.currentPage + 1;
-                } else {
-                    
-                }
+                } else {}
             }
         })
         .catch(error => console.error('Error:', error));
@@ -157,26 +122,48 @@ function loadRecentGamesFromCookie(){
             games = games.filter(game => game !== null);
             games.sort((a, b) => new Date(b.game_datetime) - new Date(a.game_datetime));
             games.forEach(game => {
-                const row = document.createElement('tr');
-                const gameDate = new Date(game.game_datetime);
-                const result = game.black_score > game.white_score 
-                               ? (game.player_color === 'black' ? 'Win' : 'Lose')
-                               : (game.black_score < game.white_score 
-                                  ? (game.player_color === 'white' ? 'Win' : 'Lose')
-                                  : 'Draw');
-                row.innerHTML = `
-                    <td>${gameDate.toLocaleDateString()}</td>
-                    <td>${gameDate.toLocaleTimeString()}</td>
-                    <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
-                    <td>${result}</td>
-                    <td>${game.black_score}</td>
-                    <td>${game.white_score}</td>
-                    <td>Level ${game.ai_level}</td>
-                `;
-                recentGamesTableBody.appendChild(row);
+                recentGamesTableBody.appendChild(createRowFromDatabase(game));
             });
         }).catch(error => console.error('Global Error:', error));
     }
+}
+
+function createRowFromDatabase(game) {
+
+    const row = document.createElement('tr');
+    row.setAttribute('data-game-id', game.id);
+
+    let favoriteColumn = '';
+
+    if (isUserLoggedIn()) {
+        const starColor = game.is_favorite ? 'orange' : 'grey';
+        favoriteColumn = `
+        <td class="favorite-column" data-game-id="${game.id}">
+            <i class="fa fa-star" style="color: ${starColor};"></i>
+        </td>
+    `;
+    }
+
+    row.innerHTML = `
+    ${favoriteColumn}
+    <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
+    <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
+    <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
+    <td>${game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw'}</td>
+    <td>${game.black_score}</td>
+    <td>${game.white_score}</td>
+    <td>Level ${game.ai_level}</td>
+    `;
+
+    if (isUserLoggedIn()) {
+        // 星のアイコンを持つセルにイベントリスナーを追加
+        const favoriteCell = row.querySelector('.favorite-column');
+        favoriteCell.addEventListener('click', function() {
+            toggleFavorite(game.id);
+        });
+    }
+
+    return row;
 }
 
 document.getElementById('load-more-games').addEventListener('click', function() {
