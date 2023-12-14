@@ -58,29 +58,30 @@ export function updateGameRecordsWithUser() {
 
 window.currentPage = 1;
 window.nextPage = 1;
+window.favoriteCurrentPage = 1;
 
-export function loadRecentGames(page = 1) {
-    fetch(`/user_games/?page=${page}`)
+export function loadGames(type = "recent", page = 1) {
+    fetch(`/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`)
         .then(response => response.json())
         .then(data => {
-            const recentGamesList = document.getElementById('recent-game-table-body');
+            const gamesList = document.getElementById(`${type == "recent" ? "recent" : "favorite"}-game-table-body`);
 
             // ログイン状態をチェック
-            if (isUserLoggedIn()) {
+            if (type == "recent" && isUserLoggedIn()) {
                 // ユーザーがログインしている場合、Favoriteヘッダーを表示
                 document.getElementById('favorite-header').style.display = 'table-cell';
             }
 
-            recentGamesList.innerHTML = '';
+            gamesList.innerHTML = '';
 
             data.games.forEach(game => {
                 const row = document.createElement('tr');
                 row.setAttribute('data-game-id', game.id);
 
-                // ログイン状態に応じてFavoriteカラムを追加
                 let favoriteColumn = '';
+
                 if (isUserLoggedIn()) {
-                    const starColor = data.is_favorite ? 'orange' : 'grey';
+                    const starColor = game.is_favorite ? 'orange' : 'grey';
                     favoriteColumn = `
                     <td class="favorite-column" data-game-id="${game.id}">
                         <i class="fa fa-star" style="color: ${starColor};"></i>
@@ -89,39 +90,43 @@ export function loadRecentGames(page = 1) {
                 }
 
                 row.innerHTML = `
-                    ${favoriteColumn}
-                    <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
-                    <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
-                    <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
-                    <td>${game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw'}</td>
-                    <td>${game.black_score}</td>
-                    <td>${game.white_score}</td>
-                    <td>Level ${game.ai_level}</td>
+                ${favoriteColumn}
+                <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
+                <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
+                <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
+                <td>${game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw'}</td>
+                <td>${game.black_score}</td>
+                <td>${game.white_score}</td>
+                <td>Level ${game.ai_level}</td>
                 `;
 
                 if (isUserLoggedIn()) {
+                    // 星のアイコンを持つセルにイベントリスナーを追加
                     const favoriteCell = row.querySelector('.favorite-column');
                     favoriteCell.addEventListener('click', function() {
                         toggleFavorite(game.id);
                     });
                 }
 
-                recentGamesList.appendChild(row);
+                gamesList.appendChild(row);
             });
 
-            window.currentPage = page;
-
-            if (window.currentPage > 1) {
-                document.getElementById('load-prev-games').style.display = 'block';
+            if (type == "recent") {
+                window.currentPage = page;
             } else {
-                document.getElementById('load-prev-games').style.display = 'none';
+                window.favoriteCurrentPage = page;
             }
 
+            // ボタンの表示・非表示を管理
+            document.getElementById(`load-prev-${type=="recent" ? "" : "favorite-"}games`).style.display = page > 1 ? 'block' : 'none';
+            document.getElementById(`load-more-${type=="recent" ? "" : "favorite-"}games`).style.display = data.has_next ? 'block' : 'none';
+
             if (data.has_next) {
-                window.nextPage = window.currentPage + 1;
-                document.getElementById('load-more-games').style.display = 'block';
-            } else {
-                document.getElementById('load-more-games').style.display = 'none';
+                if (type == "recent") {
+                    window.nextPage = window.currentPage + 1;
+                } else {
+                    
+                }
             }
         })
         .catch(error => console.error('Error:', error));
@@ -175,11 +180,11 @@ function loadRecentGamesFromCookie(){
 }
 
 document.getElementById('load-more-games').addEventListener('click', function() {
-    loadRecentGames(window.nextPage);
+    loadGames('recent', window.nextPage);
 });
 
 document.getElementById('load-prev-games').addEventListener('click', function() {
-    loadRecentGames(window.currentPage - 1);
+    loadGames('recent', window.currentPage - 1);
 });
 
 function isUserLoggedIn() {
@@ -189,21 +194,11 @@ function isUserLoggedIn() {
 document.addEventListener('DOMContentLoaded', function() {
     if (isUserLoggedIn()) {
         document.getElementById('favorite-games').style.display = 'block';
-        loadFavoriteGames();
-        loadRecentGames(window.nextPage);
+        loadGames('favorite');
+        loadGames('recent', window.nextPage);
     } else {
         loadRecentGamesFromCookie();
     }
-
-    /*
-    document.querySelectorAll('.toggle-section').forEach(header => {
-        header.addEventListener('click', function() {
-            const contentId = this.getAttribute('data-target');
-            const content = document.getElementById(contentId);
-            content.style.display = content.style.display === 'none' ? 'block' : 'none';
-        });
-    });
-    */
 
     // セクションのトグル機能
     document.querySelectorAll('.toggle-button').forEach(button => {
@@ -223,67 +218,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 
-window.favoriteCurrentPage = 1;
-
-export function loadFavoriteGames(page = 1) {
-    fetch(`/favorite_games/?page=${page}`)
-        .then(response => response.json())
-        .then(data => {
-            const favoriteGamesList = document.getElementById('favorite-game-table-body');
-            favoriteGamesList.innerHTML = '';
-
-            data.games.forEach(game => {
-                const row = document.createElement('tr');
-                row.setAttribute('data-game-id', game.id);
-
-                let favoriteColumn = '';
-                if (isUserLoggedIn()) {
-                    const starColor = data.is_favorite ? 'orange' : 'grey';
-                    favoriteColumn = `
-                    <td class="favorite-column" data-game-id="${game.id}">
-                        <i class="fa fa-star" style="color: ${starColor};"></i>
-                    </td>
-                `;
-                }
-
-                row.innerHTML = `
-                ${favoriteColumn}
-                <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
-                <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
-                <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
-                <td>${game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw'}</td>
-                <td>${game.black_score}</td>
-                <td>${game.white_score}</td>
-                <td>Level ${game.ai_level}</td>
-                `;
-
-                if (isUserLoggedIn()) {
-                    // 星のアイコンを持つセルにイベントリスナーを追加
-                    const favoriteCell = row.querySelector('.favorite-column');
-                    favoriteCell.addEventListener('click', function() {
-                        toggleFavorite(game.id);
-                    });
-                }
-
-                favoriteGamesList.appendChild(row);
-            });
-
-            window.favoriteCurrentPage = page;
-
-            // ボタンの表示・非表示を管理
-            document.getElementById('load-prev-favorite-games').style.display = window.favoriteCurrentPage > 1 ? 'block' : 'none';
-            document.getElementById('load-more-favorite-games').style.display = data.has_next ? 'block' : 'none';
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
 // ボタンのイベントリスナーを設定
 document.getElementById('load-more-favorite-games').addEventListener('click', function() {
-    loadFavoriteGames(window.favoriteCurrentPage + 1);
+    loadGames('favorite', window.favoriteCurrentPage + 1);
 });
 
 document.getElementById('load-prev-favorite-games').addEventListener('click', function() {
-    loadFavoriteGames(window.favoriteCurrentPage - 1);
+    loadGames('favorite', window.favoriteCurrentPage - 1);
 });
 
 // お気に入りの状態を切り替える関数
