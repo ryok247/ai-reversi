@@ -3,6 +3,7 @@
 import { randomAgent, simpleGreedyAgent} from './agents.js'
 import { getCookie, setCookie, getCsrfToken } from './utilities.js'
 import { loadGames } from './main.js';
+import { sharedState } from './game-shared.js';
 
 export class boardInfo{
     constructor(state, settings, history, boardElement){
@@ -267,7 +268,7 @@ export class boardInfo{
         this.state.displayEnd();
         this.saveGameToDatabase().then(() => {
             // ゲームの保存後、Recent Games の更新を行う
-            loadGames("recent", window.nextPage);
+            loadGames("recent", sharedState.nextPage);
         });
     
         this.isGameEnd = true;

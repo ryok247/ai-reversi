@@ -5,6 +5,7 @@ import { gameSettings } from './game-settings.js';
 import { gameHistory } from './game-history.js';
 import { boardInfo } from './game-logic.js';
 import { getCookie, getCsrfToken } from './utilities.js'
+import { sharedState } from './game-shared.js'
 
 const boardElement = document.querySelector(".board");
 const turnElement = document.getElementById("turn");
@@ -13,10 +14,10 @@ const historyElement = document.getElementById("history");
 
 function initializeGame(historyElement){
 
-    window.settings = new gameSettings("mode", "color", "level", "highlight");
-    window.state = new gameState(turnElement);
-    window.gamehistory = new gameHistory(historyElement, window.state);
-    window.board = new boardInfo(window.state, window.settings, window.gamehistory, boardElement);
+    sharedState.settings = new gameSettings("mode", "color", "level", "highlight");
+    sharedState.state = new gameState(turnElement);
+    sharedState.gamehistory = new gameHistory(historyElement, sharedState.state);
+    sharedState.board = new boardInfo(sharedState.state, sharedState.settings, sharedState.gamehistory, boardElement);
 
 }
 
@@ -56,10 +57,6 @@ export function updateGameRecordsWithUser() {
     }
 }
 
-window.currentPage = 1;
-window.nextPage = 1;
-window.favoriteCurrentPage = 1;
-
 export function loadGames(type = "recent", page = 1) {
     fetch(`/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`)
         .then(response => response.json())
@@ -79,9 +76,9 @@ export function loadGames(type = "recent", page = 1) {
             });
 
             if (type == "recent") {
-                window.currentPage = page;
+                sharedState.currentPage = page;
             } else {
-                window.favoriteCurrentPage = page;
+                sharedState.favoriteCurrentPage = page;
             }
 
             // ボタンの表示・非表示を管理
@@ -90,7 +87,7 @@ export function loadGames(type = "recent", page = 1) {
 
             if (data.has_next) {
                 if (type == "recent") {
-                    window.nextPage = window.currentPage + 1;
+                    sharedState.nextPage = sharedState.currentPage + 1;
                 } else {}
             }
         })
@@ -167,11 +164,11 @@ function createRowFromDatabase(game) {
 }
 
 document.getElementById('load-more-games').addEventListener('click', function() {
-    loadGames('recent', window.nextPage);
+    loadGames('recent', sharedState.nextPage);
 });
 
 document.getElementById('load-prev-games').addEventListener('click', function() {
-    loadGames('recent', window.currentPage - 1);
+    loadGames('recent', sharedState.currentPage - 1);
 });
 
 function isUserLoggedIn() {
@@ -182,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isUserLoggedIn()) {
         document.getElementById('favorite-games').style.display = 'block';
         loadGames('favorite');
-        loadGames('recent', window.nextPage);
+        loadGames('recent', sharedState.nextPage);
     } else {
         loadRecentGamesFromCookie();
     }
@@ -207,11 +204,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ボタンのイベントリスナーを設定
 document.getElementById('load-more-favorite-games').addEventListener('click', function() {
-    loadGames('favorite', window.favoriteCurrentPage + 1);
+    loadGames('favorite', sharedState.favoriteCurrentPage + 1);
 });
 
 document.getElementById('load-prev-favorite-games').addEventListener('click', function() {
-    loadGames('favorite', window.favoriteCurrentPage - 1);
+    loadGames('favorite', sharedState.favoriteCurrentPage - 1);
 });
 
 // お気に入りの状態を切り替える関数
