@@ -6,8 +6,7 @@ export const sharedState = {
     nextPage: 1,
 
     settings: undefined,
-    state: undefined,
-    gamehistory: undefined,
     board: undefined,
     logic: undefined,
+    animator: undefined,
 };

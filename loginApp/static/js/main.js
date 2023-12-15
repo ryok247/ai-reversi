@@ -6,6 +6,7 @@ import { boardInfo } from './manage-game.js';
 import { getCookie, getCsrfToken } from './utilities.js';
 import { sharedState } from './game-shared.js';
 import { gameLogic } from './game-logic.js';
+import { ReplayAnimator } from './animation.js';
 
 // Selecting DOM elements
 const boardElement = document.querySelector(".board");
@@ -332,12 +333,46 @@ function startReplay(gameId) {
 
 function openReplayWindow(gameData) {
     // 新しいウインドウ（またはモーダル）を開く
+
+    // 新しいウインドウ（またはモーダル）を開く
     const replayWindow = window.open('', '_blank');
 
-    // リプレイ用のコンテンツをウインドウに追加
-    replayWindow.document.write('<html><head><title>Game Replay</title></head><body>');
-    replayWindow.document.write('<h1>Replay of Game: ' + gameData.id + '</h1>');
-    // ここにリプレイの表示に関するコードを追加
-    replayWindow.document.write('</body></html>');
-    replayWindow.document.close();
+    // ゲームの手番を取得
+    fetch(`/get_moves/${gameData.id}`)
+        .then(response => response.json())
+        .then(data => {
+            const moves = data.moves;
+            const gameLogicInstance = new gameLogic();
+            moves.slice(1).forEach(move => {
+                // ここで各手を gameLogic インスタンスに適用
+                if (move.row == 9 && move.col == 9){
+                    gameLogicInstance.pass();
+                }
+                else {
+                    gameLogicInstance.placePiece(move.row, move.col);
+                }
+            });
+
+            // 盤面の履歴を用いてリプレイ表示
+            displayReplay(replayWindow, gameLogicInstance);
+        })
+        .catch(error => {
+            console.error('Error fetching moves:', error);
+        });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    const progressElement = document.getElementById('progress');
+    const animatedBoardElement = document.querySelector(".board.animated");
+
+    sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
+
+    document.getElementById("restart-animation-btn").addEventListener("click", () => sharedState.animator.restartAnimation());
+    document.getElementById("backward-step-btn").addEventListener("click", () => sharedState.animator.backwardStep());
+    document.getElementById("start-animation-btn").addEventListener("click", () => sharedState.animator.startAnimation());
+    document.getElementById("pause-animation-btn").addEventListener("click", () => sharedState.animator.pauseAnimation());
+    document.getElementById("forward-step-btn").addEventListener("click", () => sharedState.animator.forwardStep());
+    document.getElementById("skip-to-end-btn").addEventListener("click", () => sharedState.animator.skipToEnd());
+    document.getElementById('progress').addEventListener("click", (event) => sharedState.animator.seek(event));
+});

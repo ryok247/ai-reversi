@@ -4,7 +4,7 @@ import { randomAgent, simpleGreedyAgent} from './agents.js'
 import { getCookie, setCookie, getCsrfToken } from './utilities.js'
 import { loadGames } from './main.js';
 import { sharedState } from './game-shared.js';
-import { fromHistoryRowDisplayBoard } from "./animation.js";
+import { ReplayAnimator } from './animation.js';
 
 export class boardInfo{
     constructor(logic, settings, boardElement, turnElement, historyElement){
@@ -274,7 +274,9 @@ export class boardInfo{
             cell3.textContent = position;
 
             if (tableBody.id == "replay-table-body") {
-                newRow.addEventListener("click", fromHistoryRowDisplayBoard);
+                newRow.addEventListener("click", (event)=>{
+                    sharedState.animator.fromHistoryRowDisplayBoard(event);
+                });
             }
         });
     }
