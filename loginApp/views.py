@@ -113,6 +113,7 @@ class GameDetailsView(CreateView):
         try:
             game = Game.objects.get(id=game_id)
             return JsonResponse({
+                'id': game_id,
                 'player_color': game.player_color,
                 'game_datetime': game.game_datetime.isoformat(),
                 'ai_level': game.ai_level,

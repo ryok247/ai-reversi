@@ -61,10 +61,20 @@ function toggleFavorite(gameId) {
         if (data.status === 'success') {
             const favoriteCells = document.querySelectorAll(`.favorite-column[data-game-id="${gameId}"]`);
             favoriteCells.forEach(cell => {
-                const starColor = data.is_favorite ? 'orange' : 'grey';
-                cell.innerHTML = `<i class="fa fa-star" style="color: ${starColor};"></i>`;
+                // 以前のアイコンを削除
+                cell.innerHTML = '';
 
-                // Update the table based on favorite status
+                // 新しいアイコンを作成
+                const newFavoriteIcon = document.createElement('i');
+                newFavoriteIcon.className = `fa fa-star`;
+                newFavoriteIcon.style.color = data.is_favorite ? 'orange' : 'grey';
+                newFavoriteIcon.style.cursor = 'pointer';
+                newFavoriteIcon.addEventListener('click', () => toggleFavorite(gameId));
+
+                // 新しいアイコンを追加
+                cell.appendChild(newFavoriteIcon);
+
+                // Favorite Gamesテーブルを更新
                 const isFavorite = data.is_favorite ? 'Yes' : 'No';
                 updateFavoriteGamesTable(gameId, isFavorite);
             });
@@ -87,10 +97,17 @@ function updateFavoriteGamesTable(gameId, isFavorite) {
     if (isFavorite === 'Yes') {
         if (!rowInFavoriteGames) {
             const newRow = rowInRecentGames.cloneNode(true);
+
+            // 新しい行のリプレイアイコンにイベントリスナーを追加
+            const replayIcon = newRow.querySelector('.replay-icon');
+            replayIcon.addEventListener('click', () => startReplay(gameId));
+
+            // Favoriteアイコンにイベントリスナーを再設定
             const newFavoriteCell = newRow.querySelector('.favorite-column');
             newFavoriteCell.addEventListener('click', function() {
                 toggleFavorite(gameId);
             });
+
             favoriteGamesTableBody.appendChild(newRow);
         }
     } else {
@@ -174,39 +191,65 @@ function loadRecentGamesFromCookie() {
 
 // Function to create a table row from game data
 function createRowFromDatabase(game) {
-    // Initialize a table row and set its data attribute
     const row = document.createElement('tr');
     row.setAttribute('data-game-id', game.id);
 
-    let favoriteColumn = '';
-    if (isUserLoggedIn()) {
-        const starColor = game.is_favorite ? 'orange' : 'grey';
-        favoriteColumn = `
-        <td class="favorite-column" data-game-id="${game.id}">
-            <i class="fa fa-star" style="color: ${starColor};"></i>
-        </td>`;
-    }
-
-    // Populate row with game data
-    row.innerHTML = `
-    ${favoriteColumn}
-    <td>${new Date(game.game_datetime).toLocaleDateString()}</td>
-    <td>${new Date(game.game_datetime).toLocaleTimeString()}</td>
-    <td>${game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1)}</td>
-    <td>${game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw'}</td>
-    <td>${game.black_score}</td>
-    <td>${game.white_score}</td>
-    <td>Level ${game.ai_level}</td>`;
+    // Favorite column
+    const favoriteColumn = document.createElement('td');
+    favoriteColumn.className = 'favorite-column';
+    favoriteColumn.setAttribute('data-game-id', game.id);
 
     if (isUserLoggedIn()) {
-        // Add event listener to the favorite cell
-        const favoriteCell = row.querySelector('.favorite-column');
-        favoriteCell.addEventListener('click', function() {
-            toggleFavorite(game.id);
-        });
+        const favoriteIcon = document.createElement('i');
+        favoriteIcon.className = `fa fa-star ${game.is_favorite ? 'favorite' : ''}`;
+        favoriteIcon.style.color = game.is_favorite ? 'orange' : 'grey';
+        favoriteIcon.style.cursor = 'pointer';
+        favoriteIcon.addEventListener('click', () => toggleFavorite(game.id));
+        favoriteColumn.appendChild(favoriteIcon);
     }
+    row.appendChild(favoriteColumn);
+
+    // Replay column
+    const replayColumn = document.createElement('td');
+    const replayIcon = document.createElement('i');
+    replayIcon.classList.add('fa', 'fa-play-circle', 'replay-icon');
+    replayIcon.style.cursor = 'pointer';
+    replayIcon.addEventListener('click', () => startReplay(game.id));
+    replayColumn.appendChild(replayIcon);
+    row.appendChild(replayColumn);
+
+    // Other columns
+    const dateColumn = document.createElement('td');
+    dateColumn.textContent = new Date(game.game_datetime).toLocaleDateString();
+    row.appendChild(dateColumn);
+
+    const timeColumn = document.createElement('td');
+    timeColumn.textContent = new Date(game.game_datetime).toLocaleTimeString();
+    row.appendChild(timeColumn);
+
+    const colorColumn = document.createElement('td');
+    colorColumn.textContent = game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1);
+    row.appendChild(colorColumn);
+
+    const resultColumn = document.createElement('td');
+    resultColumn.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+    row.appendChild(resultColumn);
+
+    const blackScoreColumn = document.createElement('td');
+    blackScoreColumn.textContent = game.black_score;
+    row.appendChild(blackScoreColumn);
+
+    const whiteScoreColumn = document.createElement('td');
+    whiteScoreColumn.textContent = game.white_score;
+    row.appendChild(whiteScoreColumn);
+
+    const levelColumn = document.createElement('td');
+    levelColumn.textContent = 'Level ' + game.ai_level;
+    row.appendChild(levelColumn);
+
     return row;
 }
+
 
 // Event listeners and function calls
 document.addEventListener("DOMContentLoaded", () => {
@@ -265,3 +308,36 @@ loadGames('favorite', sharedState.favoriteCurrentPage + 1);
 document.getElementById('load-prev-favorite-games').addEventListener('click', function() {
 loadGames('favorite', sharedState.favoriteCurrentPage - 1);
 });
+
+function startReplay(gameId) {
+    // ゲーム詳細データを取得するためのAPIエンドポイント
+    const gameDetailsUrl = `/get_game_details/${gameId}`;
+
+    // ゲームデータを取得
+    fetch(gameDetailsUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Game ID ${gameId} not found`);
+            }
+            return response.json();
+        })
+        .then(gameData => {
+            // リプレイ用のウインドウ（またはモーダル）を開く
+            openReplayWindow(gameData);
+        })
+        .catch(error => {
+            console.error('Error fetching game details:', error);
+        });
+}
+
+function openReplayWindow(gameData) {
+    // 新しいウインドウ（またはモーダル）を開く
+    const replayWindow = window.open('', '_blank');
+
+    // リプレイ用のコンテンツをウインドウに追加
+    replayWindow.document.write('<html><head><title>Game Replay</title></head><body>');
+    replayWindow.document.write('<h1>Replay of Game: ' + gameData.id + '</h1>');
+    // ここにリプレイの表示に関するコードを追加
+    replayWindow.document.write('</body></html>');
+    replayWindow.document.close();
+}
