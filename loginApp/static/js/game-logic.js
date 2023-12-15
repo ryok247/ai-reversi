@@ -1,360 +1,168 @@
-"use strict";
+export const pieceColor = {
+    black: 0,
+    white: 1,
+}
 
-import { randomAgent, simpleGreedyAgent} from './agents.js'
-import { getCookie, setCookie, getCsrfToken } from './utilities.js'
-import { loadGames } from './main.js';
-import { sharedState } from './game-shared.js';
+export class gameLogic{
+    constructor(){
+        this.currentPlayer = pieceColor.black;
+        this.score = [2, 2];
+        this.history = [];
+        this.boardHistory = [];
 
-export class boardInfo{
-    constructor(state, settings, history, boardElement){
-
-        this.state = state;
-        this.settings = settings;
-        this.history = history;
-        this.boardElement = boardElement;
-
-        this.isGameEnd = false;
-
-        if (this.settings.level == 1) this.agent = new randomAgent();
-        else if (this.settings.level == 2) this.agent = new simpleGreedyAgent();
-        else console.assert(false);
-
-        this.cells = [];
-        this.boardElement.innerHTML = "";
-    
-        // Generate a game board
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                const cell = document.createElement("div");
-                cell.classList.add("cell");
-                cell.dataset.row = row;
-                cell.dataset.col = col;
-                this.boardElement.appendChild(cell);
-                this.cells.push(cell);
-    
-                // Add a click event
-                cell.addEventListener("click", this.createCellClickHandler(row, col));
-            }
-        }
-    
-        // Place the first 4 stones
-        const firstPositions = [27,28,36,35];
-        for (let i=0; i<firstPositions.length; i++){
-            const newPiece = document.createElement("div");
-            newPiece.classList.add("piece", (i % 2 == 0 ? "black": "white"));
-            this.cells[firstPositions[i]].appendChild(newPiece);
-        }
-
-        if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
-        else if (this.settings.mode == "manual") this.highlightPossibleCells();
-    
-    }
-
-    // check the position is valid for placement
-    isValidMove(row, col) {
-
-        if (row < 0 || row > 7 || col < 0 || col > 7) return false;
-
-        // impossible if some stone is already placed in the position
-        if (this.cells[row * 8 + col].childNodes.length == 1)  return false;
-
-        return this.getFlippedCells(row, col).length > 0;
-    }
-
-    // Place a stone
-    placePiece(row, col) {
-
-        const newPiece = document.createElement("div");
-        newPiece.classList.add("piece", this.state.currentPlayer);
-        this.cells[row * 8 + col].appendChild(newPiece);
-
-        // update the number of stones
-        if (this.state.currentPlayer === "black") this.state.changeScores(1,0);
-        else this.state.changeScores(0,1);
-
-        this.state.counterIncrement();
-
-    }
-
-    // flip stones
-    flipPieces(row, col) {
-
-        const flippedCells = this.getFlippedCells(row, col);
-
-        flippedCells.forEach((cell) => {
-
-            if (cell.childNodes.length == 1){
-                cell.childNodes[0].classList.toggle("black");
-                cell.childNodes[0].classList.toggle("white");
-            }
-
-            // update the number of stones
-            if (this.state.currentPlayer === "black") this.state.changeScores(1,-1);
-            else this.state.changeScores(-1,1);
-
-        });
-    }
-
-    // return a possible cells
-    getPossibleCells(){
-        let possibleCells = [];
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                if (this.isValidMove(row, col)) possibleCells.push([row,col]);
+        this.board = [];
+        for (let i = 0; i < 8; i++) {
+            this.board[i] = [];
+            for (let j = 0; j < 8; j++) {
+                this.board[i][j] = -1;
             }
         }
 
-        return possibleCells;
+        this.board[3][3] = pieceColor.black;
+        this.board[3][4] = pieceColor.white;
+        this.board[4][3] = pieceColor.white;
+        this.board[4][4] = pieceColor.black;
+
+        this.history.push([-1, -1]);
+        this.boardHistory.push(this.board.map((arr) => arr.slice()));
     }
 
-    // check if the current player has to pass (no valid place)
-    // terminate the game if the both player have to pass
-    checkPass(){
-        let possibleCells = this.getPossibleCells();
+    placePiece(x, y){
+        console.assert(this.isValidMove(x, y));
+        this.board[x][y] = this.currentPlayer;
+        this.score[this.currentPlayer]++;
+        let flip = [];
+        for (let dx = -1; dx <= 1; dx++){
+            for (let dy = -1; dy <= 1; dy++){
+                if (dx == 0 && dy == 0) continue;
+                if (!this.isValidDirection(x, y, dx, dy)) continue;
+                flip = [...flip, ...this.flipDirection(x, y, dx, dy)];
+            }
+        }
 
-        if (possibleCells.length == 0){
+        this.history.push([x, y]);
+        this.boardHistory.push(this.board.map((arr) => arr.slice()));
 
-            this.state.counterIncrement();
-            this.history.add(-1,-1,true, this);
+        this.currentPlayer ^= 1;
 
-            this.state.togglePlayer();
-            this.state.displayTurn();
+        return flip;
+    }
 
-            // two passses -> end the game
-            possibleCells = this.getPossibleCells()
-            if (possibleCells.length == 0) this.endGame();
+    pass(){
+        console.assert(this.getPossibleMoves().length == 0);
+        
+        this.history.push([-1, -1]);
+        this.boardHistory.push(this.board.map((arr) => arr.slice()));
 
-            this.highlightPossibleCells();
+        this.currentPlayer ^= 1;
 
+        // pass twice -> game over
+        if (this.history[this.history.length - 2][0] == -1){
             return true;
         }
 
         return false;
     }
 
-    // estimated the number of flipped stone if a new stone is placed on (row, col)
-    getFlippedCells(row, col){
-        const directions = [-1, 0, 1];
-        const flippedCells = [];
-
-        directions.forEach((dx) => {
-            directions.forEach((dy) => {
-                if (dx === 0 && dy === 0) return;
-
-                let currentRow = row + dx;
-                let currentCol = col + dy;
-                let flipTemp = [];
-
-                while (
-                    currentRow >= 0 &&
-                    currentRow < 8 &&
-                    currentCol >= 0 &&
-                    currentCol < 8
-                ) {
-                    const cell = this.cells[currentRow * 8 + currentCol];
-                    if (!cell) break;
-                    if (cell.childNodes.length == 0) break;
-                    if (cell.childNodes[0].classList.contains(this.state.currentPlayer)) {
-                        flippedCells.push(...flipTemp);
-                        break;
-                    }
-                    flipTemp.push(cell);
-                    currentRow += dx;
-                    currentCol += dy;
+    flipDirection(x, y, dx, dy){
+        let nx = x + dx;
+        let ny = y + dy;
+        let flip = [];
+        if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8) return flip;
+        if (this.board[nx][ny] != (this.currentPlayer ^ 1)) return flip;
+        flip.push([nx, ny]);
+        while (true){
+            nx += dx;
+            ny += dy;
+            if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8){
+                flip.pop();
+                return flip;
+            };
+            if (this.board[nx][ny] == -1){
+                flip.pop();
+                return flip;
+            
+            };
+            if (this.board[nx][ny] == this.currentPlayer){
+                for (let i = 0; i < flip.length; i++){
+                    this.board[flip[i][0]][flip[i][1]] = this.currentPlayer;
                 }
-            });
-        });
-
-        return flippedCells;
-    }
-
-    cellClickHandler(row, col){
-
-        const possibleCells = this.getPossibleCells();
-    
-        if (possibleCells.length == 0){
-    
-            this.history.add(-1,-1,true, this);
-    
-            this.state.togglePlayer();
-            this.state.displayTurn();
-            return;
-        }
-    
-        if (this.isValidMove(row, col)) {
-            this.placePiece(row, col, this.state.currentPlayer);
-            this.flipPieces(row, col);
-            this.removeHighlight();
-
-            this.history.add(row, col, false, this);
-    
-            // update the number of stones
-            this.state.updateScores();
-    
-            //　check if all stones are placed
-            if (this.state.blackScore + this.state.whiteScore == 64) this.endGame();
-    
-            // update turn messages
-            this.state.togglePlayer();
-            this.state.displayTurn();
-
-            if (this.checkPass()) return;
-    
-            // execute ai player's action
-            if (this.settings.mode == "cp") {
-    
-                this.makeComputerMove();
-    
-                //　check if terminated
-                if (this.state.blackScore + this.state.whiteScore == 64) this.endGame();
-
-                this.checkPass();
-
-                this.highlightPossibleCells();
-    
-            }
-
-            else this.highlightPossibleCells();
-
+                this.score[this.currentPlayer] += flip.length;
+                this.score[this.currentPlayer ^ 1] -= flip.length;
+                return flip;
+            }            
+            flip.push([nx, ny]);
         }
     }
-    
-    // Create a function that retains its arguments using a closure
-    createCellClickHandler(row, col) {
-        return () => {
-            this.cellClickHandler(row, col);
-        };
-    }
 
-    // AI's move
-    makeComputerMove(){
-
-        const aiMove = this.agent.move(this);
-
-        this.placePiece(...aiMove, this.state.currentPlayer);
-        this.flipPieces(...aiMove);
-
-        this.history.add(...aiMove, false, this);
-
-        // update the number of stones
-        this.state.updateScores();
-
-        // update the turn messages
-        this.state.togglePlayer();
-        this.state.displayTurn();
-    }
-
-    // Highlight places where the current player can place a stone
-    highlightPossibleCells(){
-
-        if (this.settings.highlight != "checked") return;
-
-        const possibleCells = this.getPossibleCells();
-        possibleCells.forEach((cell) => {
-            this.cells[cell[0] * 8 + cell[1]].classList.add("possible");
-        });
-    }
-
-    // Remove the highlight
-    removeHighlight(){
-        this.cells.forEach((cell) => {
-            cell.classList.remove("possible");
-        });
-    }
-
-    endGame() {
-        if (this.isGameEnd) return;
-    
-        this.state.displayEnd();
-        this.saveGameToDatabase().then(() => {
-            // ゲームの保存後、Recent Games の更新を行う
-            loadGames("recent", sharedState.nextPage);
-        });
-    
-        this.isGameEnd = true;
-    }
-
-    createGameData() {
-
-        let name = "";
-        let description = "";
-        let player_color = this.settings.color;
-        let ai_level = this.settings.level;
-        let game_datetime = new Date().toISOString();
-        let black_score = this.state.blackScore;
-        let white_score = this.state.whiteScore;
-        let is_favorite = false;
+    getPossibleMoves(){
         let moves = [];
-
-        for (let i=0; i<this.history.history.length; i++){
-            let row = this.history.history[i][0];
-            if (row == -1) row = 9;
-            let col = this.history.history[i][1]
-            if (col == -1) col = 9;
-            let is_pass = this.history.history[i][2];
-            let comment = "";
-            moves.push({
-                move_number: i+1,
-                row: row,
-                col: col,
-                is_pass: is_pass,
-                comment: comment
-            });
+        for (let x = 0; x < 8; x++){
+            for (let y = 0; y < 8; y++){
+                if (this.isValidMove(x, y)) moves.push([x, y]);
+            }
         }
-
-        return JSON.stringify({
-            name: name,
-            description: description,
-            player_color: player_color,
-            ai_level: ai_level,
-            game_datetime: game_datetime,
-            black_score: black_score,
-            white_score: white_score,
-            is_favorite: is_favorite,
-            moves: moves
-        });
+        return moves;
     }
 
-    saveGameToDatabase() {
-        const gameJsonData = this.createGameData();
-    
-        // Promise を return する
-        return fetch('/save_game/', {
-            method: 'POST',
-            body: gameJsonData,
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
+    isValidMove(x, y){
+        if (x < 0 || x >= 8 || y < 0 || y >= 8) return false;
+        if (this.board[x][y] != -1) return false;
+        for (let dx = -1; dx <= 1; dx++){
+            for (let dy = -1; dy <= 1; dy++){
+                if (dx == 0 && dy == 0) continue;
+                if (this.isValidDirection(x, y, dx, dy)) return true;
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                this.updateGameHistoryCookie(data.game_id);
-            }
-            console.log(data);
-        })
-        .catch(error => console.error('Error:', error));
+        }
+        return false;
     }
 
-    updateGameHistoryCookie(gameId) {
-        const history = getCookie('game_history');
-        let gameHistory = history ? JSON.parse(history) : [];
-
-        gameHistory.push(gameId);
-        if (gameHistory.length > 10) {
-            gameHistory = gameHistory.slice(-10);
+    isValidDirection(x, y, dx, dy){
+        let nx = x + dx;
+        let ny = y + dy;
+        if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8) return false;
+        if (this.board[nx][ny] != (this.currentPlayer ^ 1)) return false;
+        while (true){
+            nx += dx;
+            ny += dy;
+            if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8) return false;
+            if (this.board[nx][ny] == -1) return false;
+            if (this.board[nx][ny] == this.currentPlayer) return true;
         }
+    }
 
-        setCookie('game_history', JSON.stringify(gameHistory), 365);
+    isFull(){return this.score[0] + this.score[1] == 64;}
+
+    undo(turnIdx){
+        this.board = this.boardHistory[turnIdx].map((arr) => arr.slice());
+        this.history = this.history.slice(0, turnIdx+1);
+        this.boardHistory = this.boardHistory.slice(0, turnIdx+1);
+        this.currentPlayer = (this.history.length - 1) % 2;
+        this.score = [2, 2];
+        for (let x = 0; x < 8; x++){
+            for (let y = 0; y < 8; y++){
+                this.score[this.board[x][y]]++;
+            }
+        }
+    }
+
+    getCurrentBoard(){
+        return this.board;
+    }
+
+    getPastBoard(turnIdx){
+        return this.boardHistory[turnIdx];
+    }
+
+    debugPrint(){
+        console.log("score", this.score);
+        let boardString = "\n";
+        for (let x = 0; x < 8; x++){
+            for (let y = 0; y < 8; y++){
+                boardString += (this.board[x][y] == -1 ? "-": this.board[x][y] == 0 ? "B" : "W") + " ";
+            }
+            boardString += "\n";
+        }
+        console.log("board", boardString);
     }
 }
-
-// ページロード時にCookieからゲームIDを読み込む
-document.addEventListener('DOMContentLoaded', function() {
-    const gameHistory = getCookie('game_history');
-    if (gameHistory) {
-        // ゲーム履歴を使って何かする
-        console.log('Game History:', JSON.parse(gameHistory));
-    }
-});

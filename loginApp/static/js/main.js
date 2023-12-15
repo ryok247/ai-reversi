@@ -1,12 +1,11 @@
 "use strict";
 
 // Importing required modules and components
-import { gameState } from './game-state.js';
 import { gameSettings } from './game-settings.js';
-import { gameHistory } from './game-history.js';
-import { boardInfo } from './game-logic.js';
+import { boardInfo } from './manage-game.js';
 import { getCookie, getCsrfToken } from './utilities.js';
 import { sharedState } from './game-shared.js';
+import { gameLogic } from './game-logic.js';
 
 // Selecting DOM elements
 const boardElement = document.querySelector(".board");
@@ -17,9 +16,8 @@ const historyElement = document.getElementById("history");
 // Function to initialize the game
 function initializeGame(historyElement){
     sharedState.settings = new gameSettings("mode", "color", "level", "highlight");
-    sharedState.state = new gameState(turnElement);
-    sharedState.gamehistory = new gameHistory(historyElement, sharedState.state);
-    sharedState.board = new boardInfo(sharedState.state, sharedState.settings, sharedState.gamehistory, boardElement);
+    sharedState.logic = new gameLogic();
+    sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
 }
 
 // Function to check if the user is logged in

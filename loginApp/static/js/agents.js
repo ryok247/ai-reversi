@@ -12,7 +12,7 @@ export class Agent{
 export class randomAgent extends Agent{
     move(board){
         let aiMove = [-1, -1];
-        while (!board.isValidMove(...aiMove)) aiMove = [getRandomInt(7), getRandomInt(7)];
+        while (!board.logic.isValidMove(...aiMove)) aiMove = [getRandomInt(7), getRandomInt(7)];
         return aiMove;
     }
 }
