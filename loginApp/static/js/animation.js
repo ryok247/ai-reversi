@@ -1,5 +1,7 @@
 "use strict";
 
+import { sharedState } from "./game-shared.js";
+
 const progressElement = document.getElementById('progress');
 const animatedBoardElement = document.querySelector(".board.animated");
 
@@ -59,24 +61,32 @@ function constructBoard(eachBoardHistory){
 
     resetBoard();
 
-    eachBoardHistory.forEach((cellColor, index) => {
-        if (cellColor == "empty") return;
-        const newPiece = document.createElement("div");
-        newPiece.classList.add("piece", cellColor);
-        cells[index].appendChild(newPiece);
-    });
+    for (let i=0; i<8; i++){
+        for (let j=0; j<8; j++){
+            if (eachBoardHistory[i][j] == -1) continue;
+            const newPiece = document.createElement("div");
+            newPiece.classList.add("piece", (eachBoardHistory[i][j] == 0 ? "black": "white"));
+            cells[i*8+j].appendChild(newPiece);
+        }
+    }
 }
 
-function displayTurn(currentTurnIndex){
-    if (currentTurnIndex >= window.gamehistory.history.length) return;
-    constructBoard(window.gamehistory.boardHistory[currentTurnIndex]);
+function displayReplayBoard(currentTurnIndex){
+    if (currentTurnIndex + 1 >= sharedState.logic.history.length) return;
+    constructBoard(sharedState.logic.boardHistory[currentTurnIndex + 1]);
     hightlightCurrentTurn(currentTurnIndex);
 }
 
 function startAnimation(){
     isPlaying = true;
     animationInterval = setInterval(() => {
-        displayTurn(currentTurnIndex);
+        // isPlayingがfalseの場合、アニメーションを停止
+        if (!isPlaying) {
+            clearInterval(animationInterval);
+            return;
+        }
+
+        displayReplayBoard(currentTurnIndex);
         currentTurnIndex++;
         updateProgressBar();
     }, 2000);
@@ -90,18 +100,18 @@ function pauseAnimation() {
 function restartAnimation() {
     currentTurnIndex = 0;
     reloadPage();
-    displayTurn(currentTurnIndex);
+    displayReplayBoard(currentTurnIndex);
     updateProgressBar();
 }
 
 function skipToEnd() {
-    currentTurnIndex = window.gamehistory.history.length - 1;
+    currentTurnIndex = sharedState.logic.history.length - 2;
     updateProgressBar();
 }
 
 function forwardStep(){
-    if (currentTurnIndex >= window.gamehistory.history.length) return;
-    displayTurn(currentTurnIndex);
+    if (currentTurnIndex+1 >= sharedState.logic.history.length) return;
+    displayReplayBoard(currentTurnIndex);
     currentTurnIndex++;
     updateProgressBar();
 }
@@ -109,12 +119,12 @@ function forwardStep(){
 function backwardStep(){
     if (currentTurnIndex <= 0) return;
     currentTurnIndex--;
-    displayTurn(currentTurnIndex);
+    displayReplayBoard(currentTurnIndex);
     updateProgressBar();
 }
 
 function updateProgressBar() {
-    const progress = (currentTurnIndex + 1) / window.gamehistory.history.length * 100;
+    const progress = (currentTurnIndex + 1) / sharedState.logic.history.length * 100;
     progressElement.style.width = `${progress}%`;
 }
 
@@ -125,12 +135,12 @@ function seek(event) {
 
     const progressBar = event.currentTarget;
     const clickX = event.clientX - progressBar.getBoundingClientRect().left;
-    const progress = (clickX / progressBar.clientWidth) * window.gamehistory.history.length;
+    const progress = (clickX / progressBar.clientWidth) * sharedState.logic.history.length;
     currentTurnIndex = Math.floor(progress);
 
     reloadPage();
     for (let i=0; i<=currentTurnIndex; i++){
-        displayTurn(i);
+        displayReplayBoard(i);
     }
 
     updateProgressBar();
@@ -140,7 +150,7 @@ function hightlightCurrentTurn(currentTurnIndex) {
     const currentTurn = document.querySelector(".current-turn");
     if (currentTurn) currentTurn.classList.remove("current-turn");
     const currentTurnElement = document.querySelector(`.history-replay table tbody tr:nth-child(${
-        window.gamehistory.history.length - currentTurnIndex
+        sharedState.logic.history.length - currentTurnIndex - 1
     })`);
     currentTurnElement.classList.add("current-turn");
 
@@ -153,5 +163,6 @@ function hightlightCurrentTurn(currentTurnIndex) {
 export function fromHistoryRowDisplayBoard(event){
     const currentTurnElement = event.currentTarget;
     const currentTurnIndex = parseInt(currentTurnElement.childNodes[0].textContent)-1;
-    displayTurn(currentTurnIndex);
+    displayReplayBoard(currentTurnIndex);
+    isPlaying = false;
 }
