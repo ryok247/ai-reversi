@@ -10,6 +10,7 @@ export class ReplayAnimator {
         this.animationInterval = null;
         this.cells = [];
         this.initBoard();
+        this.placeInitialPieces();
     }
 
     initBoard() {
@@ -27,7 +28,6 @@ export class ReplayAnimator {
                 this.cells.push(cell);
             }
         }
-        this.placeInitialPieces();
     }
 
     placeInitialPieces() {

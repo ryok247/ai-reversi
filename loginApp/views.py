@@ -237,3 +237,7 @@ class GetMovesView(CreateView):
         except Game.DoesNotExist:
             # Game not found error response
             return JsonResponse({'error': 'Game not found'}, status=404)
+        
+class PastReplayView(CreateView):
+    def get(self, request, game_id):
+        return render(request, 'past-replay.html', {'game_id': game_id})
