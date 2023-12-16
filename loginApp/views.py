@@ -113,6 +113,7 @@ class GameDetailsView(CreateView):
         try:
             game = Game.objects.get(id=game_id)
             return JsonResponse({
+                'id': game_id,
                 'player_color': game.player_color,
                 'game_datetime': game.game_datetime.isoformat(),
                 'ai_level': game.ai_level,
@@ -214,3 +215,29 @@ class ToggleFavoriteView(CreateView):
         else:
             # Not authenticated error response
             return JsonResponse({'error': 'Not authenticated'}, status=403)
+
+class GetMovesView(CreateView):
+    # View to get moves of a game
+    def get(self, request, game_id):
+        # Handles GET request to get moves of a game
+        try:
+            game = Game.objects.get(id=game_id)
+            moves = game.moves.all().order_by('move_number')
+            moves_data = []
+            for move in moves:
+                # Formatting necessary move data to be added to moves_data
+                moves_data.append({
+                    'move_number': move.move_number,
+                    'row': move.row,
+                    'col': move.col,
+                    'is_pass': move.is_pass,
+                    'comment': move.comment
+                })
+            return JsonResponse({'moves': moves_data})
+        except Game.DoesNotExist:
+            # Game not found error response
+            return JsonResponse({'error': 'Game not found'}, status=404)
+        
+class PastReplayView(CreateView):
+    def get(self, request, game_id):
+        return render(request, 'past-replay.html', {'game_id': game_id})

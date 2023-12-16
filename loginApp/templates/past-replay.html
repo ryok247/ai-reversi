@@ -1,0 +1,74 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block title %}AI Reversi - Game Replay{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Replay</h1>
+    <input type="hidden" id="game-id" value="{{ game_id }}">
+
+    <div class="row">
+        <div class="col-2">
+            <div class="info"><h4>Game Info</h4></div>
+            <div class="info">Date</div>
+            <div id="info-date"></div>
+            <div class="info">Time</div>
+            <div id="info-time"></div>
+            <div class="info">Your Color</div>
+            <div id="info-color"></div>
+            <div class="info">Result</div>
+            <div id="info-result"></div>
+            <div class="info">Black</div>
+            <div id="info-black-score"></div>
+            <div class="info">White</div>
+            <div id="info-white-score"></div>
+            <div class="info">AI Level</div>
+            <div id="info-ai-level"></div>
+        </div>
+
+        <div class="col-7">
+            <div class="board animated">
+                <!-- Game board will be generated here. -->
+            </div>
+
+            <div class="controls">
+                <button type="button" class="btn btn-primary" id="restart-animation-btn"><i class="fa-solid fa-backward-fast"></i></button>
+                <button type="button" class="btn btn-primary" id="backward-step-btn"><i class="fa-solid fa-backward-step"></i></button>
+                <button type="button" class="btn btn-primary" id="start-animation-btn"><i class="fa-solid fa-solid fa-play"></i></button>
+                <button type="button" class="btn btn-primary" id="pause-animation-btn"><i class="fa-solid fa-pause"></i></button>
+                <button type="button" class="btn btn-primary" id="forward-step-btn"><i class="fa-solid fa-forward-step"></i></button>
+                <button type="button" class="btn btn-primary" id="skip-to-end-btn"><i class="fa-solid fa-forward-fast"></i></button>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+        </div>
+
+        <div class="col-3">
+            <div class="history-replay">
+                <div class="info"><h4>History</h4></div>
+                <div class="overflow-auto" style="max-height: 400px;">
+                    <table class="past-history-table table table-striped table-bordered border-primary table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Player</th>
+                                <th scope="col">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody id="replay-table-body">
+                            <!-- 履歴がここに表示されます -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="{% static 'js/replay.js' %}"></script>
+<script src="https://kit.fontawesome.com/e95821f2a6.js" crossorigin="anonymous"></script>
+{% endblock %}
