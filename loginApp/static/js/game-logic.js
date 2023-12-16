@@ -156,14 +156,23 @@ export class gameLogic {
     isFull() { return this.score[0] + this.score[1] == 64; }
 
     // Undoes moves up to a certain turn index.
-    undo(turnIdx) {
-        this.board = this.boardHistory[turnIdx].map((arr) => arr.slice());
-        this.history = this.history.slice(0, turnIdx + 1);
-        this.boardHistory = this.boardHistory.slice(0, turnIdx + 1);
-        this.currentPlayer = (this.history.length - 1) % 2;
-        this.score = [2, 2];
+    undo(turnIdx=-1) {
+        if (turnIdx == -1){
+            this.history.pop();
+            this.boardHistory.pop();
+            this.currentPlayer ^= 1;
+            this.board = this.boardHistory[this.boardHistory.length - 1].map((arr) => arr.slice());
+        }
+        else {
+            this.board = this.boardHistory[turnIdx].map((arr) => arr.slice());
+            this.history = this.history.slice(0, turnIdx + 1);
+            this.boardHistory = this.boardHistory.slice(0, turnIdx + 1);
+            this.currentPlayer = (this.history.length - 1) % 2;
+        }
+        this.score = [0, 0];
         for (let x = 0; x < 8; x++) {
             for (let y = 0; y < 8; y++) {
+                if (this.board[x][y] == -1) continue;
                 this.score[this.board[x][y]]++;
             }
         }
@@ -171,7 +180,7 @@ export class gameLogic {
 
     // Returns the current score.
     getScore() {
-        return this.score;
+        return [this.score[0], this.score[1]];
     }
 
     // Returns the current board state.
