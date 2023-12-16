@@ -8,8 +8,9 @@ const animatedBoardElement = document.querySelector(".board.animated");
 const animator = new ReplayAnimator(logic, animatedBoardElement, progressElement);
 
 document.addEventListener('DOMContentLoaded', function() {
-    const gameId = document.getElementById('game-id').value; // ゲームIDを取得
+    const gameId = document.getElementById('game-id').value;
 
+    // Get game details and display them
     fetch(`/get_game_details/${gameId}`)
     .then(response => {
         if (!response.ok) {
@@ -45,12 +46,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return null;
     })
 
-    fetch(`/get_moves/${gameId}/`) // ゲームデータの取得
+    // Get game moves and display them
+    fetch(`/get_moves/${gameId}/`)
         .then(response => response.json())
         .then(data => {
             const moves = data.moves;
 
-            // ここでGameLogicインスタンスの更新とリプレイの準備を行う
             for (let i=1; i<moves.length; i++){
                 if (moves[i].row == 9 && moves[i].col == 9){
                     addToHistoryTable(animator, -1, -1, logic.history.length, "past-history-table");

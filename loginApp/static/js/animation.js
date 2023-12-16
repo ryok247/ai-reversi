@@ -1,6 +1,7 @@
 "use strict";
 
 export class ReplayAnimator {
+    // Constructor: Initializes game logic, board element, and progress bar.
     constructor(gameLogicInstance, boardElement, progressElement) {
         this.gameLogic = gameLogicInstance;
         this.boardElement = boardElement;
@@ -13,6 +14,7 @@ export class ReplayAnimator {
         this.placeInitialPieces();
     }
 
+    // Initializes the game board by clearing and creating cells.
     initBoard() {
         this.cells = [];
         while (this.boardElement.firstChild) {
@@ -30,6 +32,7 @@ export class ReplayAnimator {
         }
     }
 
+    // Places the initial pieces on the board.
     placeInitialPieces() {
         const firstPositions = [27, 28, 36, 35];
         for (let i = 0; i < firstPositions.length; i++) {
@@ -39,6 +42,7 @@ export class ReplayAnimator {
         }
     }
 
+    // Constructs the board for each step in the game history.
     constructBoard(eachBoardHistory) {
         this.initBoard();
         for (let i = 0; i < 8; i++) {
@@ -51,12 +55,14 @@ export class ReplayAnimator {
         }
     }
 
+    // Displays the game board for a specific turn in the replay.
     displayReplayBoard(turnIndex) {
         if (turnIndex + 1 >= this.gameLogic.history.length) return;
         this.constructBoard(this.gameLogic.boardHistory[turnIndex + 1]);
         this.highlightCurrentTurn(turnIndex);
     }
 
+    // Starts the animation for replay.
     startAnimation() {
         this.isPlaying = true;
         this.animationInterval = setInterval(() => {
@@ -72,11 +78,13 @@ export class ReplayAnimator {
         }, 1000);
     }
 
+    // Pauses the animation.
     pauseAnimation() {
         this.isPlaying = false;
         clearInterval(this.animationInterval);
     }
 
+    // Restarts the animation from the beginning.
     restartAnimation() {
         this.currentTurnIndex = 0;
         this.initBoard();
@@ -84,11 +92,13 @@ export class ReplayAnimator {
         this.updateProgressBar();
     }
 
+    // Skips to the end of the animation.
     skipToEnd() {
         this.currentTurnIndex = this.gameLogic.history.length - 2;
         this.updateProgressBar();
     }
 
+    // Moves one step forward in the animation.
     forwardStep() {
         if (this.currentTurnIndex < this.gameLogic.history.length - 1) {
             this.displayReplayBoard(this.currentTurnIndex);
@@ -97,6 +107,7 @@ export class ReplayAnimator {
         }
     }
 
+    // Moves one step backward in the animation.
     backwardStep() {
         if (this.currentTurnIndex > 0) {
             this.currentTurnIndex--;
@@ -105,11 +116,13 @@ export class ReplayAnimator {
         }
     }
 
+    // Updates the progress bar based on the current turn.
     updateProgressBar() {
         const progress = (this.currentTurnIndex + 1) / this.gameLogic.history.length * 100;
         this.progressElement.style.width = `${progress}%`;
     }
 
+    // Handles seeking to a specific turn in the animation.
     seek(event) {
         const progressBar = event.currentTarget;
         const clickX = event.clientX - progressBar.getBoundingClientRect().left;
@@ -122,21 +135,23 @@ export class ReplayAnimator {
         this.updateProgressBar();
     }
 
+    // Highlights the current turn in the game history table.
     highlightCurrentTurn(turnIndex) {
-        // 履歴表内の全行のハイライトを削除
+        // Remove highlight from all rows in history table.
         const rows = document.querySelectorAll('.history-replay table tbody tr');
         rows.forEach(row => row.classList.remove("current-turn"));
     
-        // 現在の手番の行をハイライト
+        // Highlight the row corresponding to the current turn.
         const currentRow = rows[rows.length - turnIndex - 1];
         if (currentRow) {
             currentRow.classList.add("current-turn");
     
-            // ハイライトされた行が表示されるようにスクロール
+            // Scroll to ensure the highlighted row is visible.
             currentRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 
+    // Handles displaying the board from a specific history row click.
     fromHistoryRowDisplayBoard(event) {
         const row = event.currentTarget;
         const rowIndex = Array.from(row.parentNode.children).indexOf(row);

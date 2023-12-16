@@ -287,7 +287,7 @@ export class boardInfo{
     saveGameToDatabase() {
         const gameJsonData = this.createGameData();
     
-        // Promise を return する
+        // Send request to the backend
         return fetch('/save_game/', {
             method: 'POST',
             body: gameJsonData,
@@ -531,20 +531,20 @@ export function toggleFavorite(gameId) {
         if (data.status === 'success') {
             const favoriteCells = document.querySelectorAll(`.favorite-column[data-game-id="${gameId}"]`);
             favoriteCells.forEach(cell => {
-                // 以前のアイコンを削除
+                // Delete the old icon
                 cell.innerHTML = '';
 
-                // 新しいアイコンを作成
+                // Create a new icon
                 const newFavoriteIcon = document.createElement('i');
                 newFavoriteIcon.className = `fa fa-star`;
                 newFavoriteIcon.style.color = data.is_favorite ? 'orange' : 'grey';
                 newFavoriteIcon.style.cursor = 'pointer';
                 newFavoriteIcon.addEventListener('click', () => toggleFavorite(gameId));
 
-                // 新しいアイコンを追加
+                // Add the new icon to the cell
                 cell.appendChild(newFavoriteIcon);
 
-                // Favorite Gamesテーブルを更新
+                // Update the favorite games table
                 const isFavorite = data.is_favorite ? 'Yes' : 'No';
                 updateFavoriteGamesTable(gameId, isFavorite);
             });
@@ -568,11 +568,11 @@ export function updateFavoriteGamesTable(gameId, isFavorite) {
         if (!rowInFavoriteGames) {
             const newRow = rowInRecentGames.cloneNode(true);
 
-            // 新しい行のリプレイアイコンにイベントリスナーを追加
+            // Add event listener to the replay icon in the new row
             const replayIcon = newRow.querySelector('.replay-icon');
             replayIcon.addEventListener('click', () => startReplay(gameId));
 
-            // Favoriteアイコンにイベントリスナーを再設定
+            // Add event listener to the favorite icon in the new row
             const newFavoriteCell = newRow.querySelector('.favorite-column');
             newFavoriteCell.addEventListener('click', function() {
                 toggleFavorite(gameId);
@@ -588,6 +588,6 @@ export function updateFavoriteGamesTable(gameId, isFavorite) {
 }
 
 export function startReplay(gameId) {
-    // 新しいタブでリプレイ用のページを開く
+    // Open a new window for the replay
     window.open(`/past_replay/${gameId}/`, '_blank');
 }
