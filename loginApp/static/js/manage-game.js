@@ -202,7 +202,7 @@ export class boardInfo{
     // AI's move
     makeComputerMove(){
 
-        const aiMove = this.agent.move(this);
+        const aiMove = this.agent.move(this.logic);
         addToHistoryTable(sharedState.animator, ...aiMove, this.logic.history.length, "history-table");
         this.placePiece(...aiMove);
 

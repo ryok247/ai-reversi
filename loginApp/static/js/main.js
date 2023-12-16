@@ -19,9 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmedBtnElement.addEventListener("click", () => {
         initializeGame(historyElement);
         // Check game mode and make a computer move if necessary
-        if (settings.mode == "cp" && settings.color == "white") board.makeComputerMove();
+        if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") sharedState.board.makeComputerMove();
         // Highlight possible cells
-        board.highlightPossibleCells();
+        sharedState.board.highlightPossibleCells();
     });
     initializeGame(historyElement);
 });
