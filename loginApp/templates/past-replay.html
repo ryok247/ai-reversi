@@ -6,11 +6,29 @@
 
 {% block content %}
 <div class="container">
-    <h1>Game Replay</h1>
+    <h1>Replay</h1>
     <input type="hidden" id="game-id" value="{{ game_id }}">
 
     <div class="row">
-        <div class="col-8">
+        <div class="col-2">
+            <div class="info"><h4>Game Info</h4></div>
+            <div class="info">Date</div>
+            <div id="info-date"></div>
+            <div class="info">Time</div>
+            <div id="info-time"></div>
+            <div class="info">Your Color</div>
+            <div id="info-color"></div>
+            <div class="info">Result</div>
+            <div id="info-result"></div>
+            <div class="info">Black</div>
+            <div id="info-black-score"></div>
+            <div class="info">White</div>
+            <div id="info-white-score"></div>
+            <div class="info">AI Level</div>
+            <div id="info-ai-level"></div>
+        </div>
+
+        <div class="col-7">
             <div class="board animated">
                 <!-- Game board will be generated here. -->
             </div>
@@ -29,9 +47,9 @@
             </div>
         </div>
 
-        <div class="col-4">
+        <div class="col-3">
             <div class="history-replay">
-                <div class="info">History</div>
+                <div class="info"><h4>History</h4></div>
                 <div class="overflow-auto" style="max-height: 400px;">
                     <table class="past-history-table table table-striped table-bordered border-primary table-sm">
                         <thead>

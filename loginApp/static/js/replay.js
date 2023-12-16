@@ -10,6 +10,41 @@ const animator = new ReplayAnimator(logic, animatedBoardElement, progressElement
 document.addEventListener('DOMContentLoaded', function() {
     const gameId = document.getElementById('game-id').value; // ゲームIDを取得
 
+    fetch(`/get_game_details/${gameId}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Game ID ${gameId} not found`);
+        }
+        return response.json();
+    })
+    .then(game => {
+        // Other columns
+        const dateElement = document.getElementById('info-date');
+        dateElement.textContent = new Date(game.game_datetime).toLocaleDateString();
+    
+        const timeElement = document.getElementById('info-time');
+        timeElement.textContent = new Date(game.game_datetime).toLocaleTimeString();
+    
+        const colorElement = document.getElementById('info-color');
+        colorElement.textContent = game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1);
+    
+        const resultElement = document.getElementById('info-result');
+        resultElement.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+    
+        const blackScoreElement = document.getElementById('info-black-score');
+        blackScoreElement.textContent = game.black_score;
+    
+        const whiteScoreElement = document.getElementById('info-white-score');
+        whiteScoreElement.textContent = game.white_score;
+    
+        const ailevelElement = document.getElementById('info-ai-level');
+        ailevelElement.textContent = 'Level ' + game.ai_level;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        return null;
+    })
+
     fetch(`/get_moves/${gameId}/`) // ゲームデータの取得
         .then(response => response.json())
         .then(data => {
