@@ -36,18 +36,20 @@ export class gameLogic {
     }
 
     // Places a piece on the board and flips the opponent's pieces.
-    placePiece(x, y) {
+    placePiece(x, y, actualMove = true) {
         console.assert(this.isValidMove(x, y));
-        this.board[x][y] = this.currentPlayer;
-        this.score[this.currentPlayer]++;
+        if (actualMove) this.board[x][y] = this.currentPlayer;
+        if (actualMove) this.score[this.currentPlayer]++;
         let flip = [];
         for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
                 if (dx == 0 && dy == 0) continue;
                 if (!this.isValidDirection(x, y, dx, dy)) continue;
-                flip = [...flip, ...this.flipDirection(x, y, dx, dy)];
+                flip = [...flip, ...this.flipDirection(x, y, dx, dy, actualMove)];
             }
         }
+
+        if (!actualMove) return flip;
 
         // Updates history and board history.
         this.history.push([x, y]);
@@ -79,7 +81,7 @@ export class gameLogic {
     }
 
     // Flips the opponent's pieces in a specific direction.
-    flipDirection(x, y, dx, dy) {
+    flipDirection(x, y, dx, dy, actualFlip = true) {
         let nx = x + dx;
         let ny = y + dy;
         let flip = [];
@@ -99,6 +101,7 @@ export class gameLogic {
             
             };
             if (this.board[nx][ny] == this.currentPlayer) {
+                if (!actualFlip) return flip;
                 for (let i = 0; i < flip.length; i++) {
                     this.board[flip[i][0]][flip[i][1]] = this.currentPlayer;
                 }
@@ -153,17 +156,31 @@ export class gameLogic {
     isFull() { return this.score[0] + this.score[1] == 64; }
 
     // Undoes moves up to a certain turn index.
-    undo(turnIdx) {
-        this.board = this.boardHistory[turnIdx].map((arr) => arr.slice());
-        this.history = this.history.slice(0, turnIdx + 1);
-        this.boardHistory = this.boardHistory.slice(0, turnIdx + 1);
-        this.currentPlayer = (this.history.length - 1) % 2;
-        this.score = [2, 2];
+    undo(turnIdx=-1) {
+        if (turnIdx == -1){
+            this.history.pop();
+            this.boardHistory.pop();
+            this.currentPlayer ^= 1;
+            this.board = this.boardHistory[this.boardHistory.length - 1].map((arr) => arr.slice());
+        }
+        else {
+            this.board = this.boardHistory[turnIdx].map((arr) => arr.slice());
+            this.history = this.history.slice(0, turnIdx + 1);
+            this.boardHistory = this.boardHistory.slice(0, turnIdx + 1);
+            this.currentPlayer = (this.history.length - 1) % 2;
+        }
+        this.score = [0, 0];
         for (let x = 0; x < 8; x++) {
             for (let y = 0; y < 8; y++) {
+                if (this.board[x][y] == -1) continue;
                 this.score[this.board[x][y]]++;
             }
         }
+    }
+
+    // Returns the current score.
+    getScore() {
+        return [this.score[0], this.score[1]];
     }
 
     // Returns the current board state.

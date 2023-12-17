@@ -2,7 +2,6 @@
 
 // Importing required modules and components
 import { sharedState } from './game-shared.js';
-import { ReplayAnimator } from './animation.js';
 import { 
     initializeGame,
     loadGames, 
@@ -19,20 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmedBtnElement.addEventListener("click", () => {
         initializeGame(historyElement);
         // Check game mode and make a computer move if necessary
-        if (settings.mode == "cp" && settings.color == "white") board.makeComputerMove();
+        if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") sharedState.board.makeComputerMove();
         // Highlight possible cells
-        board.highlightPossibleCells();
+        sharedState.board.highlightPossibleCells();
     });
     initializeGame(historyElement);
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-
-    const progressElement = document.getElementById('progress');
-    const animatedBoardElement = document.querySelector(".board.animated");
-
-    sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
-
     document.getElementById("restart-animation-btn").addEventListener("click", () => sharedState.animator.restartAnimation());
     document.getElementById("backward-step-btn").addEventListener("click", () => sharedState.animator.backwardStep());
     document.getElementById("start-animation-btn").addEventListener("click", () => sharedState.animator.startAnimation());

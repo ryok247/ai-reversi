@@ -33,3 +33,20 @@ export function setCookie(name, value, days) {
 export function getCsrfToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
 }
+
+export class NotImplementedError extends Error {
+    constructor(message) {
+        super(message || "This function is not implemented.");
+        this.name = "NotImplementedError";
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, NotImplementedError);
+        }
+    }
+}
+
+export function makeAsync(syncFunction) {
+    return async function(...args) {
+        // Call a synchronous function asynchronously
+        return syncFunction.apply(this, args);
+    };
+}
