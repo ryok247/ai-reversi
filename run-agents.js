@@ -1,6 +1,6 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent, nTurnMinimaxAgent } from "./loginApp/static/js/agents.js";
+import { randomAgent, simpleGreedyAgent, nTurnMinimaxAgent, nTurnMinimaxLastExausiveAgent } from "./loginApp/static/js/agents.js";
 import { gameLogic } from "./loginApp/static/js/game-logic.js";
 
 class Game {
@@ -57,7 +57,7 @@ game.playGames(1000);
 game.printResults();
 */
 
-const game = new Game(nTurnMinimaxAgent, randomAgent, [3], []);
+const game = new Game(nTurnMinimaxLastExausiveAgent, randomAgent, [3, 10], []);
 //const game = new Game(randomAgent, nTurnMinimaxAgent, [], [3]);
 game.playGames(1000);
 game.printResults();

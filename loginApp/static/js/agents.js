@@ -40,6 +40,7 @@ export class simpleGreedyAgent extends Agent{
     }
 }
 
+// minimax agent that looks n turns ahead
 export class nTurnMinimaxAgent extends Agent{
     constructor(n){
         super();
@@ -54,14 +55,6 @@ export class nTurnMinimaxAgent extends Agent{
         this.maxDepth = 0;
         this.calcNTurnScoreDFS(logic, 0, result);
         const [optimal, [row, col]] = this.calcOptimalDFS(0, result);
-
-        /*
-        console.log()
-        console.log(logic.score[0], logic.score[1]);
-        //console.log(result);
-        console.log(optimal, [row, col]);
-        console.log()
-        */
 
         return [row, col];
     }
@@ -103,6 +96,20 @@ export class nTurnMinimaxAgent extends Agent{
             }
         });
         return [optimal, ans];
+    }
+}
+
+// minimax agent that looks n turns ahead or does exhaustive search if the game is almost over (64 - scoreSum <= k)
+export class nTurnMinimaxLastExausiveAgent extends nTurnMinimaxAgent{
+    constructor(n, k){
+        super(n);
+        this.k = k;
+    }
+
+    move(logic){
+        const scoreSum = logic.score[0] + logic.score[1];
+        if (scoreSum >= 64 - this.k) this.n = 64 - scoreSum;
+        return super.move(logic);
     }
 }
 
