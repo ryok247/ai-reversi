@@ -1,7 +1,7 @@
 "use strict";
 
 import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent} from './agents.js'
-import { getCookie, setCookie, getCsrfToken } from './utilities.js'
+import { getCookie, setCookie, getCsrfToken, makeAsync } from './utilities.js'
 import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
 import { gameLogic } from './game-logic.js';
@@ -43,6 +43,9 @@ export class boardInfo{
         else if (this.settings.level == 2) this.agent = new simpleGreedyAgent();
         else if (this.settings.level == 3) this.agent = new nTurnMinimaxLastExausiveAgent(6,10);
         else console.assert(false);
+
+        // Make the AI's move function asynchronous since it may take a long time
+        this.asyncMove = makeAsync(this.agent.move);
 
         this.cells = [];
         this.boardElement.innerHTML = "";
@@ -107,7 +110,7 @@ export class boardInfo{
         document.getElementById("white-score").textContent = this.logic.score[1];
     }
 
-    cellClickHandler(row, col){
+    async cellClickHandler(row, col){
 
         //const possibleCells = this.getPossibleCells();
 
@@ -163,11 +166,15 @@ export class boardInfo{
     
                 return;
             }
+
+            // Before executing other processes, end the current event loop cycle
+            // This allows the UI to be updated immediately
+            await new Promise(resolve => setTimeout(resolve, 0));
     
             // execute ai player's action
             if (this.settings.mode == "cp") {
     
-                this.makeComputerMove();
+                await this.makeComputerMove();
     
                 //　check if terminated
                 if (this.logic.isFull()) {
@@ -206,9 +213,10 @@ export class boardInfo{
     }
 
     // AI's move
-    makeComputerMove(){
+    async makeComputerMove(){
 
-        const aiMove = this.agent.move(this.logic);
+        //const aiMove = await this.agent.move(this.logic);
+        const aiMove = await this.asyncMove.call(this.agent, this.logic);
         addToHistoryTable(sharedState.animator, ...aiMove, this.logic.history.length, "history-table");
         this.placePiece(...aiMove);
 

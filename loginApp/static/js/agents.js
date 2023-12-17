@@ -1,6 +1,6 @@
 "use strict";
 
-import { getRandomInt, NotImplementedError } from './utilities.js';
+import { getRandomInt, NotImplementedError, } from './utilities.js';
 
 export class Agent{
     move(logic){

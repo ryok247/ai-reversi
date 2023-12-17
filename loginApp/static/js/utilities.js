@@ -43,3 +43,10 @@ export class NotImplementedError extends Error {
         }
     }
 }
+
+export function makeAsync(syncFunction) {
+    return async function(...args) {
+        // Call a synchronous function asynchronously
+        return syncFunction.apply(this, args);
+    };
+}
