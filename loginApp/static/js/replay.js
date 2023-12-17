@@ -30,7 +30,12 @@ document.addEventListener('DOMContentLoaded', function() {
         colorElement.textContent = game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1);
     
         const resultElement = document.getElementById('info-result');
-        resultElement.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+        if (game.player_color == "black"){
+            resultElement.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+        } else {
+            resultElement.textContent = game.black_score > game.white_score ? 'Lose' : game.black_score < game.white_score ? 'Win' : 'Draw';
+        }
+        row.appendChild(resultColumn);
     
         const blackScoreElement = document.getElementById('info-black-score');
         blackScoreElement.textContent = game.black_score;

@@ -1,18 +1,23 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent} from './agents.js'
+import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent} from './agents.js'
 import { getCookie, setCookie, getCsrfToken } from './utilities.js'
 import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
 import { gameLogic } from './game-logic.js';
+import { ReplayAnimator } from './animation.js';
 
 // Function to initialize the game
 export function initializeGame(historyElement){
     const boardElement = document.querySelector(".board");
     const turnElement = document.getElementById("turn");
 
+    const progressElement = document.getElementById('progress');
+    const animatedBoardElement = document.querySelector(".board.animated");
+
     sharedState.settings = new gameSettings("mode", "color", "level", "highlight");
     sharedState.logic = new gameLogic();
+    sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
     sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
 }
 
@@ -36,6 +41,7 @@ export class boardInfo{
 
         if (this.settings.level == 1) this.agent = new randomAgent();
         else if (this.settings.level == 2) this.agent = new simpleGreedyAgent();
+        else if (this.settings.level == 3) this.agent = new nTurnMinimaxLastExausiveAgent(6,10);
         else console.assert(false);
 
         this.cells = [];
@@ -472,7 +478,11 @@ export function createRowFromDatabase(game) {
     row.appendChild(colorColumn);
 
     const resultColumn = document.createElement('td');
-    resultColumn.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+    if (game.player_color == "black"){
+        resultColumn.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+    } else {
+        resultColumn.textContent = game.black_score > game.white_score ? 'Lose' : game.black_score < game.white_score ? 'Win' : 'Draw';
+    }
     row.appendChild(resultColumn);
 
     const blackScoreColumn = document.createElement('td');

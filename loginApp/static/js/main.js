@@ -2,7 +2,6 @@
 
 // Importing required modules and components
 import { sharedState } from './game-shared.js';
-import { ReplayAnimator } from './animation.js';
 import { 
     initializeGame,
     loadGames, 
@@ -27,12 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-
-    const progressElement = document.getElementById('progress');
-    const animatedBoardElement = document.querySelector(".board.animated");
-
-    sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
-
     document.getElementById("restart-animation-btn").addEventListener("click", () => sharedState.animator.restartAnimation());
     document.getElementById("backward-step-btn").addEventListener("click", () => sharedState.animator.backwardStep());
     document.getElementById("start-animation-btn").addEventListener("click", () => sharedState.animator.startAnimation());
