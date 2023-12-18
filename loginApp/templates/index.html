@@ -19,7 +19,8 @@
 
     <div class="tabs">
         <div class="tab-button active" data-tab="Game" onclick="openTab('Game')">Game</div>
-        <div class="tab-button" data-tab="Analysis" onclick="openTab('Analysis')">Analysis</div>
+        <div class="tab-button" data-tab="Replay" onclick="openTab('Replay')">Replay</div>
+        <div class="tab-button" data-tab="Dashboard" id="dashboard-tab" onclick="openTab('Dashboard')" style="display: none;">Dashboard</div>
     </div>
 
     <div id="Game" class="tab-content active">
@@ -83,6 +84,7 @@
                                         <th scope="col">#</th>
                                         <th scope="col">Player</th>
                                         <th scope="col">Position</th>
+                                        <th scope="col">Time</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -96,7 +98,7 @@
         </div>
     </div>
 
-    <div id="Analysis" class="tab-content">
+    <div id="Replay" class="tab-content">
 
         <div class="container">
             <div class="row">
@@ -128,6 +130,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Player</th>
                                     <th scope="col">Position</th>
+                                    <th scope="col">Time</th>
                                 </tr>
                                 </thead>
                                 <tbody id="replay-table-body">
@@ -140,6 +143,63 @@
         </div>
         <script src="{% static 'js/animation.js' %}"></script>
         <script src="https://kit.fontawesome.com/e95821f2a6.js" crossorigin="anonymous"></script>
+    </div>
+
+    <div id="Dashboard" class="tab-content">
+        <h2>Performance</h2>
+        <div id="dashboard-tab" style="overflow-x:auto;">
+    
+            <!-- Table that shows today's results -->
+            <h3>Today</h3>
+            <table id="ai-results-table-today" class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>AI Level</th>
+                        <th>Win</th>
+                        <th>Lose</th>
+                        <th>Draw</th>
+                        <th>Fastest Win</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data -->
+                </tbody>
+            </table>
+    
+            <!-- Table that shows this month's results -->
+            <h3>This Month</h3>
+            <table id="ai-results-table-month" class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>AI Level</th>
+                        <th>Win</th>
+                        <th>Lose</th>
+                        <th>Draw</th>
+                        <th>Fastest Win</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data -->
+                </tbody>
+            </table>
+    
+            <!-- Table that shows total results -->
+            <h3>Total</h3>
+            <table id="ai-results-table-total" class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>AI Level</th>
+                        <th>Win</th>
+                        <th>Lose</th>
+                        <th>Draw</th>
+                        <th>Fastest Win</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div id="favorite-games" style="display: none;">
@@ -161,6 +221,7 @@
                             <th scope="col">Black Score</th>
                             <th scope="col">White Score</th>
                             <th scope="col">AI Level</th>
+                            <th scope="col">User's Duration</th>
                         </tr>
                     </thead>
                     <tbody id="favorite-game-table-body">
@@ -195,6 +256,7 @@
                         <th scope="col">Black Score</th>
                         <th scope="col">White Score</th>
                         <th scope="col">AI Level</th>
+                        <th scope="col">User's Duration</th>
                     </tr>
                     </thead>
                     <tbody id="recent-game-table-body">

@@ -1,11 +1,13 @@
 from .forms import SignupForm, LoginForm
 from .models import CustomUser, Game, Move
+from django.db.models import Count, Case, When, IntegerField, F, Min
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.utils import timezone
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -71,12 +73,13 @@ class MyOtherView(LoginRequiredMixin, TemplateView):
 
 #@method_decorator(csrf_exempt, name='dispatch')
 class SaveGameView(CreateView):
-    # View for saving a game
     def post(self, request, *args, **kwargs):
-        # Handles POST request to save a game
         data = json.loads(request.body)
 
-        # Create game record
+        # Compute total duration by summing up the duration of each move
+        total_user_duration = sum(move.get('duration', 0) if move.get('duration', 0)>=0 else 0 for move in data['moves'])
+
+        # Create a new game record
         game = Game.objects.create(
             user=request.user if request.user.is_authenticated else None,
             name=data['name'],
@@ -86,7 +89,8 @@ class SaveGameView(CreateView):
             game_datetime=data['game_datetime'],
             black_score=data['black_score'],
             white_score=data['white_score'],
-            is_favorite=data['is_favorite']
+            is_favorite=data['is_favorite'],
+            total_user_duration=total_user_duration,
         )
 
         # Save each move of the game
@@ -97,7 +101,8 @@ class SaveGameView(CreateView):
                 row=move['row'],
                 col=move['col'],
                 is_pass=move['is_pass'],
-                comment=move['comment']
+                comment=move['comment'],
+                duration=move.get('duration', 0)
             )
 
         return JsonResponse({'status': 'success', 'game_id': game.id})
@@ -112,14 +117,9 @@ class GameDetailsView(CreateView):
         # Handles GET request to fetch game details
         try:
             game = Game.objects.get(id=game_id)
-            return JsonResponse({
-                'id': game_id,
-                'player_color': game.player_color,
-                'game_datetime': game.game_datetime.isoformat(),
-                'ai_level': game.ai_level,
-                'black_score': game.black_score,
-                'white_score': game.white_score
-            })
+            return JsonResponse(
+                create_game_record(game)
+            )
         except Game.DoesNotExist:
             # Game not found response
             return JsonResponse({'error': 'Game not found'}, status=404)
@@ -148,15 +148,9 @@ class UserGamesView(TemplateView):
             games_data = []
             for game in page_obj:
                 # Formatting necessary game data to be added to games_data
-                games_data.append({
-                    'id': game.id,
-                    'player_color': game.player_color,
-                    'game_datetime': game.game_datetime.isoformat(),
-                    'ai_level': game.ai_level,
-                    'black_score': game.black_score,
-                    'white_score': game.white_score,
-                    'is_favorite': game.is_favorite,
-                })
+                games_data.append(
+                    create_game_record(game)
+                )
 
             return JsonResponse({
                 'games': games_data,
@@ -180,15 +174,9 @@ class FavoriteGamesView(TemplateView):
             games_data = []
             for game in page_obj:
                 # Formatting necessary game data to be added to games_data
-                games_data.append({
-                    'id': game.id,
-                    'player_color': game.player_color,
-                    'game_datetime': game.game_datetime.isoformat(),
-                    'ai_level': game.ai_level,
-                    'black_score': game.black_score,
-                    'white_score': game.white_score,
-                    'is_favorite': game.is_favorite,
-                })
+                games_data.append(
+                    create_game_record(game)
+                )
 
             return JsonResponse({
                 'games': games_data,
@@ -198,6 +186,19 @@ class FavoriteGamesView(TemplateView):
         else:
             # Not authenticated error response
             return JsonResponse({'error': 'Not authenticated'}, status=403)
+        
+def create_game_record(game):
+    return {
+        'id': game.id,
+        'player_color': game.player_color,
+        'game_datetime': game.game_datetime.isoformat(),
+        'ai_level': game.ai_level,
+        'black_score': game.black_score,
+        'white_score': game.white_score,
+        'is_favorite': game.is_favorite,
+        'total_user_duration': game.total_user_duration,
+    }
+
 
 class ToggleFavoriteView(CreateView):
     # View to toggle the favorite status of a game
@@ -231,7 +232,8 @@ class GetMovesView(CreateView):
                     'row': move.row,
                     'col': move.col,
                     'is_pass': move.is_pass,
-                    'comment': move.comment
+                    'duration': move.duration,
+                    'comment': move.comment,
                 })
             return JsonResponse({'moves': moves_data})
         except Game.DoesNotExist:
@@ -241,3 +243,59 @@ class GetMovesView(CreateView):
 class PastReplayView(CreateView):
     def get(self, request, game_id):
         return render(request, 'past-replay.html', {'game_id': game_id})
+
+def get_ai_results_for_period(user, start_date, end_date=None):
+    """
+    Get the results of AI wins and losses for the specified period
+    """
+    games = Game.objects.filter(user=user, game_datetime__gte=start_date)
+    if end_date:
+        games = games.filter(game_datetime__lte=end_date)
+
+    results = games.values('ai_level').annotate(
+        wins=Count(
+            Case(
+                When(player_color='black', black_score__gt=F('white_score'), then=1),
+                When(player_color='white', white_score__gt=F('black_score'), then=1),
+                output_field=IntegerField(),
+            )
+        ),
+        losses=Count(
+            Case(
+                When(player_color='black', black_score__lt=F('white_score'), then=1),
+                When(player_color='white', white_score__lt=F('black_score'), then=1),
+                output_field=IntegerField(),
+            )
+        ),
+        draws=Count(
+            Case(
+                When(black_score=F('white_score'), then=1),
+                output_field=IntegerField(),
+            )
+        ),
+        fastest_win=Min(
+            Case(
+                When(player_color='black', black_score__gt=F('white_score'), then=F('total_user_duration')),
+                When(player_color='white', white_score__gt=F('black_score'), then=F('total_user_duration')),
+                output_field=IntegerField(),
+            )
+        )
+    )
+    return list(results)
+
+class DashboardView(CreateView):
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'User not authenticated'}, status=403)
+
+        today = timezone.now().date()
+        start_of_month = today.replace(day=1)
+        total_results = get_ai_results_for_period(request.user, start_date=timezone.datetime.min)
+        today_results = get_ai_results_for_period(request.user, start_date=today)
+        month_results = get_ai_results_for_period(request.user, start_date=start_of_month, end_date=today)
+
+        return JsonResponse({
+            'today': today_results,
+            'this_month': month_results,
+            'total': total_results,
+        })

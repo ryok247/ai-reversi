@@ -19,4 +19,5 @@ urlpatterns = [
     path('toggle_favorite/<int:game_id>/', views.ToggleFavoriteView.as_view(), name='toggle_favorite'),
     path('get_moves/<int:game_id>/', views.GetMovesView.as_view(), name='get_moves'),
     path('past_replay/<int:game_id>/', views.PastReplayView.as_view(), name='past_replay'),
+    path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

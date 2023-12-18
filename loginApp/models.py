@@ -16,6 +16,7 @@ class Game(models.Model):
     black_score = models.PositiveIntegerField(default=0)
     white_score = models.PositiveIntegerField(default=0)
     is_favorite = models.BooleanField(default=False)
+    total_user_duration = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -27,6 +28,7 @@ class Move(models.Model):
     col = models.PositiveIntegerField()
     is_pass = models.BooleanField(default=False)
     comment = models.TextField(blank=True)
+    duration = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.game.name} - Move {self.move_number}"
