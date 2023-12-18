@@ -73,12 +73,13 @@ class MyOtherView(LoginRequiredMixin, TemplateView):
 
 #@method_decorator(csrf_exempt, name='dispatch')
 class SaveGameView(CreateView):
-    # View for saving a game
     def post(self, request, *args, **kwargs):
-        # Handles POST request to save a game
         data = json.loads(request.body)
 
-        # Create game record
+        # Compute total duration by summing up the duration of each move
+        total_user_duration = sum(move.get('duration', 0) if move.get('duration', 0)>=0 else 0 for move in data['moves'])
+
+        # Create a new game record
         game = Game.objects.create(
             user=request.user if request.user.is_authenticated else None,
             name=data['name'],
@@ -88,7 +89,8 @@ class SaveGameView(CreateView):
             game_datetime=data['game_datetime'],
             black_score=data['black_score'],
             white_score=data['white_score'],
-            is_favorite=data['is_favorite']
+            is_favorite=data['is_favorite'],
+            total_user_duration=total_user_duration,
         )
 
         # Save each move of the game
@@ -99,7 +101,8 @@ class SaveGameView(CreateView):
                 row=move['row'],
                 col=move['col'],
                 is_pass=move['is_pass'],
-                comment=move['comment']
+                comment=move['comment'],
+                duration=move.get('duration', 0)
             )
 
         return JsonResponse({'status': 'success', 'game_id': game.id})

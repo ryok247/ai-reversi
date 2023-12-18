@@ -47,6 +47,9 @@ export class boardInfo{
         // Make the AI's move function asynchronous since it may take a long time
         this.asyncMove = makeAsync(this.agent.move);
 
+        this.lastMoveTime = -1;
+        this.timeHistory = [-1];
+
         this.cells = [];
         this.boardElement.innerHTML = "";
     
@@ -112,13 +115,22 @@ export class boardInfo{
 
     async cellClickHandler(row, col){
 
+        const endTime = Date.now();
+
+        let moveDuration = -1;
+        if (this.lastMoveTime != -1) moveDuration = endTime - this.lastMoveTime; // Compute the elapsed time
+
+        this.lastMoveTime = endTime;
+
         //const possibleCells = this.getPossibleCells();
 
         const possibleCells = this.logic.getPossibleMoves();
     
         if (possibleCells.length == 0){
 
-            addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, "history-table");
+            addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
+            this.timeHistory.push(-1);
+
             let twoPass = this.logic.pass()
 
             if (twoPass) {
@@ -131,7 +143,9 @@ export class boardInfo{
         }
     
         if (this.logic.isValidMove(row, col)) {
-            addToHistoryTable(sharedState.animator, row, col, this.logic.history.length, "history-table");
+            addToHistoryTable(sharedState.animator, row, col, this.logic.history.length, moveDuration, "history-table");
+            this.timeHistory.push(moveDuration);
+
             this.placePiece(row, col);
             this.removeHighlight();
     
@@ -151,7 +165,9 @@ export class boardInfo{
 
             if (possibleCells.length == 0){
 
-                addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, "history-table");
+                addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
+                this.timeHistory.push(-1);
+
                 let isTwoPass = this.logic.pass();
 
                 this.displayTurn();
@@ -186,7 +202,9 @@ export class boardInfo{
 
                 if (possibleCells.length == 0){
     
-                    addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, "history-table");
+                    addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
+                    this.timeHistory.push(-1);
+
                     let isTwoPass = this.logic.pass();
     
                     this.displayTurn();
@@ -202,6 +220,8 @@ export class boardInfo{
             }
 
             else this.highlightPossibleCells();
+
+            this.lastMoveTime = Date.now();
         }
     }
     
@@ -215,9 +235,19 @@ export class boardInfo{
     // AI's move
     async makeComputerMove(){
 
+        this.lastMoveTime = this.lastMoveTime != -1 ? Date.now() : -1;
+
         //const aiMove = await this.agent.move(this.logic);
         const aiMove = await this.asyncMove.call(this.agent, this.logic);
-        addToHistoryTable(sharedState.animator, ...aiMove, this.logic.history.length, "history-table");
+
+        const endTime = Date.now();
+        const moveDuration = this.lastMoveTime != -1 ? endTime - this.lastMoveTime: -1; // Compute the elapsed time
+
+        this.lastMoveTime = Date.now();
+
+        addToHistoryTable(sharedState.animator, ...aiMove, this.logic.history.length, moveDuration, "history-table");
+        this.timeHistory.push(moveDuration);
+
         this.placePiece(...aiMove);
 
         // update the number of stones
@@ -281,7 +311,8 @@ export class boardInfo{
                 row: row,
                 col: col,
                 is_pass: is_pass,
-                comment: comment
+                duration: this.timeHistory[i+1],
+                comment: comment,
             });
         }
 
@@ -333,7 +364,7 @@ export class boardInfo{
     }
 }
 
-export function addToHistoryTable(animator, row, col, turnNumber, historyTableClass) {
+export function addToHistoryTable(animator, row, col, turnNumber, duration, historyTableClass) {
     
     const toReversiCol = {
         0: "A",
@@ -357,11 +388,13 @@ export function addToHistoryTable(animator, row, col, turnNumber, historyTableCl
         let cell1 = newRow.insertCell(0);
         let cell2 = newRow.insertCell(1);
         let cell3 = newRow.insertCell(2);
+        let cell4 = newRow.insertCell(3);
 
         // Set content for each cell (you can modify this as needed)
         cell1.textContent = turnNumber;
         cell2.textContent = animator.gameLogic.currentPlayer == 0 ? "Black" : "White";
         cell3.textContent = (row == -1 && col == -1) ? " Pass" : ` ${toReversiCol[col]}${row + 1} `;
+        cell4.textContent = duration != -1 ? (duration / 1000).toFixed(3) : "-";
 
         if (tableBody.id == "replay-table-body") {
             newRow.addEventListener("click", (event)=>{

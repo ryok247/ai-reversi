@@ -15,10 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const historyElement = document.getElementById("history");
 
     // Initialize game on page load
-    confirmedBtnElement.addEventListener("click", () => {
+    confirmedBtnElement.addEventListener("click", async () => {
         initializeGame(historyElement);
         // Check game mode and make a computer move if necessary
-        if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") sharedState.board.makeComputerMove();
+        if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") await sharedState.board.makeComputerMove();
         // Highlight possible cells
         sharedState.board.highlightPossibleCells();
     });
