@@ -7,6 +7,7 @@ import {
     loadGames, 
     loadRecentGamesFromCookie, 
     isUserLoggedIn,
+    enableEditing
  } from './manage-game.js';
 
 // Event listeners and function calls
@@ -128,3 +129,13 @@ function updateTable(tableBody, results) {
         row.insertCell(4).textContent = result.fastest_win !== null ? (result.fastest_win / 1000).toFixed(3) : '-';
     });
 }
+
+// Example for attaching event listeners
+document.querySelectorAll('.edit-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+        const gameId = icon.closest('tr').dataset.gameId;
+        const nameColumn = icon.closest('tr').children[2]; // Assuming name is the 3rd column
+        const isFavorite = icon.closest('table').id.includes('favorite');
+        enableEditing(gameId, nameColumn, isFavorite);
+    });
+});

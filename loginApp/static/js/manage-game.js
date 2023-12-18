@@ -412,21 +412,18 @@ export function loadGames(type = "recent", page = 1) {
             const gamesList = document.getElementById(`${type == "recent" ? "recent" : "favorite"}-game-table-body`);
 
             // Check if user is logged in
-            if (type == "recent" && isUserLoggedIn()) {
-                document.getElementById('favorite-header').style.display = 'table-cell';
-            }
+            const loggedIn = isUserLoggedIn();
+            const displayStyle = loggedIn ? 'table-cell' : 'none';
+            document.getElementById('favorite-header').style.display = displayStyle;
+            document.getElementById('title-header').style.display = displayStyle;
+            document.getElementById('edit-header').style.display = displayStyle;
 
             gamesList.innerHTML = '';
 
             data.games.forEach(game => {
-                gamesList.appendChild(createRowFromDatabase(game));
+                const row = createRowFromDatabase(game, loggedIn);
+                gamesList.appendChild(row);
             });
-
-            if (type == "recent") {
-                sharedState.currentPage = page;
-            } else {
-                sharedState.favoriteCurrentPage = page;
-            }
 
             // Manage display of buttons
             document.getElementById(`load-prev-${type == "recent" ? "" : "favorite-"}games`).style.display = page > 1 ? 'block' : 'none';
@@ -477,7 +474,7 @@ export function loadRecentGamesFromCookie() {
 }
 
 // Function to create a table row from game data
-export function createRowFromDatabase(game) {
+export function createRowFromDatabase(game, loggedIn) {
     const row = document.createElement('tr');
     row.setAttribute('data-game-id', game.id);
 
@@ -485,6 +482,7 @@ export function createRowFromDatabase(game) {
     const favoriteColumn = document.createElement('td');
     favoriteColumn.className = 'favorite-column';
     favoriteColumn.setAttribute('data-game-id', game.id);
+    favoriteColumn.style.display = loggedIn ? 'table-cell' : 'none';
 
     if (isUserLoggedIn()) {
         const favoriteIcon = document.createElement('i');
@@ -504,6 +502,24 @@ export function createRowFromDatabase(game) {
     replayIcon.addEventListener('click', () => startReplay(game.id));
     replayColumn.appendChild(replayIcon);
     row.appendChild(replayColumn);
+
+    // Name column
+    const nameColumn = document.createElement('td');
+    nameColumn.textContent = game.name;
+    nameColumn.style.display = loggedIn ? 'table-cell' : 'none';
+    row.appendChild(nameColumn);
+
+    // Edit button column
+    const editColumn = document.createElement('td');
+    editColumn.style.display = loggedIn ? 'table-cell' : 'none';
+    if (isUserLoggedIn()) {
+        const editIcon = document.createElement('i');
+        editIcon.className = 'fa fa-edit edit-icon';
+        editIcon.style.cursor = 'pointer';
+        editIcon.addEventListener('click', () => enableEditing(game.id, nameColumn));
+        editColumn.appendChild(editIcon);
+    }
+    row.appendChild(editColumn);
 
     // Other columns
     const dateColumn = document.createElement('td');
@@ -645,4 +661,57 @@ export function updateFavoriteGamesTable(gameId, isFavorite) {
 export function startReplay(gameId) {
     // Open a new window for the replay
     window.open(`/past_replay/${gameId}/`, '_blank');
+}
+
+// Enable editing for the given game
+export function enableEditing(gameId, nameColumn, isFavorite) {
+    // Get the current game name
+    const currentName = nameColumn.textContent;
+
+    // Create an input element
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'game-name-input';
+    input.value = currentName;
+    input.dataset.gameId = gameId;
+
+    // Replace the name column with the input element
+    nameColumn.innerHTML = '';
+    nameColumn.appendChild(input);
+
+    // Create a save button
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save';
+    saveButton.addEventListener('click', () => {
+        updateGameName(gameId, input.value, nameColumn, isFavorite);
+    });
+
+    // Add the save button
+    nameColumn.appendChild(saveButton);
+}
+
+// Update game name in both Recent and Favorite Games
+function updateGameName(gameId, newName, nameColumn, isFavorite) {
+    fetch(`/update_game_name/${gameId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ name: newName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update name in both tables
+            const nameCells = document.querySelectorAll(`tr[data-game-id="${gameId}"] td:nth-child(3)`); // Assuming name is the 3rd column
+            nameCells.forEach(cell => cell.textContent = newName || '');
+
+            // Optionally, switch back from input to text
+            nameColumn.textContent = newName || '';
+        } else {
+            console.error('Error updating name:', data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
 }

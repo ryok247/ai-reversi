@@ -190,6 +190,7 @@ class FavoriteGamesView(TemplateView):
 def create_game_record(game):
     return {
         'id': game.id,
+        'name': game.name,
         'player_color': game.player_color,
         'game_datetime': game.game_datetime.isoformat(),
         'ai_level': game.ai_level,
@@ -299,3 +300,15 @@ class DashboardView(CreateView):
             'this_month': month_results,
             'total': total_results,
         })
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateGameNameView(CreateView):
+    def post(self, request, game_id):
+        try:
+            game = Game.objects.get(id=game_id, user=request.user)
+            data = json.loads(request.body)
+            game.name = data.get('name', '')
+            game.save()
+            return JsonResponse({'status': 'success'})
+        except Game.DoesNotExist:
+            return JsonResponse({'error': 'Game not found'}, status=404)

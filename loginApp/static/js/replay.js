@@ -19,7 +19,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return response.json();
     })
     .then(game => {
-        // Other columns
+
+        const titleElement = document.getElementById('info-title');
+        titleElement.textContent = game.name;
+
         const dateElement = document.getElementById('info-date');
         dateElement.textContent = new Date(game.game_datetime).toLocaleDateString();
     
