@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             resultElement.textContent = game.black_score > game.white_score ? 'Lose' : game.black_score < game.white_score ? 'Win' : 'Draw';
         }
-        row.appendChild(resultColumn);
     
         const blackScoreElement = document.getElementById('info-black-score');
         blackScoreElement.textContent = game.black_score;
@@ -45,6 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
         const ailevelElement = document.getElementById('info-ai-level');
         ailevelElement.textContent = 'Level ' + game.ai_level;
+
+        const durationElement = document.getElementById('info-duration');
+        durationElement.textContent = `${game.total_user_duration / 1000} seconds`;
     })
     .catch(error => {
         console.error('Error:', error);
@@ -59,11 +61,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             for (let i=1; i<moves.length; i++){
                 if (moves[i].row == 9 && moves[i].col == 9){
-                    addToHistoryTable(animator, -1, -1, logic.history.length, "past-history-table");
+                    addToHistoryTable(animator, -1, -1, logic.history.length, -1, "past-history-table");
                     logic.pass();
                 }
                 else {
-                    addToHistoryTable(animator, moves[i].row, moves[i].col, logic.history.length, "past-history-table");
+                    addToHistoryTable(animator, moves[i].row, moves[i].col, logic.history.length, moves[i].duration, "past-history-table");
                     logic.placePiece(moves[i].row, moves[i].col);
                 }
             }

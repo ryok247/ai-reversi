@@ -1,6 +1,6 @@
 from .forms import SignupForm, LoginForm
 from .models import CustomUser, Game, Move
-from django.db.models import Count, Case, When, IntegerField, F
+from django.db.models import Count, Case, When, IntegerField, F, Min
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
@@ -117,14 +117,9 @@ class GameDetailsView(CreateView):
         # Handles GET request to fetch game details
         try:
             game = Game.objects.get(id=game_id)
-            return JsonResponse({
-                'id': game_id,
-                'player_color': game.player_color,
-                'game_datetime': game.game_datetime.isoformat(),
-                'ai_level': game.ai_level,
-                'black_score': game.black_score,
-                'white_score': game.white_score
-            })
+            return JsonResponse(
+                create_game_record(game)
+            )
         except Game.DoesNotExist:
             # Game not found response
             return JsonResponse({'error': 'Game not found'}, status=404)
@@ -153,15 +148,9 @@ class UserGamesView(TemplateView):
             games_data = []
             for game in page_obj:
                 # Formatting necessary game data to be added to games_data
-                games_data.append({
-                    'id': game.id,
-                    'player_color': game.player_color,
-                    'game_datetime': game.game_datetime.isoformat(),
-                    'ai_level': game.ai_level,
-                    'black_score': game.black_score,
-                    'white_score': game.white_score,
-                    'is_favorite': game.is_favorite,
-                })
+                games_data.append(
+                    create_game_record(game)
+                )
 
             return JsonResponse({
                 'games': games_data,
@@ -185,15 +174,9 @@ class FavoriteGamesView(TemplateView):
             games_data = []
             for game in page_obj:
                 # Formatting necessary game data to be added to games_data
-                games_data.append({
-                    'id': game.id,
-                    'player_color': game.player_color,
-                    'game_datetime': game.game_datetime.isoformat(),
-                    'ai_level': game.ai_level,
-                    'black_score': game.black_score,
-                    'white_score': game.white_score,
-                    'is_favorite': game.is_favorite,
-                })
+                games_data.append(
+                    create_game_record(game)
+                )
 
             return JsonResponse({
                 'games': games_data,
@@ -203,6 +186,19 @@ class FavoriteGamesView(TemplateView):
         else:
             # Not authenticated error response
             return JsonResponse({'error': 'Not authenticated'}, status=403)
+        
+def create_game_record(game):
+    return {
+        'id': game.id,
+        'player_color': game.player_color,
+        'game_datetime': game.game_datetime.isoformat(),
+        'ai_level': game.ai_level,
+        'black_score': game.black_score,
+        'white_score': game.white_score,
+        'is_favorite': game.is_favorite,
+        'total_user_duration': game.total_user_duration,
+    }
+
 
 class ToggleFavoriteView(CreateView):
     # View to toggle the favorite status of a game
@@ -236,7 +232,8 @@ class GetMovesView(CreateView):
                     'row': move.row,
                     'col': move.col,
                     'is_pass': move.is_pass,
-                    'comment': move.comment
+                    'duration': move.duration,
+                    'comment': move.comment,
                 })
             return JsonResponse({'moves': moves_data})
         except Game.DoesNotExist:
@@ -276,6 +273,13 @@ def get_ai_results_for_period(user, start_date, end_date=None):
                 output_field=IntegerField(),
             )
         ),
+        fastest_win=Min(
+            Case(
+                When(player_color='black', black_score__gt=F('white_score'), then=F('total_user_duration')),
+                When(player_color='white', white_score__gt=F('black_score'), then=F('total_user_duration')),
+                output_field=IntegerField(),
+            )
+        )
     )
     return list(results)
 

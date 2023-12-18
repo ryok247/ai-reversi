@@ -111,7 +111,7 @@ function updateTable(tableBody, results) {
     // AIレベルが存在することを保証
     for (let level = 1; level <= 3; level++) {
         if (!results.some(result => result.ai_level === level)) {
-            results.push({ai_level: level, wins: 0, losses: 0, draws: 0});
+            results.push({ai_level: level, wins: 0, losses: 0, draws: 0, fastest_win: null});
         }
     }
 
@@ -125,5 +125,6 @@ function updateTable(tableBody, results) {
         row.insertCell(1).textContent = result.wins;
         row.insertCell(2).textContent = result.losses;
         row.insertCell(3).textContent = result.draws;
+        row.insertCell(4).textContent = result.fastest_win !== null ? (result.fastest_win / 1000).toFixed(3) : '-';
     });
 }

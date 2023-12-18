@@ -311,7 +311,7 @@ export class boardInfo{
                 row: row,
                 col: col,
                 is_pass: is_pass,
-                duration: this.timeHistory[i+1],
+                duration: this.timeHistory[i],
                 comment: comment,
             });
         }
@@ -537,6 +537,10 @@ export function createRowFromDatabase(game) {
     const levelColumn = document.createElement('td');
     levelColumn.textContent = 'Level ' + game.ai_level;
     row.appendChild(levelColumn);
+
+    const durationColumn = document.createElement('td');
+    durationColumn.textContent = (game.total_user_duration / 1000).toFixed(3);
+    row.appendChild(durationColumn);
 
     return row;
 }
