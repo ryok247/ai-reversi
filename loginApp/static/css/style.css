@@ -232,3 +232,32 @@ body {
 .arrow-button i, .toggle-button i {
     font-size: 1.2rem; /* Icon size */
 }
+
+.dashboard-table th {
+    background-color: #007bff;  /* Main color */
+    color: white;               /* Text color */
+    text-align: center;         /* Center align text */
+    padding: 10px;              /* Padding */
+    border: 1px solid #ddd;     /* Border style */
+}
+
+.dashboard-table td {
+    text-align: center;         /* Center align text */
+    padding: 8px;               /* Padding */
+    border: 1px solid #ddd;     /* Border style */
+}
+
+.dashboard-table tr:nth-child(even) {
+    background-color: #f2f2f2;  /* Background color for even rows */
+}
+
+.dashboard-table {
+    width: 100%;                /* Table width */
+    border-collapse: collapse;  /* Border style */
+    margin-top: 20px;           /* Top margin */
+}
+
+#Dashboard h3 {
+    color: #007bff;            /* 文字色 */ /* Text color */
+    margin-bottom: 15px;       /* 下部の余白 */ /* Bottom margin */
+}

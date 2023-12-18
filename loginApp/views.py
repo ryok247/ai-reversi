@@ -1,11 +1,13 @@
 from .forms import SignupForm, LoginForm
 from .models import CustomUser, Game, Move
+from django.db.models import Count, Case, When, IntegerField, F
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.utils import timezone
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -241,3 +243,52 @@ class GetMovesView(CreateView):
 class PastReplayView(CreateView):
     def get(self, request, game_id):
         return render(request, 'past-replay.html', {'game_id': game_id})
+
+def get_ai_results_for_period(user, start_date, end_date=None):
+    """
+    Get the results of AI wins and losses for the specified period
+    """
+    games = Game.objects.filter(user=user, game_datetime__gte=start_date)
+    if end_date:
+        games = games.filter(game_datetime__lte=end_date)
+
+    results = games.values('ai_level').annotate(
+        wins=Count(
+            Case(
+                When(player_color='black', black_score__gt=F('white_score'), then=1),
+                When(player_color='white', white_score__gt=F('black_score'), then=1),
+                output_field=IntegerField(),
+            )
+        ),
+        losses=Count(
+            Case(
+                When(player_color='black', black_score__lt=F('white_score'), then=1),
+                When(player_color='white', white_score__lt=F('black_score'), then=1),
+                output_field=IntegerField(),
+            )
+        ),
+        draws=Count(
+            Case(
+                When(black_score=F('white_score'), then=1),
+                output_field=IntegerField(),
+            )
+        ),
+    )
+    return list(results)
+
+class DashboardView(CreateView):
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'User not authenticated'}, status=403)
+
+        today = timezone.now().date()
+        start_of_month = today.replace(day=1)
+        total_results = get_ai_results_for_period(request.user, start_date=timezone.datetime.min)
+        today_results = get_ai_results_for_period(request.user, start_date=today)
+        month_results = get_ai_results_for_period(request.user, start_date=start_of_month, end_date=today)
+
+        return JsonResponse({
+            'today': today_results,
+            'this_month': month_results,
+            'total': total_results,
+        })
