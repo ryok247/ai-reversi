@@ -155,7 +155,8 @@ class UserGamesView(TemplateView):
             return JsonResponse({
                 'games': games_data,
                 'has_next': page_obj.has_next(),
-                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None
+                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+                'total_pages': paginator.num_pages,
             })
         else:
             # Not authenticated error response
@@ -181,7 +182,8 @@ class FavoriteGamesView(TemplateView):
             return JsonResponse({
                 'games': games_data,
                 'has_next': page_obj.has_next(),
-                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None
+                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+                'total_pages': paginator.num_pages,
             })
         else:
             # Not authenticated error response

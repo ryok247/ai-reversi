@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('dashboard-tab').style.display = 'block';
         document.getElementById('favorite-games').style.display = 'block';
         loadGames('favorite');
-        loadGames('recent', sharedState.nextPage);
+        loadGames('recent');
         updateGameRecordsWithUser();
     } else {
         loadRecentGamesFromCookie();
@@ -68,24 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('game-end-modal').style.display = 'none';
         document.getElementById('game-title-input').value = ''; // Reset title input
     });
-});
-
-// Event listeners for loading more games
-document.getElementById('load-more-games').addEventListener('click',    function() {
-    loadGames('recent', sharedState.nextPage);
-});
-
-document.getElementById('load-prev-games').addEventListener('click', function() {
-loadGames('recent', sharedState.currentPage - 1);
-});
-
-// Event listeners for favorite games buttons
-document.getElementById('load-more-favorite-games').addEventListener('click', function() {
-loadGames('favorite', sharedState.favoriteCurrentPage + 1);
-});
-
-document.getElementById('load-prev-favorite-games').addEventListener('click', function() {
-loadGames('favorite', sharedState.favoriteCurrentPage - 1);
 });
 
 document.addEventListener('DOMContentLoaded', function() {

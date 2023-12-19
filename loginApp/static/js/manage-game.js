@@ -435,16 +435,21 @@ export function loadGames(type = "recent", page = 1) {
                 gamesList.appendChild(row);
             });
 
-            // Manage display of buttons
-            document.getElementById(`load-prev-${type == "recent" ? "" : "favorite-"}games`).style.display = page > 1 ? 'block' : 'none';
-            document.getElementById(`load-more-${type == "recent" ? "" : "favorite-"}games`).style.display = data.has_next ? 'block' : 'none';
-
             if (data.has_next) {
                 if (type == "recent") {
                     sharedState.nextPage = sharedState.currentPage + 1;
                 } else {
                     // Handle the next page for favorite games
                 }
+            }
+
+            // Update pagination
+            if (type === 'recent') {
+                sharedState.currentPage = page;
+                createPagination('recent-games-pagination', page, data.total_pages, 'recent');
+            } else if (type === 'favorite') {
+                sharedState.favoriteCurrentPage = page;
+                createPagination('favorite-games-pagination', page, data.total_pages, 'favorite');
             }
         })
         .catch(error => console.error('Error:', error));
@@ -724,4 +729,28 @@ function updateGameName(gameId, newName, nameColumn, isFavorite) {
         }
     })
     .catch(error => console.error('Error:', error));
+}
+
+// Generate pagination buttons
+function createPagination(containerId, currentPage, totalPages, type) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    container.classList.add('d-flex', 'justify-content-center', 'my-3');
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.classList.add('btn-sm', 'mx-1');
+
+        if (i === currentPage) {
+            // Apply btn-primary class to the button of the current page
+            button.classList.add('btn-primary');
+        } else {
+            // Apply btn-outline-primary class to the buttons of other pages
+            button.classList.add('btn-outline-primary');
+        }
+
+        button.onclick = () => loadGames(type, i);
+        container.appendChild(button);
+    }
 }
