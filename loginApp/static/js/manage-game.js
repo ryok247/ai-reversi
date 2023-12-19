@@ -104,10 +104,20 @@ export class boardInfo{
         if (this.logic.score[0] > this.logic.score[1]) resultMessage = 'Black Wins!';
         else if (this.logic.score[0] < this.logic.score[1]) resultMessage = 'White Wins!';
         else resultMessage = 'Draw!';
-
-        alert(`${resultMessage}\nBlack: ${this.logic.score[0]}\nWhite: ${this.logic.score[1]}`);
+    
+        document.getElementById('game-end-modal').style.display = 'block';
+        document.getElementById('game-result').textContent = resultMessage;
+    
+        // Change the display according to the login status
+        if (isUserLoggedIn()) {
+            document.getElementById('game-title-input').style.display = 'block';
+            document.getElementById('login-signup-message').style.display = 'none';
+        } else {
+            document.getElementById('game-title-input').style.display = 'none';
+            document.getElementById('login-signup-message').style.display = 'block';
+        }
     }
-
+    
     updateScores() {
         document.getElementById("black-score").textContent = this.logic.score[0];
         document.getElementById("white-score").textContent = this.logic.score[1];
@@ -288,9 +298,8 @@ export class boardInfo{
         this.isGameEnd = true;
     }
 
-    createGameData() {
+    createGameData(title) {
 
-        let name = "";
         let description = "";
         let player_color = this.settings.color;
         let ai_level = this.settings.level;
@@ -317,7 +326,7 @@ export class boardInfo{
         }
 
         return JSON.stringify({
-            name: name,
+            name: title,
             description: description,
             player_color: player_color,
             ai_level: ai_level,
@@ -330,7 +339,8 @@ export class boardInfo{
     }
 
     saveGameToDatabase() {
-        const gameJsonData = this.createGameData();
+        const title = document.getElementById('game-title-input').value || "Untitled";
+        const gameJsonData = this.createGameData(title);
     
         // Send request to the backend
         return fetch('/save_game/', {

@@ -7,7 +7,8 @@ import {
     loadGames, 
     loadRecentGamesFromCookie, 
     isUserLoggedIn,
-    enableEditing
+    enableEditing,
+    updateGameRecordsWithUser,
  } from './manage-game.js';
 
 // Event listeners and function calls
@@ -24,9 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sharedState.board.highlightPossibleCells();
     });
     initializeGame(historyElement);
-});
 
-document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("restart-animation-btn").addEventListener("click", () => sharedState.animator.restartAnimation());
     document.getElementById("backward-step-btn").addEventListener("click", () => sharedState.animator.backwardStep());
     document.getElementById("start-animation-btn").addEventListener("click", () => sharedState.animator.startAnimation());
@@ -34,6 +33,41 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("forward-step-btn").addEventListener("click", () => sharedState.animator.forwardStep());
     document.getElementById("skip-to-end-btn").addEventListener("click", () => sharedState.animator.skipToEnd());
     document.getElementById('progress').addEventListener("click", (event) => sharedState.animator.seek(event));
+
+    if (isUserLoggedIn()) {
+        document.getElementById('dashboard-tab').style.display = 'block';
+        document.getElementById('favorite-games').style.display = 'block';
+        loadGames('favorite');
+        loadGames('recent', sharedState.nextPage);
+        updateGameRecordsWithUser();
+    } else {
+        loadRecentGamesFromCookie();
+    }
+
+    // Toggle functionality for sections
+    document.querySelectorAll('.toggle-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const header = this.parentElement;
+            const contentId = header.getAttribute('data-target');
+            const content = document.getElementById(contentId);
+            const isExpanded = content.style.display === 'block';
+
+            // Toggle display of content
+            content.style.display = isExpanded ? 'none' : 'block';
+            
+            // Change button text based on state
+            this.textContent = isExpanded ? '+' : '-';
+        });
+    });
+
+    // Event listeners for game end modal
+    document.getElementById('modal-close-btn').addEventListener('click', function() {
+        const title = document.getElementById('game-title-input').value || "Untitled";
+        sharedState.board.saveGameToDatabase(title); // Save game to database
+
+        document.getElementById('game-end-modal').style.display = 'none';
+        document.getElementById('game-title-input').value = ''; // Reset title input
+    });
 });
 
 // Event listeners for loading more games
@@ -43,34 +77,6 @@ document.getElementById('load-more-games').addEventListener('click',    function
 
 document.getElementById('load-prev-games').addEventListener('click', function() {
 loadGames('recent', sharedState.currentPage - 1);
-});
-
-// Execute when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-if (isUserLoggedIn()) {
-    document.getElementById('dashboard-tab').style.display = 'block';
-    document.getElementById('favorite-games').style.display = 'block';
-    loadGames('favorite');
-    loadGames('recent', sharedState.nextPage);
-} else {
-    loadRecentGamesFromCookie();
-}
-
-// Toggle functionality for sections
-document.querySelectorAll('.toggle-button').forEach(button => {
-    button.addEventListener('click', function() {
-        const header = this.parentElement;
-        const contentId = header.getAttribute('data-target');
-        const content = document.getElementById(contentId);
-        const isExpanded = content.style.display === 'block';
-
-        // Toggle display of content
-        content.style.display = isExpanded ? 'none' : 'block';
-        
-        // Change button text based on state
-        this.textContent = isExpanded ? '+' : '-';
-    });
-});
 });
 
 // Event listeners for favorite games buttons
@@ -95,31 +101,31 @@ function loadDashboardData() {
 }
 
 function updateDashboardTable(data) {
-    // 各期間のテーブルのbodyを取得
+    // Get the table bodies for each time period
     const todayTableBody = document.getElementById('ai-results-table-today').querySelector('tbody');
     const monthTableBody = document.getElementById('ai-results-table-month').querySelector('tbody');
     const totalTableBody = document.getElementById('ai-results-table-total').querySelector('tbody');
 
-    // 各期間のデータを更新
+    // Update data for each time period
     updateTable(todayTableBody, data['today'] || []);
     updateTable(monthTableBody, data['this_month'] || []);
     updateTable(totalTableBody, data['total'] || []);
 }
 
 function updateTable(tableBody, results) {
-    tableBody.innerHTML = ''; // 既存の行をクリア
+    tableBody.innerHTML = ''; // Clear table body
 
-    // AIレベルが存在することを保証
+    // Make sure there is a result for each AI level
     for (let level = 1; level <= 3; level++) {
         if (!results.some(result => result.ai_level === level)) {
             results.push({ai_level: level, wins: 0, losses: 0, draws: 0, fastest_win: null});
         }
     }
 
-    // AIレベルでソート
+    // Sort results by AI level
     results.sort((a, b) => a.ai_level - b.ai_level);
 
-    // テーブルにデータを追加
+    // Add results to table
     results.forEach(result => {
         const row = tableBody.insertRow();
         row.insertCell(0).textContent = `Level ${result.ai_level}`;
