@@ -21,4 +21,5 @@ urlpatterns = [
     path('past_replay/<int:game_id>/', views.PastReplayView.as_view(), name='past_replay'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     path('update_game_name/<int:game_id>/', views.UpdateGameNameView.as_view(), name='update_game_name'),
+    path('update_game_description/<int:game_id>/', views.UpdateGameDescriptionView.as_view(), name='update_game_description'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

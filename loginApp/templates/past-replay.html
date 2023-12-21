@@ -21,7 +21,16 @@
                 <!-- Input field for editing and save button (initially hidden) -->
                 <input type="text" id="edit-title-input" style="display: none;">
                 <button id="save-title-button" style="display: none;">Save</button>
-            </div>                    
+            </div>
+            <div class="info">
+                Description
+                <i id="edit-description-icon" class="fa fa-edit edit-icon"></i>
+            </div>
+            <div id="info-description-container">
+                <span id="info-description"></span>
+                <textarea id="edit-description-input" style="display: none;" maxlength="140"></textarea>
+                <button id="save-description-button" style="display: none;">Save</button>
+            </div>                           
             <div class="info">Date</div>
             <div id="info-date"></div>
             <div class="info">Time</div>

@@ -1,6 +1,7 @@
 import { gameLogic } from "./game-logic.js"
 import { ReplayAnimator } from './animation.js';
 import { addToHistoryTable, updateGameName } from "./manage-game.js";
+import { getCsrfToken } from './utilities.js'
 
 let logic = new gameLogic();
 const progressElement = document.getElementById('progress');
@@ -120,3 +121,55 @@ document.addEventListener('DOMContentLoaded', function() {
         editIcon.style.display = 'block';
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const gameId = document.getElementById('game-id').value;
+    const descriptionElement = document.getElementById('info-description');
+    const editDescriptionIcon = document.getElementById('edit-description-icon');
+    const editDescriptionInput = document.getElementById('edit-description-input');
+    const saveDescriptionButton = document.getElementById('save-description-button');
+
+    // ゲームの詳細を取得して表示
+    fetch(`/get_game_details/${gameId}`)
+    .then(response => response.json())
+    .then(game => {
+        // タイトルと説明を表示
+        document.getElementById('info-title').textContent = game.name;
+        descriptionElement.textContent = game.description;
+        // その他の情報もここで設定
+    });
+
+    // 説明編集アイコンのクリックイベント
+    editDescriptionIcon.addEventListener('click', function() {
+        editDescriptionInput.style.display = 'block';
+        saveDescriptionButton.style.display = 'block';
+        editDescriptionInput.value = descriptionElement.textContent;
+        descriptionElement.style.display = 'none';
+        editDescriptionIcon.style.display = 'none';
+    });
+
+    // 説明保存ボタンのクリックイベント
+    saveDescriptionButton.addEventListener('click', function() {
+        const newDescription = editDescriptionInput.value;
+        // サーバーに新しい説明を送信
+        updateGameDescription(gameId, newDescription).then(() => {
+            descriptionElement.textContent = newDescription;
+            descriptionElement.style.display = 'block';
+            editDescriptionIcon.style.display = 'block';
+            editDescriptionInput.style.display = 'none';
+            saveDescriptionButton.style.display = 'none';
+        });
+    });
+});
+
+// サーバーに新しい説明を送信する関数
+function updateGameDescription(gameId, description) {
+    return fetch(`/update_game_description/${gameId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ description })
+    }).then(response => response.json());
+}

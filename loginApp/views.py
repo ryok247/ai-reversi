@@ -193,6 +193,7 @@ def create_game_record(game):
     return {
         'id': game.id,
         'name': game.name,
+        'description': game.description,
         'player_color': game.player_color,
         'game_datetime': game.game_datetime.isoformat(),
         'ai_level': game.ai_level,
@@ -312,5 +313,21 @@ class UpdateGameNameView(CreateView):
             game.name = data.get('name', '')
             game.save()
             return JsonResponse({'status': 'success'})
+        except Game.DoesNotExist:
+            return JsonResponse({'error': 'Game not found'}, status=404)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateGameDescriptionView(CreateView):
+    def post(self, request, game_id):
+        try:
+            game = Game.objects.get(id=game_id, user=request.user)
+            data = json.loads(request.body)
+            description = data.get('description', '')
+            if len(description) <= 140:
+                game.description = description
+                game.save()
+                return JsonResponse({'status': 'success'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Description is too long'}, status=400)
         except Game.DoesNotExist:
             return JsonResponse({'error': 'Game not found'}, status=404)
