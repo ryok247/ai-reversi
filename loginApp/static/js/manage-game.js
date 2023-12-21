@@ -531,7 +531,21 @@ export function createRowFromDatabase(game, loggedIn) {
         const editIcon = document.createElement('i');
         editIcon.className = 'fa fa-edit edit-icon';
         editIcon.style.cursor = 'pointer';
-        editIcon.addEventListener('click', () => enableEditing(game.id, nameColumn));
+        editIcon.addEventListener('click', () => {
+            // 新しい入力要素と保存ボタンを作成
+            const inputElement = document.createElement('input');
+            inputElement.type = 'text';
+            inputElement.className = 'game-name-input';
+            inputElement.value = nameColumn.textContent;
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.className = 'save-button';
+
+            // enableEditing 関数の修正されたバージョンを呼び出す
+            enableEditing(game.id, nameColumn, inputElement, saveButton);
+        });
+
         editColumn.appendChild(editIcon);
     }
     row.appendChild(editColumn);
@@ -679,34 +693,29 @@ export function startReplay(gameId) {
 }
 
 // Enable editing for the given game
-export function enableEditing(gameId, nameColumn, isFavorite) {
-    // Get the current game name
-    const currentName = nameColumn.textContent;
+export function enableEditing(gameId, nameColumn, inputElement, saveButton) {
+    // 既存の名前列の内容を非表示にする
+    nameColumn.style.display = 'none';
 
-    // Create an input element
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'game-name-input';
-    input.value = currentName;
-    input.dataset.gameId = gameId;
+    // inputElement と saveButton を nameColumn の親要素に挿入
+    nameColumn.parentNode.insertBefore(inputElement, nameColumn);
+    nameColumn.parentNode.insertBefore(saveButton, nameColumn.nextSibling);
 
-    // Replace the name column with the input element
-    nameColumn.innerHTML = '';
-    nameColumn.appendChild(input);
-
-    // Create a save button
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save';
+    // 保存ボタンのクリックイベントを設定
     saveButton.addEventListener('click', () => {
-        updateGameName(gameId, input.value, nameColumn, isFavorite);
-    });
+        const newName = inputElement.value;
+        updateGameName(gameId, newName, nameColumn);
 
-    // Add the save button
-    nameColumn.appendChild(saveButton);
+        // 入力フィールドと保存ボタンを削除し、名前列を再表示
+        nameColumn.textContent = newName;
+        inputElement.remove();
+        saveButton.remove();
+        nameColumn.style.display = 'block';
+    });
 }
 
 // Update game name in both Recent and Favorite Games
-function updateGameName(gameId, newName, nameColumn, isFavorite) {
+export function updateGameName(gameId, newName, nameColumn, isFavorite) {
     fetch(`/update_game_name/${gameId}/`, {
         method: 'POST',
         headers: {

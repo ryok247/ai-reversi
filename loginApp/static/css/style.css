@@ -295,3 +295,12 @@ body {
     border: none;
     cursor: pointer;
 }
+
+.info {
+    display: flex;
+    align-items: center;
+}
+
+.info .edit-icon {
+    margin-left: 5px;
+}

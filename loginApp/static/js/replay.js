@@ -1,6 +1,6 @@
 import { gameLogic } from "./game-logic.js"
 import { ReplayAnimator } from './animation.js';
-import { addToHistoryTable } from "./manage-game.js";
+import { addToHistoryTable, updateGameName } from "./manage-game.js";
 
 let logic = new gameLogic();
 const progressElement = document.getElementById('progress');
@@ -84,4 +84,39 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("forward-step-btn").addEventListener("click", () => animator.forwardStep());
     document.getElementById("skip-to-end-btn").addEventListener("click", () => animator.skipToEnd());
     document.getElementById('progress').addEventListener("click", (event) => animator.seek(event));
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const gameId = document.getElementById('game-id').value;
+    const titleElement = document.getElementById('info-title');
+    const editIcon = document.getElementById('edit-title-icon');
+    const inputElement = document.getElementById('edit-title-input');
+    const saveButton = document.getElementById('save-title-button');
+
+    editIcon.addEventListener('click', function() {
+        // Display the input field and save button
+        inputElement.style.display = 'block';
+        saveButton.style.display = 'block';
+
+        // Set the current title to the input field
+        inputElement.value = titleElement.textContent;
+
+        // Hide the title element and edit icon
+        titleElement.style.display = 'none';
+        editIcon.style.display = 'none';
+    });
+
+    saveButton.addEventListener('click', function() {
+        const newTitle = inputElement.value;
+        updateGameName(gameId, newTitle, titleElement);
+
+        // Hide the input field and save button
+        inputElement.style.display = 'none';
+        saveButton.style.display = 'none';
+
+        // Update and display the title element
+        titleElement.textContent = newTitle;
+        titleElement.style.display = 'block';
+        editIcon.style.display = 'block';
+    });
 });
