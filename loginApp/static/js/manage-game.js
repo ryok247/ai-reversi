@@ -111,9 +111,11 @@ export class boardInfo{
         // Change the display according to the login status
         if (isUserLoggedIn()) {
             document.getElementById('game-title-input').style.display = 'block';
+            document.getElementById('game-description-input').style.display = 'block';
             document.getElementById('login-signup-message').style.display = 'none';
         } else {
             document.getElementById('game-title-input').style.display = 'none';
+            document.getElementById('game-description-input').style.display = 'none';
             document.getElementById('login-signup-message').style.display = 'block';
         }
     }
@@ -131,8 +133,6 @@ export class boardInfo{
         if (this.lastMoveTime != -1) moveDuration = endTime - this.lastMoveTime; // Compute the elapsed time
 
         this.lastMoveTime = endTime;
-
-        //const possibleCells = this.getPossibleCells();
 
         const possibleCells = this.logic.getPossibleMoves();
     
@@ -694,14 +694,14 @@ export function startReplay(gameId) {
 
 // Enable editing for the given game
 export function enableEditing(gameId, nameColumn, inputElement, saveButton) {
-    // 既存の名前列の内容を非表示にする
+    // Hide the name column
     nameColumn.style.display = 'none';
 
-    // inputElement と saveButton を nameColumn の親要素に挿入
+    // Insert the input element and save button before the name column
     nameColumn.parentNode.insertBefore(inputElement, nameColumn);
     nameColumn.parentNode.insertBefore(saveButton, nameColumn.nextSibling);
 
-    // 保存ボタンのクリックイベントを設定
+    // Save the new name to the database
     saveButton.addEventListener('click', () => {
         const newName = inputElement.value;
 
@@ -712,7 +712,7 @@ export function enableEditing(gameId, nameColumn, inputElement, saveButton) {
 
         updateGameName(gameId, newName, nameColumn);
 
-        // 入力フィールドと保存ボタンを削除し、名前列を再表示
+        // Display the name column again
         nameColumn.textContent = newName;
         inputElement.remove();
         saveButton.remove();

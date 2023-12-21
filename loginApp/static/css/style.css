@@ -304,3 +304,7 @@ body {
 .info .edit-icon {
     margin-left: 5px;
 }
+
+#game-title-input {
+    margin-bottom: 15px;
+}

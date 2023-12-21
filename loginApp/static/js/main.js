@@ -63,14 +63,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Event listeners for game end modal
     document.getElementById('modal-close-btn').addEventListener('click', function() {
         sharedState.userInputTitle = document.getElementById('game-title-input').value || "Untitled";
+        sharedState.userInputDescription = document.getElementById('game-description-input').value || "";
 
         if (sharedState.userInputTitle.length > sharedState.maxTitleLength){
             alert(`Title must be less than ${sharedState.maxTitleLength} characters`);
             return;
         }
 
+        if (sharedState.userInputDescription.length > sharedState.maxDescriptionLength){
+            alert(`Description must be less than ${sharedState.maxDescriptionLength} characters`);
+            return;
+        }
+
         document.getElementById('game-end-modal').style.display = 'none';
         document.getElementById('game-title-input').value = ''; // Reset title input
+        document.getElementById('game-description-input').value = ''; // Reset description input
     });
 });
 
@@ -136,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/api/settings')
         .then(response => response.json())
         .then(data => {
-            // ここで取得した設定値を使用する
+            // Use the settings retrieved here
             sharedState.maxTitleLength = data.max_title_length;
             sharedState.maxDescriptionLength = data.max_description_length;
         })
