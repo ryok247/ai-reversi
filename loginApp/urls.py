@@ -20,4 +20,7 @@ urlpatterns = [
     path('get_moves/<int:game_id>/', views.GetMovesView.as_view(), name='get_moves'),
     path('past_replay/<int:game_id>/', views.PastReplayView.as_view(), name='past_replay'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+    path('update_game_name/<int:game_id>/', views.UpdateGameNameView.as_view(), name='update_game_name'),
+    path('update_game_description/<int:game_id>/', views.UpdateGameDescriptionView.as_view(), name='update_game_description'),
+    path('api/settings', views.SettingsView.as_view(), name='api-settings'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

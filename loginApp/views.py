@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
+from loginProject import settings
 
 import json
 
@@ -155,7 +156,8 @@ class UserGamesView(TemplateView):
             return JsonResponse({
                 'games': games_data,
                 'has_next': page_obj.has_next(),
-                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None
+                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+                'total_pages': paginator.num_pages,
             })
         else:
             # Not authenticated error response
@@ -181,7 +183,8 @@ class FavoriteGamesView(TemplateView):
             return JsonResponse({
                 'games': games_data,
                 'has_next': page_obj.has_next(),
-                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None
+                'next_page_number': page_obj.next_page_number() if page_obj.has_next() else None,
+                'total_pages': paginator.num_pages,
             })
         else:
             # Not authenticated error response
@@ -190,6 +193,8 @@ class FavoriteGamesView(TemplateView):
 def create_game_record(game):
     return {
         'id': game.id,
+        'name': game.name,
+        'description': game.description,
         'player_color': game.player_color,
         'game_datetime': game.game_datetime.isoformat(),
         'ai_level': game.ai_level,
@@ -298,4 +303,39 @@ class DashboardView(CreateView):
             'today': today_results,
             'this_month': month_results,
             'total': total_results,
+        })
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateGameNameView(CreateView):
+    def post(self, request, game_id):
+        try:
+            game = Game.objects.get(id=game_id, user=request.user)
+            data = json.loads(request.body)
+            game.name = data.get('name', '')
+            game.save()
+            return JsonResponse({'status': 'success'})
+        except Game.DoesNotExist:
+            return JsonResponse({'error': 'Game not found'}, status=404)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateGameDescriptionView(CreateView):
+    def post(self, request, game_id):
+        try:
+            game = Game.objects.get(id=game_id, user=request.user)
+            data = json.loads(request.body)
+            description = data.get('description', '')
+            if len(description) <= settings.MAX_DESCRIPTION_LENGTH:
+                game.description = description
+                game.save()
+                return JsonResponse({'status': 'success'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Description is too long'}, status=400)
+        except Game.DoesNotExist:
+            return JsonResponse({'error': 'Game not found'}, status=404)
+
+class SettingsView(CreateView):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({
+            'max_title_length': settings.MAX_TITLE_LENGTH,
+            'max_description_length': settings.MAX_DESCRIPTION_LENGTH
         })

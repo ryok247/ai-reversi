@@ -1,6 +1,8 @@
 import { gameLogic } from "./game-logic.js"
 import { ReplayAnimator } from './animation.js';
-import { addToHistoryTable } from "./manage-game.js";
+import { addToHistoryTable, updateGameName } from "./manage-game.js";
+import { getCsrfToken } from './utilities.js'
+import { sharedState } from "./game-shared.js";
 
 let logic = new gameLogic();
 const progressElement = document.getElementById('progress');
@@ -19,7 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return response.json();
     })
     .then(game => {
-        // Other columns
+
+        const titleElement = document.getElementById('info-title');
+        titleElement.textContent = game.name;
+
         const dateElement = document.getElementById('info-date');
         dateElement.textContent = new Date(game.game_datetime).toLocaleDateString();
     
@@ -82,3 +87,102 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("skip-to-end-btn").addEventListener("click", () => animator.skipToEnd());
     document.getElementById('progress').addEventListener("click", (event) => animator.seek(event));
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const gameId = document.getElementById('game-id').value;
+    const titleElement = document.getElementById('info-title');
+    const editIcon = document.getElementById('edit-title-icon');
+    const inputElement = document.getElementById('edit-title-input');
+    const saveButton = document.getElementById('save-title-button');
+
+    editIcon.addEventListener('click', function() {
+        // Display the input field and save button
+        inputElement.style.display = 'block';
+        saveButton.style.display = 'block';
+
+        // Set the current title to the input field
+        inputElement.value = titleElement.textContent;
+
+        // Hide the title element and edit icon
+        titleElement.style.display = 'none';
+        editIcon.style.display = 'none';
+    });
+
+    saveButton.addEventListener('click', function() {
+        const newTitle = inputElement.value;
+
+        if (newTitle.length > sharedState.maxTitleLength){
+            alert(`Title must be less than ${sharedState.maxTitleLength} characters`);
+            return;
+        }
+
+        updateGameName(gameId, newTitle, titleElement);
+
+        // Hide the input field and save button
+        inputElement.style.display = 'none';
+        saveButton.style.display = 'none';
+
+        // Update and display the title element
+        titleElement.textContent = newTitle;
+        titleElement.style.display = 'block';
+        editIcon.style.display = 'block';
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const gameId = document.getElementById('game-id').value;
+    const descriptionElement = document.getElementById('info-description');
+    const editDescriptionIcon = document.getElementById('edit-description-icon');
+    const editDescriptionInput = document.getElementById('edit-description-input');
+    const saveDescriptionButton = document.getElementById('save-description-button');
+
+    // ゲームの詳細を取得して表示
+    fetch(`/get_game_details/${gameId}`)
+    .then(response => response.json())
+    .then(game => {
+        // タイトルと説明を表示
+        document.getElementById('info-title').textContent = game.name;
+        descriptionElement.textContent = game.description;
+        // その他の情報もここで設定
+    });
+
+    // 説明編集アイコンのクリックイベント
+    editDescriptionIcon.addEventListener('click', function() {
+        editDescriptionInput.style.display = 'block';
+        saveDescriptionButton.style.display = 'block';
+        editDescriptionInput.value = descriptionElement.textContent;
+        descriptionElement.style.display = 'none';
+        editDescriptionIcon.style.display = 'none';
+    });
+
+    // 説明保存ボタンのクリックイベント
+    saveDescriptionButton.addEventListener('click', function() {
+        const newDescription = editDescriptionInput.value;
+
+        if (newDescription.length > sharedState.maxDescriptionLength){
+            alert(`Description must be less than ${sharedState.maxDescriptionLength} characters`);
+            return;
+        }
+
+        // サーバーに新しい説明を送信
+        updateGameDescription(gameId, newDescription).then(() => {
+            descriptionElement.textContent = newDescription;
+            descriptionElement.style.display = 'block';
+            editDescriptionIcon.style.display = 'block';
+            editDescriptionInput.style.display = 'none';
+            saveDescriptionButton.style.display = 'none';
+        });
+    });
+});
+
+// サーバーに新しい説明を送信する関数
+function updateGameDescription(gameId, description) {
+    return fetch(`/update_game_description/${gameId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ description })
+    }).then(response => response.json());
+}

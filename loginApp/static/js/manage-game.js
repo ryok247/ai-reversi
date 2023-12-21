@@ -104,10 +104,22 @@ export class boardInfo{
         if (this.logic.score[0] > this.logic.score[1]) resultMessage = 'Black Wins!';
         else if (this.logic.score[0] < this.logic.score[1]) resultMessage = 'White Wins!';
         else resultMessage = 'Draw!';
-
-        alert(`${resultMessage}\nBlack: ${this.logic.score[0]}\nWhite: ${this.logic.score[1]}`);
+    
+        document.getElementById('game-end-modal').style.display = 'block';
+        document.getElementById('game-result').textContent = resultMessage;
+    
+        // Change the display according to the login status
+        if (isUserLoggedIn()) {
+            document.getElementById('game-title-input').style.display = 'block';
+            document.getElementById('game-description-input').style.display = 'block';
+            document.getElementById('login-signup-message').style.display = 'none';
+        } else {
+            document.getElementById('game-title-input').style.display = 'none';
+            document.getElementById('game-description-input').style.display = 'none';
+            document.getElementById('login-signup-message').style.display = 'block';
+        }
     }
-
+    
     updateScores() {
         document.getElementById("black-score").textContent = this.logic.score[0];
         document.getElementById("white-score").textContent = this.logic.score[1];
@@ -121,8 +133,6 @@ export class boardInfo{
         if (this.lastMoveTime != -1) moveDuration = endTime - this.lastMoveTime; // Compute the elapsed time
 
         this.lastMoveTime = endTime;
-
-        //const possibleCells = this.getPossibleCells();
 
         const possibleCells = this.logic.getPossibleMoves();
     
@@ -288,9 +298,8 @@ export class boardInfo{
         this.isGameEnd = true;
     }
 
-    createGameData() {
+    createGameData(title) {
 
-        let name = "";
         let description = "";
         let player_color = this.settings.color;
         let ai_level = this.settings.level;
@@ -317,7 +326,7 @@ export class boardInfo{
         }
 
         return JSON.stringify({
-            name: name,
+            name: title,
             description: description,
             player_color: player_color,
             ai_level: ai_level,
@@ -330,7 +339,8 @@ export class boardInfo{
     }
 
     saveGameToDatabase() {
-        const gameJsonData = this.createGameData();
+        const title = sharedState.userInputTitle || "Untitled";
+        const gameJsonData = this.createGameData(title);
     
         // Send request to the backend
         return fetch('/save_game/', {
@@ -412,25 +422,18 @@ export function loadGames(type = "recent", page = 1) {
             const gamesList = document.getElementById(`${type == "recent" ? "recent" : "favorite"}-game-table-body`);
 
             // Check if user is logged in
-            if (type == "recent" && isUserLoggedIn()) {
-                document.getElementById('favorite-header').style.display = 'table-cell';
-            }
+            const loggedIn = isUserLoggedIn();
+            const displayStyle = loggedIn ? 'table-cell' : 'none';
+            document.getElementById('favorite-header').style.display = displayStyle;
+            document.getElementById('title-header').style.display = displayStyle;
+            document.getElementById('edit-header').style.display = displayStyle;
 
             gamesList.innerHTML = '';
 
             data.games.forEach(game => {
-                gamesList.appendChild(createRowFromDatabase(game));
+                const row = createRowFromDatabase(game, loggedIn);
+                gamesList.appendChild(row);
             });
-
-            if (type == "recent") {
-                sharedState.currentPage = page;
-            } else {
-                sharedState.favoriteCurrentPage = page;
-            }
-
-            // Manage display of buttons
-            document.getElementById(`load-prev-${type == "recent" ? "" : "favorite-"}games`).style.display = page > 1 ? 'block' : 'none';
-            document.getElementById(`load-more-${type == "recent" ? "" : "favorite-"}games`).style.display = data.has_next ? 'block' : 'none';
 
             if (data.has_next) {
                 if (type == "recent") {
@@ -438,6 +441,15 @@ export function loadGames(type = "recent", page = 1) {
                 } else {
                     // Handle the next page for favorite games
                 }
+            }
+
+            // Update pagination
+            if (type === 'recent') {
+                sharedState.currentPage = page;
+                createPagination('recent-games-pagination', page, data.total_pages, 'recent');
+            } else if (type === 'favorite') {
+                sharedState.favoriteCurrentPage = page;
+                createPagination('favorite-games-pagination', page, data.total_pages, 'favorite');
             }
         })
         .catch(error => console.error('Error:', error));
@@ -477,7 +489,7 @@ export function loadRecentGamesFromCookie() {
 }
 
 // Function to create a table row from game data
-export function createRowFromDatabase(game) {
+export function createRowFromDatabase(game, loggedIn) {
     const row = document.createElement('tr');
     row.setAttribute('data-game-id', game.id);
 
@@ -485,6 +497,7 @@ export function createRowFromDatabase(game) {
     const favoriteColumn = document.createElement('td');
     favoriteColumn.className = 'favorite-column';
     favoriteColumn.setAttribute('data-game-id', game.id);
+    favoriteColumn.style.display = loggedIn ? 'table-cell' : 'none';
 
     if (isUserLoggedIn()) {
         const favoriteIcon = document.createElement('i');
@@ -504,6 +517,38 @@ export function createRowFromDatabase(game) {
     replayIcon.addEventListener('click', () => startReplay(game.id));
     replayColumn.appendChild(replayIcon);
     row.appendChild(replayColumn);
+
+    // Name column
+    const nameColumn = document.createElement('td');
+    nameColumn.textContent = game.name;
+    nameColumn.style.display = loggedIn ? 'table-cell' : 'none';
+    row.appendChild(nameColumn);
+
+    // Edit button column
+    const editColumn = document.createElement('td');
+    editColumn.style.display = loggedIn ? 'table-cell' : 'none';
+    if (isUserLoggedIn()) {
+        const editIcon = document.createElement('i');
+        editIcon.className = 'fa fa-edit edit-icon';
+        editIcon.style.cursor = 'pointer';
+        editIcon.addEventListener('click', () => {
+            // 新しい入力要素と保存ボタンを作成
+            const inputElement = document.createElement('input');
+            inputElement.type = 'text';
+            inputElement.className = 'game-name-input';
+            inputElement.value = nameColumn.textContent;
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.className = 'save-button';
+
+            // enableEditing 関数の修正されたバージョンを呼び出す
+            enableEditing(game.id, nameColumn, inputElement, saveButton);
+        });
+
+        editColumn.appendChild(editIcon);
+    }
+    row.appendChild(editColumn);
 
     // Other columns
     const dateColumn = document.createElement('td');
@@ -645,4 +690,82 @@ export function updateFavoriteGamesTable(gameId, isFavorite) {
 export function startReplay(gameId) {
     // Open a new window for the replay
     window.open(`/past_replay/${gameId}/`, '_blank');
+}
+
+// Enable editing for the given game
+export function enableEditing(gameId, nameColumn, inputElement, saveButton) {
+    // Hide the name column
+    nameColumn.style.display = 'none';
+
+    // Insert the input element and save button before the name column
+    nameColumn.parentNode.insertBefore(inputElement, nameColumn);
+    nameColumn.parentNode.insertBefore(saveButton, nameColumn.nextSibling);
+
+    // Save the new name to the database
+    saveButton.addEventListener('click', () => {
+        const newName = inputElement.value;
+
+        if (newName.length > sharedState.maxTitleLength) {
+            alert(`The title of the game cannot be longer than ${sharedState.maxTitleLength} characters.`)
+            return;
+        }
+
+        updateGameName(gameId, newName, nameColumn);
+
+        // Display the name column again
+        nameColumn.textContent = newName;
+        inputElement.remove();
+        saveButton.remove();
+        nameColumn.style.display = 'block';
+    });
+}
+
+// Update game name in both Recent and Favorite Games
+export function updateGameName(gameId, newName, nameColumn, isFavorite) {
+    fetch(`/update_game_name/${gameId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ name: newName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update name in both tables
+            const nameCells = document.querySelectorAll(`tr[data-game-id="${gameId}"] td:nth-child(3)`); // Assuming name is the 3rd column
+            nameCells.forEach(cell => cell.textContent = newName || '');
+
+            // Optionally, switch back from input to text
+            nameColumn.textContent = newName || '';
+        } else {
+            console.error('Error updating name:', data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Generate pagination buttons
+function createPagination(containerId, currentPage, totalPages, type) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    container.classList.add('d-flex', 'justify-content-center', 'my-3');
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.classList.add('btn-sm', 'mx-1');
+
+        if (i === currentPage) {
+            // Apply btn-primary class to the button of the current page
+            button.classList.add('btn-primary');
+        } else {
+            // Apply btn-outline-primary class to the buttons of other pages
+            button.classList.add('btn-outline-primary');
+        }
+
+        button.onclick = () => loadGames(type, i);
+        container.appendChild(button);
+    }
 }
