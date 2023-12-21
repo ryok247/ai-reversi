@@ -2,6 +2,7 @@ import { gameLogic } from "./game-logic.js"
 import { ReplayAnimator } from './animation.js';
 import { addToHistoryTable, updateGameName } from "./manage-game.js";
 import { getCsrfToken } from './utilities.js'
+import { sharedState } from "./game-shared.js";
 
 let logic = new gameLogic();
 const progressElement = document.getElementById('progress');
@@ -109,6 +110,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     saveButton.addEventListener('click', function() {
         const newTitle = inputElement.value;
+
+        if (newTitle.length > sharedState.maxTitleLength){
+            alert(`Title must be less than ${sharedState.maxTitleLength} characters`);
+            return;
+        }
+
         updateGameName(gameId, newTitle, titleElement);
 
         // Hide the input field and save button
@@ -151,6 +158,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // 説明保存ボタンのクリックイベント
     saveDescriptionButton.addEventListener('click', function() {
         const newDescription = editDescriptionInput.value;
+
+        if (newDescription.length > sharedState.maxDescriptionLength){
+            alert(`Description must be less than ${sharedState.maxDescriptionLength} characters`);
+            return;
+        }
+
         // サーバーに新しい説明を送信
         updateGameDescription(gameId, newDescription).then(() => {
             descriptionElement.textContent = newDescription;

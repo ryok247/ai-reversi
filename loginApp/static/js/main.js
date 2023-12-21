@@ -64,8 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('modal-close-btn').addEventListener('click', function() {
         sharedState.userInputTitle = document.getElementById('game-title-input').value || "Untitled";
 
-        if (sharedState.userInputTitle.length > 100){
-            alert("Title must be less than 100 characters");
+        if (sharedState.userInputTitle.length > sharedState.maxTitleLength){
+            alert(`Title must be less than ${sharedState.maxTitleLength} characters`);
             return;
         }
 
@@ -130,4 +130,15 @@ document.querySelectorAll('.edit-icon').forEach(icon => {
         const isFavorite = icon.closest('table').id.includes('favorite');
         enableEditing(gameId, nameColumn, isFavorite);
     });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/settings')
+        .then(response => response.json())
+        .then(data => {
+            // ここで取得した設定値を使用する
+            sharedState.maxTitleLength = data.max_title_length;
+            sharedState.maxDescriptionLength = data.max_description_length;
+        })
+        .catch(error => console.error('Error:', error));
 });

@@ -704,6 +704,12 @@ export function enableEditing(gameId, nameColumn, inputElement, saveButton) {
     // 保存ボタンのクリックイベントを設定
     saveButton.addEventListener('click', () => {
         const newName = inputElement.value;
+
+        if (newName.length > sharedState.maxTitleLength) {
+            alert(`The title of the game cannot be longer than ${sharedState.maxTitleLength} characters.`)
+            return;
+        }
+
         updateGameName(gameId, newName, nameColumn);
 
         // 入力フィールドと保存ボタンを削除し、名前列を再表示

@@ -3,13 +3,15 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
+from loginProject import settings
+
 class CustomUser(AbstractUser):
     pass
 
 class Game(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100)
-    description = models.TextField()
+    name = models.CharField(max_length=settings.MAX_TITLE_LENGTH)
+    description = models.TextField(max_length=settings.MAX_DESCRIPTION_LENGTH, blank=True)
     player_color = models.CharField(max_length=5, choices=[('black', 'Black'), ('white', 'White')])
     ai_level = models.IntegerField()
     game_datetime = models.DateTimeField(default=timezone.now)

@@ -12,4 +12,7 @@ export const sharedState = {
 
     userInputTitle: undefined,
     userInputDescription: undefined,
+
+    maxTitleLength: 50,
+    maxDescriptionLength: 200,
 };
