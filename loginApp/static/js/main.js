@@ -62,8 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Event listeners for game end modal
     document.getElementById('modal-close-btn').addEventListener('click', function() {
-        const title = document.getElementById('game-title-input').value || "Untitled";
-        sharedState.board.saveGameToDatabase(title); // Save game to database
+        sharedState.userInputTitle = document.getElementById('game-title-input').value || "Untitled";
+
+        if (sharedState.userInputTitle.length > 100){
+            alert("Title must be less than 100 characters");
+            return;
+        }
 
         document.getElementById('game-end-modal').style.display = 'none';
         document.getElementById('game-title-input').value = ''; // Reset title input

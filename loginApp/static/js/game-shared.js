@@ -9,4 +9,7 @@ export const sharedState = {
     board: undefined,
     logic: undefined,
     animator: undefined,
+
+    userInputTitle: undefined,
+    userInputDescription: undefined,
 };

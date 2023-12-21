@@ -339,7 +339,7 @@ export class boardInfo{
     }
 
     saveGameToDatabase() {
-        const title = document.getElementById('game-title-input').value || "Untitled";
+        const title = sharedState.userInputTitle || "Untitled";
         const gameJsonData = this.createGameData(title);
     
         // Send request to the backend
