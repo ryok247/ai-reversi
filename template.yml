@@ -2,9 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation template for EC2 and RDS instances with associated security groups and Elastic IP.
 
 Resources:
+
+  # port 8000 will be added manually later
   EC2SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
-    DeletionPolicy: Retain
     Properties:
       GroupDescription: 'Security group for EC2 instance'
       VpcId: 'vpc-0277fe13aac9a146d'
@@ -12,23 +13,14 @@ Resources:
         - IpProtocol: 'tcp'
           FromPort: 22
           ToPort: 22
-          CidrIp: '0.0.0.0/0'
+          CidrIp: '0.0.0.0/0' # Adjust as necessary for your security
         - IpProtocol: 'tcp'
           FromPort: 443
           ToPort: 443
-          CidrIp: '0.0.0.0/0'
-        - IpProtocol: 'tcp'
-          FromPort: 80
-          ToPort: 80
-          CidrIp: '220.220.239.102/32'
-      SecurityGroupEgress:
-        - IpProtocol: 'tcp'
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: '0.0.0.0/0'
+          CidrIp: '0.0.0.0/0' # Adjust as necessary for your security
+
   RDSSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
-    DeletionPolicy: Retain
     Properties:
       GroupDescription: 'Security group for RDS instance'
       VpcId: 'vpc-0277fe13aac9a146d'
@@ -36,57 +28,57 @@ Resources:
         - IpProtocol: 'tcp'
           FromPort: 5432
           ToPort: 5432
-          SourceSecurityGroupId:
-            Ref: 'EC2SecurityGroup'
-  EC2RDSSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    DeletionPolicy: Retain
-    Properties:
-      GroupDescription: 'Security group to securely connect to RDS'
-      VpcId: 'vpc-0277fe13aac9a146d'
-      SecurityGroupEgress:
-        - IpProtocol: 'tcp'
-          FromPort: 5432
-          ToPort: 5432
-          DestinationSecurityGroupId:
-            Ref: 'RDSSecurityGroup'
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+
   EC2Instance:
     Type: 'AWS::EC2::Instance'
-    DeletionPolicy: Retain
     Properties:
       InstanceType: t2.micro
       ImageId: ami-09a81b370b76de6a2 # Ubuntu Server 22.04 LTS AMI
       KeyName: ai-reversi
       SubnetId: subnet-00f244f854eae69f4
       SecurityGroupIds:
-        - sg-02de48bd82e689962 # Security group for EC2 instance
+        - !Ref EC2SecurityGroup
       Tags:
         - Key: Name
           Value: ai-reversi
 
-  ElasticIP:
-    Type: 'AWS::EC2::EIP'
-    DeletionPolicy: Retain
+  # The existing Elastic IP will be added manually later
+  #ElasticIP:
+  #  Type: 'AWS::EC2::EIP'
+  #  Properties:
+  #    Domain: vpc
+  #    InstanceId: !Ref EC2Instance
+
+  RDSSecret:
+    Type: AWS::SecretsManager::Secret
     Properties:
-      Domain: vpc
-      InstanceId: !Ref EC2Instance
+      Name: ai-reversi-db-secret
+      Description: "Secret for AI Reversi RDS database"
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "db_rds_admin"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: "\"@/\\"
 
   RDSInstance:
     Type: 'AWS::RDS::DBInstance'
-    DeletionPolicy: Retain
     Properties:
       DBInstanceClass: db.t3.micro
-      AllocatedStorage: 20 # Adjust the storage size as needed
+      AllocatedStorage: 20 # Adjust as needed
       Engine: postgres
-      EngineVersion: '15.4' # Specify the version you are using
+      EngineVersion: '15.4' # Update to the version you want to use
       DBInstanceIdentifier: ai-reversi-postgre
-      MasterUsername: db_rds_admin # Change to your master username
-      MasterUserPassword: 'your_master_password' # Set your master password
+      MasterUsername: !GetAtt RDSSecret.SecretString.username
+      MasterUserPassword: !GetAtt RDSSecret.SecretString.password
       DBSubnetGroupName: rds-ec2-db-subnet-group-1
       VPCSecurityGroups:
-        - sg-0c3b0ebbe15063d05 # Security group for RDS
+        - !Ref RDSSecurityGroup
       Tags:
         - Key: Name
           Value: ai-reversi-postgre
-
-
+        
+Outputs:
+  RDSSecretARN:
+    Description: "Secret ARN for RDS instance"
+    Value: !Ref RDSSecret
