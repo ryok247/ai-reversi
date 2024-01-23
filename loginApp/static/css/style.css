@@ -10,6 +10,7 @@ body {
     color: var(--text-color);
     background-color: var(--background-color);
     overflow-x: hidden; /* Hide the horizontal scrollbar */
+    margin: 20px;
 }
 
 /* Blue text color for questions */
@@ -223,8 +224,11 @@ body {
     background-color: #007bff; /* Background color */
     color: white; /* Text color */
     border: none; /* No border */
-    padding: 10px; /* Padding */
+    padding: 0px; /* Padding */
     border-radius: 5px; /* Border radius */
+    margin-left: 5px; /* Margin to the left edge */
+    height: 2.5rem;
+    width: 2.5rem;
     cursor: pointer; /* Cursor style */
 }
 
@@ -307,4 +311,30 @@ body {
 
 #game-title-input {
     margin-bottom: 15px;
+}
+
+/* Style for the container that contains the radio buttons for first player and second player */
+.container-for-players {
+    display: flex;
+    flex-direction: column;
+    margin-left: 15px;
+}
+
+/* Style for the container that contains the radio buttons for AI Level */
+.container-for-levels {
+    display: flex;
+    flex-direction: column;
+    margin-left: 15px;
+}
+
+/* Style for the blue line surrounding You are and AI Level */
+.container-for-options {
+    border: 2px solid blue;
+    padding: 10px;
+}
+
+.container-for-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
 }
