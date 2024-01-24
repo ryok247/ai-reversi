@@ -116,12 +116,18 @@ function updateTable(tableBody, results) {
     }
 
     // Sort results by AI level
-    results.sort((a, b) => a.ai_level - b.ai_level);
+    results.sort((a, b) => a.ai_level - b.ai_level); 
+
+    const levelToText = {
+        1: 'Very Easy',
+        2: 'Easy',
+        3: 'Medium',
+    };
 
     // Add results to table
     results.forEach(result => {
         const row = tableBody.insertRow();
-        row.insertCell(0).textContent = `Level ${result.ai_level}`;
+        row.insertCell(0).textContent = levelToText[result.ai_level];
         row.insertCell(1).textContent = result.wins;
         row.insertCell(2).textContent = result.losses;
         row.insertCell(3).textContent = result.draws;
