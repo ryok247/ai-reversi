@@ -41,10 +41,15 @@
             <div class="row">
                 <div class="col-md-4 col-12">
                     <div class="container container-for-options">
+                        <!--
                         <div class="question"><h4>Mode</h4></div>
                         <div>
                             <label><input type="radio" name="mode" value="cp" checked> vs AI</label>
                             <label><input type="radio" name="mode" value="manual"> vs Human</label>
+                        </div>
+                        -->
+                        <div>
+                            <label><input type="hidden" name="mode" value="cp" checked></label>
                         </div>
                 
                         <div class="question"><h4>You are</h4></div>
@@ -165,55 +170,61 @@
         <div id="dashboard-tab" style="overflow-x:auto;">
     
             <!-- Table that shows today's results -->
+            <div class="dashboard-element">
             <h3>Today</h3>
-            <table id="ai-results-table-today" class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>AI Level</th>
-                        <th>Win</th>
-                        <th>Lose</th>
-                        <th>Draw</th>
-                        <th>Fastest Win</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data -->
-                </tbody>
-            </table>
+                <table id="ai-results-table-today" class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>AI Level</th>
+                            <th>Win</th>
+                            <th>Lose</th>
+                            <th>Draw</th>
+                            <th>Fastest Win</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data -->
+                    </tbody>
+                </table>
+            </div>
     
             <!-- Table that shows this month's results -->
-            <h3>This Month</h3>
-            <table id="ai-results-table-month" class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>AI Level</th>
-                        <th>Win</th>
-                        <th>Lose</th>
-                        <th>Draw</th>
-                        <th>Fastest Win</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data -->
-                </tbody>
-            </table>
+            <div class="dashboard-element">
+                <h3>This Month</h3>
+                <table id="ai-results-table-month" class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>AI Level</th>
+                            <th>Win</th>
+                            <th>Lose</th>
+                            <th>Draw</th>
+                            <th>Fastest Win</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data -->
+                    </tbody>
+                </table>
+            </div>
     
             <!-- Table that shows total results -->
-            <h3>Total</h3>
-            <table id="ai-results-table-total" class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>AI Level</th>
-                        <th>Win</th>
-                        <th>Lose</th>
-                        <th>Draw</th>
-                        <th>Fastest Win</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Data -->
-                </tbody>
-            </table>
+            <div class="dashboard-element">
+                <h3>Total</h3>
+                <table id="ai-results-table-total" class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>AI Level</th>
+                            <th>Win</th>
+                            <th>Lose</th>
+                            <th>Draw</th>
+                            <th>Fastest Win</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
