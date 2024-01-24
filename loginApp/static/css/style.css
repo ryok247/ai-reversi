@@ -236,6 +236,7 @@ body {
     border: none; /* No border */
     padding: 0px; /* Padding */
     border-radius: 5px; /* Border radius */
+    margin-top: 10px; /* Margin to the top edge */
     margin-left: 5px; /* Margin to the left edge */
     height: 2.5rem;
     width: 2.5rem;
@@ -245,6 +246,10 @@ body {
 /* Style for icons in arrow and toggle buttons */
 .arrow-button i, .toggle-button i {
     font-size: 1.2rem; /* Icon size */
+}
+
+.dashboard-element {
+    margin-top: 20px;
 }
 
 .dashboard-table th {
