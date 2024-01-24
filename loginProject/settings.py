@@ -31,6 +31,7 @@ LOCAL = config('LOCAL', default=False, cast=bool)
 ALLOWED_HOSTS = [
     config('ALLOWED_HOST1', default='127.0.0.1'),
     config('ALLOWED_HOST2', default='127.0.0.1'),
+    config('ALLOWED_HOST3', default='127.0.0.1'),
 ]
 
 if LOCAL:
