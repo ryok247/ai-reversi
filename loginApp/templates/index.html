@@ -5,15 +5,12 @@
 {% block title %}AI Reversi{% endblock %}
 
 {% block content %}
+
     <div>
         {% if request.user.is_authenticated %}
         <p id="user-status" style="display: none;">Logged In</p>
-        <p>Welcome, {{ request.user.username }}!</p>
-        <a href="{% url 'logout' %}">Logout</a>
         {% else %}
         <p id="user-status" style="display: none;">Not Logged In</p>
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'signup' %}">Signup</a>
         {% endif %}
     </div>
 
@@ -44,25 +41,23 @@
             <div class="row">
                 <div class="col-md-4 col-12">
                     <div class="container container-for-options">
-                        <!--
                         <div class="question"><h4>Mode</h4></div>
                         <div>
                             <label><input type="radio" name="mode" value="cp" checked> vs AI</label>
                             <label><input type="radio" name="mode" value="manual"> vs Human</label>
                         </div>
-                        -->
                 
                         <div class="question"><h4>You are</h4></div>
                         <div class="container-for-players">
-                            <label><input type="radio" name="color" value="black" checked> First player (Black)</label>
-                            <label><input type="radio" name="color" value="white"> Second player (White)</label>
+                            <label><input type="radio" name="color" value="black" checked> First (Black)</label>
+                            <label><input type="radio" name="color" value="white"> Second (White)</label>
                         </div>
                 
-                        <div class="question"><h4>AI level</h4></div>
+                        <div class="question"><h4>Level</h4></div>
                         <div class="container-for-levels">
-                            <label><input type="radio" name="level" value=1 checked> 1</label>
-                            <label><input type="radio" name="level" value=2> 2</label>
-                            <label><input type="radio" name="level" value=3> 3</label>
+                            <label><input type="radio" name="level" value=1 checked> Very Easy</label>
+                            <label><input type="radio" name="level" value=2> Easy</label>
+                            <label><input type="radio" name="level" value=3> Medium</label>
                         </div>
                         <!-- Checkbox that asks highlighting possible cells-->
                 
@@ -73,7 +68,7 @@
                     <div class="container">
                         <form action="">
                             <input type="checkbox" id="highlight" name="highlight" value="checked" checked>
-                            <label for="highlight">Highlight valid places</label>
+                            <label for="highlight">Highlight</label>
                         </form>
                     </div>
                 </div>

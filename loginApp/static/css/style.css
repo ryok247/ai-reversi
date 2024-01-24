@@ -9,8 +9,18 @@ body {
     font-family: 'Arial', sans-serif;
     color: var(--text-color);
     background-color: var(--background-color);
-    overflow-x: hidden; /* Hide the horizontal scrollbar */
-    margin: 20px;
+    overflow-x: hidden; /* 水平スクロールバーを非表示 */
+    margin: 0; /* bodyのマージンを0に設定 */
+    padding: 0; /* bodyのパディングを0に設定 */
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+
+.tabs {
+    margin-top: 40px;
+    margin-bottom: 20px;
 }
 
 /* Blue text color for questions */
