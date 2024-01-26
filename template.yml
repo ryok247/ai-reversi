@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormation template for EC2 and RDS instances with associated security groups and Elastic IP.
+Description: CloudFormation template for EC2, RDS, ALB, and associated resources.
 
 Resources:
 
@@ -46,13 +46,6 @@ Resources:
         - Key: Name
           Value: ai-reversi
 
-  # The existing Elastic IP will be added manually later
-  #ElasticIP:
-  #  Type: 'AWS::EC2::EIP'
-  #  Properties:
-  #    Domain: vpc
-  #    InstanceId: !Ref EC2Instance
-
   RDSSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -80,6 +73,60 @@ Resources:
       Tags:
         - Key: Name
           Value: ai-reversi-postgre
+
+  ElasticIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+
+  ElasticIPAssociation:
+    Type: 'AWS::EC2::EIPAssociation'
+    Properties:
+      InstanceId: !Ref EC2Instance
+      AllocationId: !GetAtt ElasticIP.AllocationId
+
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: ai-reversi
+      Subnets:
+        - subnet-00f244f854eae69f4
+        - subnet-03b0b39b4ed6f0b3f
+      SecurityGroups:
+        - !Ref EC2SecurityGroup
+      Scheme: internet-facing
+      Type: application
+      IpAddressType: ipv4
+
+  LoadBalancerListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: "arn:aws:acm:ap-northeast-1:099119496071:certificate/dec32abb-d8aa-40ef-b314-f7434304c1d0"
+
+  TargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId: vpc-0277fe13aac9a146d
+      TargetType: instance
+
+  DNSRecord:
+    Type: 'AWS::Route53::RecordSet'
+    Properties:
+      HostedZoneId: "Z032605334SKM0XBBMJC0"
+      Name: "ai-reversi.com"
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
         
 Outputs:
   RDSSecretARN:
