@@ -65,7 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Event listeners for game end modal
+    // Commented out for now because it might make users confused
+    // When this is uncommented, make sure lines to send data to server should be added
+    // When this is uncommented, make sure to uncomment in manage-game.js as well
+    
     document.getElementById('modal-close-btn').addEventListener('click', function() {
+
+        /*
         sharedState.userInputTitle = document.getElementById('game-title-input').value || "Untitled";
         sharedState.userInputDescription = document.getElementById('game-description-input').value || "";
 
@@ -79,9 +85,15 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        document.getElementById('game-end-modal').style.display = 'none';
+        // -- lines to send data to server should be added here --
+
         document.getElementById('game-title-input').value = ''; // Reset title input
         document.getElementById('game-description-input').value = ''; // Reset description input
+
+        */
+
+        document.getElementById('game-end-modal').style.display = 'none';
+
     });
 });
 

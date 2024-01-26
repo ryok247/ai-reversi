@@ -109,6 +109,9 @@ export class boardInfo{
         document.getElementById('game-result').textContent = resultMessage;
     
         // Change the display according to the login status
+        // Commented out for now because it might make users confused
+        // When this is uncommented, make sure to uncomment in main.js as well
+        /*
         if (isUserLoggedIn()) {
             document.getElementById('game-title-input').style.display = 'block';
             document.getElementById('game-description-input').style.display = 'block';
@@ -118,6 +121,11 @@ export class boardInfo{
             document.getElementById('game-description-input').style.display = 'none';
             document.getElementById('login-signup-message').style.display = 'block';
         }
+        */
+
+        document.getElementById('game-title-input').style.display = 'none';
+        document.getElementById('game-description-input').style.display = 'none';
+        if (!isUserLoggedIn()) document.getElementById('login-signup-message').style.display = 'block';
     }
     
     updateScores() {
