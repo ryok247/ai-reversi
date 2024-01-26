@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     initializeGame(historyElement);
 
+    document.getElementById('highlight').addEventListener('change', () => {
+        sharedState.settings.updateSettings("highlight");
+    });
+
     document.getElementById("restart-animation-btn").addEventListener("click", () => sharedState.animator.restartAnimation());
     document.getElementById("backward-step-btn").addEventListener("click", () => sharedState.animator.backwardStep());
     document.getElementById("start-animation-btn").addEventListener("click", () => sharedState.animator.startAnimation());

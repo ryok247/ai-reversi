@@ -7,6 +7,12 @@ export class gameSettings{
         });
     }
 
+    updateSettings(...settingKeywords){
+        settingKeywords.forEach(keyword => {
+            this[keyword] = this.getInputValue(keyword);
+        });
+    }
+
     getInputValue(name){
         let elements = document.getElementsByName(name);
         let checkedValue = '';

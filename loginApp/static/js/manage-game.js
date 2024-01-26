@@ -281,6 +281,7 @@ export class boardInfo{
 
     // Remove the highlight
     removeHighlight(){
+
         this.cells.forEach((cell) => {
             cell.classList.remove("possible");
         });
