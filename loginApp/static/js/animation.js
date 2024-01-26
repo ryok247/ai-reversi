@@ -6,7 +6,7 @@ export class ReplayAnimator {
         this.gameLogic = gameLogicInstance;
         this.boardElement = boardElement;
         this.progressElement = progressElement;
-        this.currentTurnIndex = 0;
+        this.currentTurnIndex = -1;
         this.isPlaying = false;
         this.animationInterval = null;
         this.cells = [];
@@ -74,7 +74,7 @@ export class ReplayAnimator {
             if (this.currentTurnIndex < this.gameLogic.history.length - 1) {
                 this.currentTurnIndex++;
             }
-            this.updateProgressBar();
+            this.updateProgressBar(this.currentTurnIndex);
         }, 1000);
     }
 
@@ -86,39 +86,40 @@ export class ReplayAnimator {
 
     // Restarts the animation from the beginning.
     restartAnimation() {
-        this.currentTurnIndex = 0;
+        this.currentTurnIndex = -1;
         this.initBoard();
         this.displayReplayBoard(this.currentTurnIndex);
-        this.updateProgressBar();
+        this.updateProgressBar(this.currentTurnIndex);
     }
 
     // Skips to the end of the animation.
     skipToEnd() {
         this.currentTurnIndex = this.gameLogic.history.length - 2;
-        this.updateProgressBar();
+        this.displayReplayBoard(this.currentTurnIndex);
+        this.updateProgressBar(this.currentTurnIndex);
     }
 
     // Moves one step forward in the animation.
     forwardStep() {
-        if (this.currentTurnIndex < this.gameLogic.history.length - 1) {
-            this.displayReplayBoard(this.currentTurnIndex);
+        if (this.currentTurnIndex < this.gameLogic.history.length - 2) {
             this.currentTurnIndex++;
-            this.updateProgressBar();
+            this.displayReplayBoard(this.currentTurnIndex);
+            this.updateProgressBar(this.currentTurnIndex);
         }
     }
 
     // Moves one step backward in the animation.
     backwardStep() {
-        if (this.currentTurnIndex > 0) {
+        if (this.currentTurnIndex > -1) {
             this.currentTurnIndex--;
             this.displayReplayBoard(this.currentTurnIndex);
-            this.updateProgressBar();
+            this.updateProgressBar(this.currentTurnIndex);
         }
     }
 
     // Updates the progress bar based on the current turn.
-    updateProgressBar() {
-        const progress = (this.currentTurnIndex + 1) / this.gameLogic.history.length * 100;
+    updateProgressBar(turnIndex) {
+        const progress = (turnIndex + 2) / this.gameLogic.history.length * 100;
         this.progressElement.style.width = `${progress}%`;
     }
 
@@ -132,7 +133,7 @@ export class ReplayAnimator {
         for (let i = 0; i <= this.currentTurnIndex; i++) {
             this.displayReplayBoard(i);
         }
-        this.updateProgressBar();
+        this.updateProgressBar(this.currentTurnIndex);
     }
 
     // Highlights the current turn in the game history table.
@@ -157,7 +158,7 @@ export class ReplayAnimator {
         const rowIndex = Array.from(row.parentNode.children).indexOf(row);
         this.currentTurnIndex = this.gameLogic.history.length - rowIndex - 2;
         this.displayReplayBoard(this.currentTurnIndex);
-        this.updateProgressBar();
+        this.updateProgressBar(this.currentTurnIndex);
         this.isPlaying = false;
         if (this.animationInterval) {
             clearInterval(this.animationInterval);
