@@ -37,6 +37,8 @@ ALLOWED_HOSTS = [
 if LOCAL:
     ALLOWED_HOSTS += ['localhost', '127.0.0.1', '[::1]']
 
+CSRF_TRUSTED_ORIGINS = ['https://ai-reversi.com']
+
 # Application definition
 
 INSTALLED_APPS = [
