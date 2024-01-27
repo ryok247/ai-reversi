@@ -79,7 +79,7 @@ docker-compose -f docker-compose.dev.yml build --no-cache
 docker-compose -f docker-compose.dev.yml up
 ```
 
-- ローカルホスト（http://127.0.0.1:8000/）にアクセスするとWebサイトが表示されます。
+- ローカルホスト（ http://127.0.0.1:8000/ ）にアクセスするとWebサイトが表示されます。
 
 ## ライセンス
 
