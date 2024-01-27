@@ -1,50 +1,66 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormation template for EC2, RDS, ALB, and associated resources.
+Description: CloudFormation template for EC2, RDS, ALB, Auto Scaling, and associated resources.
 
 Resources:
+  # VPC and subnets
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+
+  MySubnetA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: ap-northeast-1a
+      MapPublicIpOnLaunch: true
+
+  MySubnetB:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: ap-northeast-1c
+      MapPublicIpOnLaunch: true
+
+  MyDBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: 'Subnet group for RDS instance'
+      SubnetIds:
+        - !Ref MySubnetA
+        - !Ref MySubnetB
 
   EC2SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'Security group for EC2 instance'
-      VpcId: 'vpc-0277fe13aac9a146d'
+      VpcId: !Ref MyVPC
       SecurityGroupIngress:
         - IpProtocol: 'tcp'
           FromPort: 22
           ToPort: 22
-          CidrIp: '0.0.0.0/0' # Adjust as necessary for your security
+          CidrIp: '0.0.0.0/0'
         - IpProtocol: 'tcp'
           FromPort: 443
           ToPort: 443
-          CidrIp: '0.0.0.0/0' # Adjust as necessary for your security
+          CidrIp: '0.0.0.0/0'
         - IpProtocol: 'tcp'
           FromPort: 80
           ToPort: 80
-          CidrIp: '0.0.0.0/0' # Adjust as necessary for your security
+          CidrIp: '0.0.0.0/0'
 
   RDSSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'Security group for RDS instance'
-      VpcId: 'vpc-0277fe13aac9a146d'
+      VpcId: !Ref MyVPC
       SecurityGroupIngress:
         - IpProtocol: 'tcp'
           FromPort: 5432
           ToPort: 5432
           SourceSecurityGroupId: !Ref EC2SecurityGroup
-
-  EC2Instance:
-    Type: 'AWS::EC2::Instance'
-    Properties:
-      InstanceType: t2.micro
-      ImageId: ami-09a81b370b76de6a2 # Ubuntu Server 22.04 LTS AMI
-      KeyName: ai-reversi
-      SubnetId: subnet-00f244f854eae69f4
-      SecurityGroupIds:
-        - !Ref EC2SecurityGroup
-      Tags:
-        - Key: Name
-          Value: ai-reversi
 
   RDSSecret:
     Type: AWS::SecretsManager::Secret
@@ -61,37 +77,61 @@ Resources:
     Type: 'AWS::RDS::DBInstance'
     Properties:
       DBInstanceClass: db.t3.micro
-      AllocatedStorage: 10 # Adjust as needed
+      AllocatedStorage: 10
       Engine: postgres
-      EngineVersion: '15.4' # Update to the version you want to use
+      EngineVersion: '15.4'
       DBInstanceIdentifier: ai-reversi-postgre
       MasterUsername: db_rds_admin
       MasterUserPassword: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
-      DBSubnetGroupName: rds-ec2-db-subnet-group-1
+      DBSubnetGroupName: !Ref MyDBSubnetGroup
       VPCSecurityGroups:
         - !Ref RDSSecurityGroup
       Tags:
         - Key: Name
           Value: ai-reversi-postgre
 
-  ElasticIP:
-    Type: 'AWS::EC2::EIP'
-    Properties:
-      Domain: vpc
+  MyInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
 
-  ElasticIPAssociation:
-    Type: 'AWS::EC2::EIPAssociation'
+  GatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
     Properties:
-      InstanceId: !Ref EC2Instance
-      AllocationId: !GetAtt ElasticIP.AllocationId
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyInternetGateway
 
+  MyRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref MyVPC
+
+  InternetRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: GatewayAttachment
+    Properties:
+      RouteTableId: !Ref MyRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref MyInternetGateway
+
+  SubnetRouteTableAssociationA:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref MySubnetA
+      RouteTableId: !Ref MyRouteTable
+
+  SubnetRouteTableAssociationB:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref MySubnetB
+      RouteTableId: !Ref MyRouteTable
+
+  # Load balancer configuration
   LoadBalancer:
     Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
     Properties:
       Name: ai-reversi
       Subnets:
-        - subnet-00f244f854eae69f4
-        - subnet-03b0b39b4ed6f0b3f
+        - !Ref MySubnetA
+        - !Ref MySubnetB
       SecurityGroups:
         - !Ref EC2SecurityGroup
       Scheme: internet-facing
@@ -115,7 +155,7 @@ Resources:
     Properties:
       Port: 80
       Protocol: HTTP
-      VpcId: vpc-0277fe13aac9a146d
+      VpcId: !Ref MyVPC
       TargetType: instance
 
   DNSRecord:
@@ -127,7 +167,35 @@ Resources:
       AliasTarget:
         DNSName: !GetAtt LoadBalancer.DNSName
         HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
-        
+
+  # Auto Scaling Group configuration
+  LaunchConfig:
+    Type: 'AWS::AutoScaling::LaunchConfiguration'
+    Properties:
+      ImageId: ami-09a81b370b76de6a2
+      InstanceType: t2.micro
+      AssociatePublicIpAddress: true
+      SecurityGroups:
+        - !Ref EC2SecurityGroup
+      KeyName: ai-reversi
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+          aws ec2 create-tags --resources $INSTANCE_ID --tags Key=Name,Value=ai-reversi-${!INSTANCE_ID} --region ${AWS::Region}
+
+  AutoScalingGroup:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      MinSize: '1'
+      MaxSize: '1'
+      DesiredCapacity: '1'
+      VPCZoneIdentifier:
+        - !Ref MySubnetA
+      LaunchConfigurationName: !Ref LaunchConfig
+      TargetGroupARNs:
+        - !Ref TargetGroup
+
 Outputs:
   RDSSecretARN:
     Description: "Secret ARN for RDS instance"

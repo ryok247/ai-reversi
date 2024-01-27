@@ -12,4 +12,3 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo usermod -aG docker $USER
 sudo apt install postgresql-client-common
 sudo apt-get install postgresql-client-14
-exit
