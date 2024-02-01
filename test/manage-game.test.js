@@ -53,6 +53,7 @@ jest.mock('../loginApp/static/js/utilities', () => ({
     getCsrfToken: jest.fn().mockReturnValue('fake-csrf-token'),
     makeAsync: jest.fn().mockImplementation(fn => fn),
     getCookie: jest.fn().mockReturnValue(),
+    setCookie: jest.fn(),
   }));
   
 describe('boardInfo', () => {
