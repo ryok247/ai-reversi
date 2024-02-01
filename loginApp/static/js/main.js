@@ -102,11 +102,14 @@ document.addEventListener('DOMContentLoaded', function() {
     dashboardTab.addEventListener('click', loadDashboardData);
 });
 
-function loadDashboardData() {
-    fetch('/dashboard/')
-        .then(response => response.json())
-        .then(data => updateDashboardTable(data))
-        .catch(error => console.error('Error:', error));
+export async function loadDashboardData() {
+    try {
+        const response = await fetch('/dashboard/');
+        const data = await response.json();
+        updateDashboardTable(data);
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 function updateDashboardTable(data) {
@@ -121,7 +124,7 @@ function updateDashboardTable(data) {
     updateTable(totalTableBody, data['total'] || []);
 }
 
-function updateTable(tableBody, results) {
+export function updateTable(tableBody, results) {
     tableBody.innerHTML = ''; // Clear table body
 
     // Make sure there is a result for each AI level
