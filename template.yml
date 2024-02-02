@@ -196,6 +196,46 @@ Resources:
       TargetGroupARNs:
         - !Ref TargetGroup
 
+  GithubOidc:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: 'https://token.actions.githubusercontent.com'
+      ClientIdList:
+        - 'sts.amazonaws.com'
+      ThumbprintList:
+        - 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
+  GithubRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'GitHubActionsDeployRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !GetAtt GithubOidc.Arn
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: 'sts.amazonaws.com'
+              StringLike:
+                token.actions.githubusercontent.com:sub: 'repo:ryok/ai-reversi:ref:refs/heads/main'
+      Policies:
+        - PolicyName: 'EC2Access'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - ec2:DescribeInstances
+                  - ec2:StartInstances
+                  - ec2:StopInstances
+                  - ec2:RebootInstances
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeKeyPairs
+                Resource: '*'
+
 Outputs:
   RDSSecretARN:
     Description: "Secret ARN for RDS instance"
