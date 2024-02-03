@@ -1,4 +1,4 @@
-name: cd
+name: CD
 
 on:
   push:
@@ -31,5 +31,11 @@ jobs:
 
       - name: Deploy to EC2 via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USER_NAME }}@${{ secrets.HOST_NAME }} "cd ai-reversi && docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml build --no-cache && docker-compose -f docker-compose.prod.yml up -d"
-
+            ssh -o StrictHostKeyChecking=no ${{ secrets.USER_NAME }}@${{ secrets.HOST_NAME }} << EOF
+            cd ai-reversi
+            docker-compose -f docker-compose.prod.yml down
+            git fetch origin main
+            git reset --hard origin/main
+            docker-compose -f docker-compose.prod.yml build --no-cache
+            docker-compose -f docker-compose.prod.yml up -d
+            EOF
