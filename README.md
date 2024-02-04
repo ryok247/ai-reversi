@@ -6,7 +6,11 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
 
 [AI Reversi Webサイト](https://ai-reversi.com)
 
+### ゲーム画面
 ![AI Reversi Demo](demo.gif)
+
+### リプレイ画面
+![AI Reversi Demo](demo2.gif)
 
 ## 技術スタック
 
