@@ -6,16 +6,17 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
 
 [AI Reversi Webサイト](https://ai-reversi.com)
 
-![AI Reversi Demo](demo.png)
+![AI Reversi Demo](demo.gif)
 
 ## 技術スタック
 
 - **フロントエンド**: JavaScript
 - **バックエンド**: Django (Python), PostgreSQL
 - **Webサーバー**: Nginx, Gunicorn
-- **クラウド**: AWS (EC2, RDS, ELB, CloudFormation)
-- **コンテナ化**: Docker
-- **CI**: GitHub Actions
+- **クラウドプラットフォーム**: AWS (EC2, RDS, ELB)
+- **コンテナ化**: Docker, Docker Compose
+- **CI/CD**: GitHub Actions, OpenID Connect (OIDC)
+- **Infrastructure as Code (IaC)**: AWS CloudFormation
 
 ## 特徴と機能
 
