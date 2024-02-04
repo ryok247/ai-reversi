@@ -1,60 +1,62 @@
 # AI Reversi
 
-AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレイすることができます。さらに、リプレイ機能を使って自分の過去の対戦の内容を振り返ったり、メモを付けたりすることができます。自分のこれまでの対戦結果はダッシュボードでいつでも確認することができます。
+[日本語で読む](README_JA.md)
 
-## デモ
+With AI Reversi, you can play Reversi against AIs of various difficulties. Additionally, you can use the replay feature to review your past games, add notes, and check your game history on the dashboard at any time.
 
-[AI Reversi Webサイト](https://ai-reversi.com)
+## Demo
 
-### ゲーム画面
+Visit the [AI Reversi Website](https://ai-reversi.com)
+
+### Game Screen
 ![AI Reversi Demo](demo.gif)
 
-### リプレイ画面
-![AI Reversi Demo](demo2.gif)
+### Replay Screen
+![AI Reversi Replay Demo](demo2.gif)
 
-## 技術スタック
+## Tech Stack
 
-- **フロントエンド**: JavaScript
-- **バックエンド**: Django (Python), PostgreSQL
-- **Webサーバー**: Nginx, Gunicorn
-- **クラウドプラットフォーム**: AWS (EC2, RDS, ELB)
-- **コンテナ化**: Docker, Docker Compose
+- **Frontend**: JavaScript
+- **Backend**: Django (Python), PostgreSQL
+- **Web Server**: Nginx, Gunicorn
+- **Cloud Platform**: AWS (EC2, RDS, ELB)
+- **Containerization**: Docker, Docker Compose
 - **CI/CD**: GitHub Actions, OpenID Connect (OIDC)
 - **Infrastructure as Code (IaC)**: AWS CloudFormation
 
-## 特徴と機能
+## Features
 
-- さまざまな強さのAIとの対戦
-    - Very Easy: ランダムな手を選択するAI
-    - Easy: 次の1手のみを読み、最も多くの石をひっくり返すことができる手を選択するAI
-    - Medium: 6手先（最後の10手は全ての手）まで読み、[Minimax法](https://en.wikipedia.org/wiki/Minimax)によって最適な手を選択するAI
-- 過去のゲームのリプレイ機能
-    - 最新10件（会員登録すると無制限）のゲームを保存、対戦内容をリプレイで見ることができる
-    - リプレイ画面では自動再生のほか、次の手や一つ前の手を直感的にボタンを操作して見ることができるほか、手の一覧画面をクリックするとその手に飛ぶことが可能
-    - 会員登録した場合は各ゲームのタイトルやメモを作成することが可能
-    - 会員登録した場合はゲームのお気に入り登録も可能
-- ユーザーダッシュボード
-- レスポンシブデザイン
+- Compete against AIs with different levels of difficulty:
+    - Very Easy: AI that selects moves randomly.
+    - Easy: AI that reads one move ahead and chooses the move that flips the most pieces.
+    - Medium: AI that reads up to 6 moves ahead (all moves for the last 10 moves) and selects the best move using [Minimax algorithm](https://en.wikipedia.org/wiki/Minimax).
+- Replay past games feature:
+    - Save and replay the last 10 games (unlimited for registered users).
+    - In the replay screen, you can automatically play, move to the next or previous move by buttons, and jump to any move by clicking on the move list.
+    - Registered users can create titles and notes for each game.
+    - Registered users can also favorite games.
+- User dashboard
+- Responsive design
 
-## アーキテクチャ
+## Architecture
 
-![アーキテクチャ図](architecture.png)
+![Architecture Diagram](architecture.png)
 
-## ローカルでWebサイトを表示する場合の手順
+## Running the Website Locally
 
-- Docker DesktopおよびDocker Composeのインストール
+- Install Docker Desktop and Docker Compose:
     - [Docker Desktop](https://docs.docker.com/desktop/)
     - [Docker Compose](https://docs.docker.jp/v1.12/compose/install.html)
 
-- Dockerデーモン（サーバー）を立ち上げます。
+- Start the Docker daemon (server).
 
-- レポジトリをクローンします。
+- Clone the repository:
 ```
 git clone git@github.com:ryok247/ai-reversi.git
 cd ai-reversi
 ```
 
-- .envファイルを作成し、ルートディレクトリ直下に置きます。.envファイルには例えば以下のような内容を書きます。
+- Create a .env file and place it directly under the root directory. The .env file should contain something like the following:
 ```
 SECRET_KEY=<your-secret-key>
 
@@ -78,14 +80,14 @@ DB_PASSWORD=<db-password>
 DB_PORT=5432
 ```
 
-- docker-composeコマンドでローカルサーバーを立ち上げます。
+- Use the docker-compose command to launch the local server:
 ```
 docker-compose -f docker-compose.dev.yml build --no-cache
 docker-compose -f docker-compose.dev.yml up
 ```
 
-- ローカルホスト（ http://127.0.0.1:8000/ ）にアクセスするとWebサイトが表示されます。
+- Access the website at http://127.0.0.1:8000/.
 
-## ライセンス
+## Licence
 
-このプロジェクトはMITライセンスのもとで公開されています。
+This project is released under the MIT License.
