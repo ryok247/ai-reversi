@@ -80,6 +80,7 @@ Resources:
     Properties:
       DBInstanceClass: db.t3.micro
       AllocatedStorage: 10
+      MultiAZ: true
       Engine: postgres
       EngineVersion: '15.4'
       DBInstanceIdentifier: ai-reversi-postgre
