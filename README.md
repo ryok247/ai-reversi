@@ -16,12 +16,15 @@ Visit the [AI Reversi Website](https://ai-reversi.com)
 
 ## Tech Stack
 
-- **Frontend**: JavaScript
-- **Backend**: Django (Python), PostgreSQL
-- **Web Server**: Nginx, Gunicorn
+- **Frontend**: JavaScript (Node.js v18.15.0 / npm v9.5.0)
+- **Backend**: Django v4.2.7 (Python v3.12.1), PostgreSQL v16.1 (Debian 16.1-1.pgdg120+1)
+- **Testing**: Jest v29.7.0 (for JavaScript testing), Django's default test framework (Django v4.2.7)
+- **Web Server**: Nginx v1.18.0, Gunicorn v21.2.0
+- **Authentication**: Custom User Model with Django's authentication system
 - **Cloud Platform**: AWS (EC2, RDS, ELB)
-- **Containerization**: Docker, Docker Compose
-- **CI/CD**: GitHub Actions, OpenID Connect (OIDC)
+- **Security and Infrastructure**: HTTPS enabled via AWS Certificate Manager (ACM) for SSL/TLS certificates
+- **Containerization**: Docker v20.10.11, Docker Compose v1.29.2
+- **CI/CD**: GitHub Actions (actions/checkout@v2, actions/setup-python@v2, actions/setup-node@v1, aws-actions/configure-aws-credentials@v1, webfactory/ssh-agent@v0.5.3), OpenID Connect (OIDC)
 - **Infrastructure as Code (IaC)**: AWS CloudFormation
 
 ## Features
@@ -111,12 +114,19 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
 
 ## 技術スタック
 
-- **フロントエンド**: JavaScript
-- **バックエンド**: Django (Python), PostgreSQL
-- **Webサーバー**: Nginx, Gunicorn
+## 技術スタック
+
+## 技術スタック
+
+- **フロントエンド**: JavaScript (Node.js v18.15.0 / npm v9.5.0)
+- **バックエンド**: Django v4.2.7 (Python v3.12.1)、PostgreSQL v16.1 (Debian 16.1-1.pgdg120+1)
+- **テスト**: Jest v29.7.0 (JavaScriptのテスト)、Djangoのデフォルトテストフレームワーク (Django v4.2.7)
+- **Webサーバー**: Nginx v1.18.0, Gunicorn v21.2.0
+- **認証**: Djangoのカスタムユーザーモデルを使用した認証システム
 - **クラウドプラットフォーム**: AWS (EC2, RDS, ELB)
-- **コンテナ化**: Docker, Docker Compose
-- **CI/CD**: GitHub Actions, OpenID Connect (OIDC)
+- **セキュリティとインフラ**: AWS Certificate Manager (ACM) によるSSL/TLS証明書でHTTPS有効化
+- **コンテナ化**: Docker v20.10.11, Docker Compose v1.29.2
+- **CI/CD**: GitHub Actions (actions/checkout@v2, actions/setup-python@v2, actions/setup-node@v1, aws-actions/configure-aws-credentials@v1, webfactory/ssh-agent@v0.5.3), OpenID Connect (OIDC)
 - **Infrastructure as Code (IaC)**: AWS CloudFormation
 
 ## 特徴と機能
