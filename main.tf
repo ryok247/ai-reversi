@@ -178,4 +178,61 @@ provider "aws" {
       evaluate_target_health = true
     }
   }
+
+  resource "aws_iam_openid_connect_provider" "github_oidc" {
+    url             = "https://token.actions.githubusercontent.com"
+    client_id_list  = ["sts.amazonaws.com"]
+    thumbprint_list = ["a031c46782e6e6c662c2c87c76da9aa62ccabd8e"]
+  }
   
+  resource "aws_iam_role" "github_actions_deploy_role" {
+    name = "GitHubActionsDeployRole"
+  
+    assume_role_policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Effect = "Allow",
+          Principal = {
+            Federated = aws_iam_openid_connect_provider.github_oidc.arn
+          },
+          Action = "sts:AssumeRoleWithWebIdentity",
+          Condition = {
+            StringEquals = {
+              "${aws_iam_openid_connect_provider.github_oidc.url}:aud" = "sts.amazonaws.com"
+            },
+            StringLike = {
+              "${aws_iam_openid_connect_provider.github_oidc.url}:sub" = "repo:ryok247/ai-reversi:ref:refs/heads/main"
+            }
+          }
+        },
+      ]
+    })
+  }
+  
+  resource "aws_iam_policy" "github_actions_policy" {
+    name        = "GitHubActionsPolicy"
+    description = "Policy for GitHub Actions to access AWS resources"
+  
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
+        {
+          Effect = "Allow",
+          Action = [
+            "ec2:DescribeInstances",
+            "ec2:StartInstances",
+            "ec2:StopInstances",
+            "ec2:TerminateInstances",
+            "s3:*",
+          ],
+          Resource = "*"
+        },
+      ]
+    })
+  }
+  
+  resource "aws_iam_role_policy_attachment" "attach_policy_to_role" {
+    role       = aws_iam_role.github_actions_deploy_role.name
+    policy_arn = aws_iam_policy.github_actions_policy.arn
+  }
