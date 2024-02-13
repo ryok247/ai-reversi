@@ -27,7 +27,7 @@ Visit the [AI Reversi Website](https://ai-reversi.com)
 | Security and Infrastructure | HTTPS enabled via AWS Certificate Manager (ACM) for SSL/TLS certificates |
 | Containerization       | Docker v20.10.11, Docker Compose v1.29.2                    |
 | CI/CD                  | GitHub Actions (actions/checkout@v2, actions/setup-python@v2, actions/setup-node@v1, aws-actions/configure-aws-credentials@v1, webfactory/ssh-agent@v0.5.3), OpenID Connect (OIDC) |
-| Infrastructure as Code (IaC) | AWS CloudFormation                                        |
+| Infrastructure as Code (IaC) | Terraform (1.7.3), AWS CloudFormation                                        |
 | Logging and Analysis   | Automatically save AWS Elastic Load Balancer (ELB) access logs to Amazon S3 buckets, with Amazon Athena used for on-demand log data analysis |
 
 ## Features
@@ -140,7 +140,7 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
 | セキュリティとインフラ | AWS Certificate Manager (ACM) によるSSL/TLS証明書でHTTPS有効化 |
 | コンテナ化             | Docker v20.10.11, Docker Compose v1.29.2                    |
 | CI/CD                  | GitHub Actions (actions/checkout@v2, actions/setup-python@v2, actions/setup-node@v1, aws-actions/configure-aws-credentials@v1, webfactory/ssh-agent@v0.5.3), OpenID Connect (OIDC) |
-| IaC                    | AWS CloudFormation                                           |
+| IaC                    | Terraform (1.7.3), AWS CloudFormation                                           |
 | ログ管理と分析         | AWS Elastic Load Balancer (ELB) のアクセスログをS3バケットに保存し、Amazon Athenaを使用して解析 |
 
 ## 特徴と機能

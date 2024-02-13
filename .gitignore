@@ -16,3 +16,10 @@ staticfiles/
 
 # temporary scripts for development
 comprun.sh
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.* 
+*.tfvars
+secrets.tfvars
