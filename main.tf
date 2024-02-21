@@ -80,7 +80,7 @@ provider "aws" {
     db_subnet_group_name   = aws_db_subnet_group.my_db_subnet_group.name
     vpc_security_group_ids = [aws_security_group.rds_sg.id]
     skip_final_snapshot    = true
-    multi_az               = true
+    multi_az               = false
   }
   
   resource "random_password" "password" {
