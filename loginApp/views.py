@@ -23,56 +23,56 @@ from datetime import date
 import json
 
 def index(request: HttpRequest) -> HttpResponse:
-    # Renders the main index page
+    """Renders the main index page"""
     return render(request, 'index.html')
 
 # Alias for the index view
 home = index
 
 class MySignupView(CreateView):
-    # View for user signup
+    """View for user signup"""
     template_name: str = 'signup.html'
     form_class: Any = SignupForm
     success_url: str = '/'
 
     def form_valid(self, form: Any) -> HttpResponse:
-        # Handles a valid form submission
+        """Handles a valid form submission"""
         result: HttpResponse = super().form_valid(form)
         user = self.object
         login(self.request, user) # Logs in the user
         return result
 
 class MyLoginView(LoginView):
-    # View for user login
+    """View for user login"""
     template_name: str = 'login.html'
     form_class: Any = LoginForm
 
     def get_success_url(self) -> str:
-        # Redirects user after successful login
+        """Redirects user after successful login"""
         return self.request.GET.get('next', '/')
     
 class MyLogoutView(CreateView):
-    # View for user logout
+    """View for user logout"""
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         logout(request)
         return redirect('/')
     
 class MyUserView(LoginRequiredMixin, TemplateView):
-    # View for displaying user-related data
+    """View for displaying user-related data"""
     template_name: str = 'user.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        # Adds user context to the view
+        """Adds user context to the view"""
         context: Dict[str, Any] = super().get_context_data(**kwargs)
         context['user'] = self.request.user
         return context
 
 class MyOtherView(LoginRequiredMixin, TemplateView):
-    # View for displaying data related to other users
+    """View for displaying data related to other users"""
     template_name: str = 'other.html'
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-         # Adds other users' context to the view
+        """Adds other users' context to the view"""
         context: Dict[str, Any] = super().get_context_data(**kwargs)
         context['users'] = CustomUser.objects.exclude(username=self.request.user.username)
         return context
@@ -114,13 +114,13 @@ class SaveGameView(CreateView):
         return JsonResponse({'status': 'success', 'game_id': game.id})
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        # Returns error response for GET requests
+        """Returns error response for GET requests"""
         return JsonResponse({'status': 'error'}, status=400)
  
 class GameDetailsView(CreateView):
-    # View for retrieving game details
+    """View for retrieving game details"""
     def get(self, request: HttpRequest, game_id: int) -> JsonResponse:
-        # Handles GET request to fetch game details
+        """Handles GET request to fetch game details"""
         try:
             game: Game = Game.objects.get(id=game_id)
             return JsonResponse(create_game_record(game))
@@ -129,9 +129,9 @@ class GameDetailsView(CreateView):
             return JsonResponse({'error': 'Game not found'}, status=404)
     
 class UpdateGameRecordsView(CreateView):
-    # View for updating game records
+    """View for updating game records"""
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
-        # Handles POST request for updating game records
+        """Handles POST request for updating game records"""
         data: Dict[str, Any] = json.loads(request.body)
         game_ids: List[int] = data.get('game_ids', [])
         if request.user.is_authenticated:
@@ -140,7 +140,7 @@ class UpdateGameRecordsView(CreateView):
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=403)
         
 class UserGamesView(TemplateView):
-    # View for listing games of a logged-in user
+    """View for listing games of a logged-in user"""
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         if request.user.is_authenticated:
             games: 'QuerySet[Game]' = Game.objects.filter(user=request.user).order_by('-game_datetime')
@@ -163,7 +163,7 @@ class UserGamesView(TemplateView):
             return JsonResponse({'error': 'Not authenticated'}, status=403)
         
 class FavoriteGamesView(TemplateView):
-    # View for listing favorite games of a logged-in user
+    """View for listing favorite games of a logged-in user"""
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         if request.user.is_authenticated:
             games: 'QuerySet[Game]' = Game.objects.filter(user=request.user, is_favorite=True).order_by('-game_datetime')
@@ -186,7 +186,7 @@ class FavoriteGamesView(TemplateView):
             return JsonResponse({'error': 'Not authenticated'}, status=403)
         
 def create_game_record(game: Game) -> Dict[str, Any]:
-    # Takes a game instance and returns a dictionary with its relevant data.
+    """Takes a game instance and returns a dictionary with its relevant data."""
 
     return {
         'id': game.id,
@@ -202,9 +202,9 @@ def create_game_record(game: Game) -> Dict[str, Any]:
     }
         
 class ToggleFavoriteView(CreateView):
-    # View to toggle the favorite status of a game
+    """View to toggle the favorite status of a game"""
     def post(self, request: HttpRequest, game_id: int) -> JsonResponse:
-        # Handles POST request to toggle favorite status
+        """Handles POST request to toggle favorite status"""
         if request.user.is_authenticated:
             try:
                 game: Game = Game.objects.get(id=game_id, user=request.user)
@@ -219,9 +219,9 @@ class ToggleFavoriteView(CreateView):
             return JsonResponse({'error': 'Not authenticated'}, status=403)
         
 class GetMovesView(CreateView):
-    # View to get moves of a game
+    """View to get moves of a game"""
     def get(self, request: HttpRequest, game_id: int) -> JsonResponse:
-        # Handles GET request to get moves of a game
+        """Handles GET request to get moves of a game"""
         try:
             game: Game = Game.objects.get(id=game_id)
             # Formatting necessary move data to be added to moves_data
@@ -244,7 +244,7 @@ class PastReplayView(CreateView):
         return render(request, 'past-replay.html', {'game_id': game_id})
 
 def get_ai_results_for_period(user: User, start_date: date, end_date: Optional[date] = None) -> List[Dict[str, Any]]:
-    #Gets the results of AI wins, losses, draws, and fastest win for the specified user and period.
+    """Gets the results of AI wins, losses, draws, and fastest win for the specified user and period."""
 
     games: 'QuerySet[Game]' = Game.objects.filter(user=user, game_datetime__gte=start_date)
     if end_date:
