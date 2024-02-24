@@ -169,8 +169,8 @@ export class boardInfo{
     
             // update the number of stones
             this.updateScores();
-    
-            //　check if all stones are placed
+            
+            // check if all stones are placed
             if (this.logic.isFull()) {
                 this.endGame();
                 return;
@@ -209,8 +209,8 @@ export class boardInfo{
             if (this.settings.mode == "cp") {
     
                 await this.makeComputerMove();
-    
-                //　check if terminated
+                
+                // check if terminated
                 if (this.logic.isFull()) {
                     this.endGame();
                     return;

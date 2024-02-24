@@ -1,0 +1,4 @@
+babel.config.js
+jest.setup.js
+staticfiles/admin/*
+venv/*
