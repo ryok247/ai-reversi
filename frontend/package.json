@@ -13,7 +13,12 @@
     "react-tabs": "^6.0.2",
     "redux": "^4.1.2",
     "react-redux": "^7.2.6",
-    "@reduxjs/toolkit": "^1.7.1"
+    "@reduxjs/toolkit": "^1.7.1",
+    "bootstrap": "^5.3.0",
+    "react-bootstrap": "2.10.1",
+    "@fortawesome/react-fontawesome": "^0.1.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4"
   },
   "scripts": {
     "start": "react-scripts start",

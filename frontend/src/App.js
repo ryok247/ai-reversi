@@ -1,14 +1,17 @@
 import React from 'react';
 import NavigationBar from './NavigationBar';
-import GameTabs from './GameTabs';
+import PrimaryTabs from './PrimaryTabs';
 import Modal from './Modal';
+import { RecentGames, FavoriteGames } from './GameTable';
 
 function App() {
   return (
     <div>
       <NavigationBar />
-      <GameTabs />
+      <PrimaryTabs />
       <Modal />
+      <FavoriteGames games={[]} />
+      <RecentGames games={[]} />
     </div>
   );
 }

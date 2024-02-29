@@ -1,5 +1,5 @@
 const initialState = {
-  isVisible: false
+  isVisible: true
 };
 
 const visibilityReducer = (state = initialState, action) => {
