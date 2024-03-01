@@ -12,5 +12,4 @@ function PlayerOptions() {
   );
 }
 
-
 export default PlayerOptions;

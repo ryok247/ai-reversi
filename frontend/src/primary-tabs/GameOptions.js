@@ -1,4 +1,5 @@
 import React from 'react';
+import ModeOption from './ModeOption';
 import PlayerOptions from './PlayerOptions';
 import LevelOptions from './LevelOptions';
 import HighlightOption from './HighlightOption';
@@ -14,6 +15,7 @@ function GameOptions() {
         <div className="row">
           <div className="col-md-4 col-12">
             <div className="container container-for-options">
+              <ModeOption />
               <PlayerOptions />
               <LevelOptions />
               <StartButton />
