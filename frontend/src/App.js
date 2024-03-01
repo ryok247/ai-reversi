@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import NavigationBar from './NavigationBar';
 import PrimaryTabs from './PrimaryTabs';
 import Modal from './Modal';

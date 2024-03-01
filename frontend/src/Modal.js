@@ -1,3 +1,5 @@
+import React from 'react';
+
 function Modal() {
   return (
     <div id="game-end-modal" className="modal">

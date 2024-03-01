@@ -1,3 +1,5 @@
+import React from 'react';
+
 function ReplayHistory() {
   return (
     <div className="history-replay">

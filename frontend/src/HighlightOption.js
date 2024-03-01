@@ -1,3 +1,5 @@
+import React from 'react';
+
 function HighlightOption() {
   return (
     <div className="container">

@@ -1,3 +1,5 @@
+import React from 'react';
+
 function LevelOptions() {
   return (
     <div className="container-for-levels">

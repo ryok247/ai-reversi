@@ -1,3 +1,5 @@
+import React from 'react';
+
 function PlayerOptions() {
   return (
     <div className="container-for-players">

@@ -1,3 +1,5 @@
+import React from 'react';
+
 function NavigationBar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">

@@ -1,3 +1,5 @@
+import React from 'react';
+
 function StartButton() {
   return (
     <div className="container-for-button">

@@ -1,3 +1,4 @@
+import React from 'react';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import visibilityReducer from './reducers/visibilityReducer';
 import authReducer from './reducers/authReducer';
