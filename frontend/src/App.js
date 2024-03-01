@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import NavigationBar from './NavigationBar';
-import PrimaryTabs from './PrimaryTabs';
-import Modal from './Modal';
-import { RecentGames, FavoriteGames } from './GameTable';
+import NavigationBar from './navigation-bar/NavigationBar';
+import PrimaryTabs from './primary-tabs/PrimaryTabs';
+import Modal from './modal/Modal';
+import { RecentGames, FavoriteGames } from './games/GameTable';
 
 function App() {
   return (

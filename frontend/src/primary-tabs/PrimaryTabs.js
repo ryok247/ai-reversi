@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { toggleVisibility } from './actions/visibilityActions';
+import { toggleVisibility } from '../actions/visibilityActions';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import GameOptions from './GameOptions';
