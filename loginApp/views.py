@@ -1,9 +1,10 @@
 from .models import CustomUser, Game, Move
+from .forms import SignupForm
 from django.db.models import Count, Case, When, IntegerField, F, Min
 from django.shortcuts import render
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
@@ -28,16 +29,33 @@ def index(request: HttpRequest) -> HttpResponse:
 # Alias for the index view
 home = index
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class CheckAuthStatusView(CreateView):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return JsonResponse({
+                "isAuthenticated": True,
+                "user": {
+                    "username": request.user.username,
+                }
+            })
+        else:
+            return JsonResponse({"isAuthenticated": False}, status=401)
+
 @method_decorator(csrf_protect, name='dispatch')
 class MySignupView(CreateView):
     def post(self, request, *args, **kwargs):
+        # JSONデータをパースしてフォームに渡す
         data = json.loads(request.body)
-        form = UserCreationForm(data)
+        # カスタムフォーム`SignupForm`を使用
+        form = SignupForm(data)
         if form.is_valid():
             user = form.save()
+            # ユーザーをログインさせる
             login(request, user)
             return JsonResponse({"status": "success"}, status=200)
         else:
+            # フォームのエラーを返す
             return JsonResponse({"status": "error", "errors": form.errors}, status=400)
         
 class MyLoginView(LoginView):

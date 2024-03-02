@@ -6,9 +6,11 @@ from .models import CustomUser, Game, Move
 CustomUser = get_user_model()
 
 class SignupForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
     class Meta:
         model = CustomUser
-        fields = [CustomUser.USERNAME_FIELD] + CustomUser.REQUIRED_FIELDS + ['password1', 'password2']
+        fields = ('username', 'email', 'password1', 'password2')
 
 class LoginForm(AuthenticationForm):
     pass

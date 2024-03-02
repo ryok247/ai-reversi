@@ -24,4 +24,5 @@ urlpatterns = [
     path('update_game_description/<int:game_id>/', views.UpdateGameDescriptionView.as_view(), name='update_game_description'),
     path('api/settings', views.SettingsView.as_view(), name='api-settings'),
     path('api/csrf/', views.CSRFTokenView.as_view(), name='csrf'),
+    path('api/check-auth-status/', views.CheckAuthStatusView.as_view(), name='check_auth_status')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

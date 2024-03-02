@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { loginSuccess, logout } from './actions/authActions';
 import NavigationBar from './navigation-bar/NavigationBar';
 import PrimaryTabs from './primary-tabs/PrimaryTabs';
 import Modal from './modal/Modal';
@@ -15,7 +17,31 @@ import {
 
 function App() {
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
+    fetch('/api/check-auth-status/', {credentials: 'include'})
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Authentication check failed');
+      })
+      .then(data => {
+        if (data.isAuthenticated) {
+          // ユーザーがログインしている場合、Reduxストアを更新
+          dispatch(loginSuccess(data.user));
+        } else {
+          // ユーザーがログインしていない場合、Reduxストアを更新
+          dispatch(logout());
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }, [dispatch]);  
+
+  useEffect(() => {
+
+    console.log(isUserLoggedIn());
 
     // CSRFトークンを取得してステートに保存する処理
     fetch('/api/csrf/', {
