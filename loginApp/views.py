@@ -1,16 +1,15 @@
-from .forms import SignupForm, LoginForm
 from .models import CustomUser, Game, Move
 from django.db.models import Count, Case, When, IntegerField, F, Min
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth import login, logout
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import TemplateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
 from django.utils import timezone
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie, csrf_protect
 from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from loginProject import settings
@@ -29,33 +28,30 @@ def index(request: HttpRequest) -> HttpResponse:
 # Alias for the index view
 home = index
 
+@method_decorator(csrf_protect, name='dispatch')
 class MySignupView(CreateView):
-    """View for user signup"""
-    template_name: str = 'signup.html'
-    form_class: Any = SignupForm
-    success_url: str = '/'
-
-    def form_valid(self, form: Any) -> HttpResponse:
-        """Handles a valid form submission"""
-        result: HttpResponse = super().form_valid(form)
-        user = self.object
-        login(self.request, user) # Logs in the user
-        return result
-
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        form = UserCreationForm(data)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return JsonResponse({"status": "success"}, status=200)
+        else:
+            return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+        
 class MyLoginView(LoginView):
-    """View for user login"""
-    template_name: str = 'login.html'
-    form_class: Any = LoginForm
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+        return JsonResponse({"status": "success"}, status=200)
 
-    def get_success_url(self) -> str:
-        """Redirects user after successful login"""
-        return self.request.GET.get('next', '/')
-    
+    def form_invalid(self, form):
+        return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+
 class MyLogoutView(CreateView):
-    """View for user logout"""
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def get(self, request, *args, **kwargs):
         logout(request)
-        return redirect('/')
+        return JsonResponse({"status": "success"}, status=200)
     
 class MyUserView(LoginRequiredMixin, TemplateView):
     """View for displaying user-related data"""
@@ -332,3 +328,8 @@ class SettingsView(CreateView):
             'max_title_length': settings.MAX_TITLE_LENGTH,
             'max_description_length': settings.MAX_DESCRIPTION_LENGTH
         })
+
+class CSRFTokenView(CreateView):
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request, *args, **kwargs):
+        return JsonResponse({'detail': 'CSRF cookie set'})

@@ -1,40 +1,39 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { toggleVisibility } from '../actions/visibilityActions';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
+import React, { useState } from 'react';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
 import GameOptions from './GameOptions';
 import Replay from './Replay';
 import Dashboard from './Dashboard';
 
 const PrimaryTabs = ({ isVisible, toggleVisibility }) => {
-    return (
-    <Tabs>
-        <TabList>
-        <Tab>Game</Tab>
-        <Tab>Replay</Tab>
-        {isVisible && <Tab>Dashboard</Tab>}
-        </TabList>
+  const [activeTab, setActiveTab] = useState(0);
 
-        <TabPanel>
+  const handleChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  // スタイル定義: 非アクティブなタブのコンテンツを隠す
+  const hiddenStyle = { display: 'none' };
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Tabs value={activeTab} onChange={handleChange} aria-label="basic tabs example">
+        <Tab label="Game" />
+        <Tab label="Replay" />
+        <Tab label="Dashboard" disabled={!isVisible} />
+      </Tabs>
+      <div style={activeTab === 0 ? {} : hiddenStyle}>
         <GameOptions />
-        </TabPanel>
-        <TabPanel>
+      </div>
+      <div style={activeTab === 1 ? {} : hiddenStyle}>
         <Replay />
-        </TabPanel>
-        {isVisible && <TabPanel>
+      </div>
+      <div style={activeTab === 2 && isVisible ? {} : hiddenStyle}>
         <Dashboard />
-        </TabPanel>}
-    </Tabs>
-    );
+      </div>
+    </Box>
+  );
 };
 
-const mapStateToProps = state => ({
-  isVisible: state.visibility.isVisible
-});
-
-const mapDispatchToProps = {
-  toggleVisibility
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(PrimaryTabs);
+export default PrimaryTabs;

@@ -10,10 +10,14 @@ COPY package*.json ./
 # 依存関係をインストール
 RUN npm install
 
+# serveパッケージをグローバルにインストール
+RUN npm install -g serve
+
 # ソースコードをコピー
 COPY . .
 
-# 開発サーバーを起動
-CMD ["npm", "start"]
+# Reactアプリケーションをビルド
+RUN npm run build
 
-
+# ビルドされたアプリケーションをサーブ
+CMD ["serve", "-s", "build"]

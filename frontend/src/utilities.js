@@ -31,7 +31,16 @@ export function setCookie(name, value, days) {
 }
 
 export function getCsrfToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let csrfToken = null;
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith('csrftoken=')) {
+            csrfToken = cookie.substring('csrftoken='.length, cookie.length);
+            break;
+        }
+    }
+    return csrfToken;
 }
 
 export class NotImplementedError extends Error {
