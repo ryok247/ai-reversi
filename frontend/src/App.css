@@ -171,16 +171,6 @@ body {
   background-color: #e7e7e7; /* Background color on hover */
 }
 
-/* Style for tab content section */
-.tab-content {
-  display: none; /* Initially hidden */
-}
-
-/* Style for active tab content */
-.tab-content.active {
-  display: block; /* Display when active */
-}
-
 /* General container styling */
 .container {
   font-size: 1rem; /* Font size */

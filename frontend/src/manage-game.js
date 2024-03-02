@@ -437,9 +437,11 @@ export function loadGames(type = "recent", page = 1) {
             // Check if user is logged in
             const loggedIn = isUserLoggedIn();
             const displayStyle = loggedIn ? 'table-cell' : 'none';
-            document.getElementById('favorite-header').style.display = displayStyle;
-            document.getElementById('title-header').style.display = displayStyle;
-            document.getElementById('edit-header').style.display = displayStyle;
+
+            for (const id of ['favorite-header', 'title-header', 'edit-header']){
+                const element = document.getElementById(id);
+                if (element) element.style.display = displayStyle;
+            }
 
             gamesList.innerHTML = '';
 
