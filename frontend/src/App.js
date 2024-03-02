@@ -41,8 +41,6 @@ function App() {
 
   useEffect(() => {
 
-    console.log(isUserLoggedIn());
-
     // CSRFトークンを取得してステートに保存する処理
     fetch('/api/csrf/', {
         credentials: 'include', // 必要に応じて設定

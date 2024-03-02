@@ -11,7 +11,6 @@ export class ReplayAnimator {
         this.animationInterval = null;
         this.cells = [];
         this.initBoard();
-        return;
         this.placeInitialPieces();
     }
 
@@ -21,7 +20,6 @@ export class ReplayAnimator {
         while (this.boardElement.firstChild) {
             this.boardElement.removeChild(this.boardElement.firstChild);
         }
-        return;
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const cell = document.createElement("div");

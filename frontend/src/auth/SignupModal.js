@@ -66,7 +66,6 @@ const SignupModal = ({ isOpen, onRequestClose }) => {
       dispatch(loginSuccess(data.user));
       onRequestClose();
     } else {
-      console.log("Sign up failed");
       setErrors(data.errors || { form: 'Failed to sign up' });
     }
   };
