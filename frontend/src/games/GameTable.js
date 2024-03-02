@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { isUserLoggedIn } from "../manage-game";
 
 function GameTable({ games, type }) {
   return (
@@ -13,10 +14,10 @@ function GameTable({ games, type }) {
           <table className="table table-striped table-bordered border-primary table-sm">
             <thead>
               <tr>
-                <th>Favorite</th>
+                {isUserLoggedIn() && <th>Favorite</th>}
                 <th>Replay</th>
-                <th>Title</th>
-                <th>Edit</th>
+                {isUserLoggedIn() && <th>Title</th>}
+                {isUserLoggedIn() && <th>Edit</th>}
                 <th>Date</th>
                 <th>Time</th>
                 <th>Your Color</th>
@@ -30,10 +31,10 @@ function GameTable({ games, type }) {
             <tbody id={`${type}-game-table-body`}>
               {games.map((game, index) => (
                 <tr key={index}>
-                  <td>{game.favorite}</td>
+                  {isUserLoggedIn() && <td>game.favorite</td>}
                   <td>{game.replay}</td>
-                  <td>{game.title}</td>
-                  <td>{game.edit}</td>
+                  {isUserLoggedIn() && <td>game.title</td>}
+                  {isUserLoggedIn() && <td>game.edit</td>}
                   <td>{game.date}</td>
                   <td>{game.time}</td>
                   <td>{game.color}</td>
