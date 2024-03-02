@@ -5,6 +5,19 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../actions/authActions';
 import { getCookie } from '../utilities';
 
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    width: '400px', // モーダルの幅を指定
+    height: '300px', // モーダルの高さを指定
+  },
+};
+
 const LoginModal = ({ isOpen, onRequestClose }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +41,7 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
       body: formData, // JSONではなくformDataを使用
       credentials: 'include',
     });
-    
+
     if (response.ok) { // response.status === 'success'ではなく、response.okを使用
       const data = await response.json(); // レスポンスデータを取得
       dispatch(loginSuccess(data.user)); // loginSuccessアクションをディスパッチしてユーザー情報を更新
@@ -41,7 +54,11 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
   
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onRequestClose} contentLabel="Login">
+    <Modal 
+    isOpen={isOpen} 
+    onRequestClose={onRequestClose} 
+    contentLabel="Login" 
+    style={customStyles}>
       <h2>ログイン</h2>
       <form onSubmit={handleSubmit}>
         <div>

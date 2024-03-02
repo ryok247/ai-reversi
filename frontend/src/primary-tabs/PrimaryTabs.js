@@ -5,8 +5,9 @@ import Box from '@mui/material/Box';
 import GameOptions from './GameOptions';
 import Replay from './Replay';
 import Dashboard from './Dashboard';
+import { isUserLoggedIn } from '../manage-game';
 
-const PrimaryTabs = ({ isVisible, toggleVisibility }) => {
+const PrimaryTabs = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -21,7 +22,7 @@ const PrimaryTabs = ({ isVisible, toggleVisibility }) => {
       <Tabs value={activeTab} onChange={handleChange} aria-label="basic tabs example">
         <Tab label="Game" />
         <Tab label="Replay" />
-        <Tab label="Dashboard" disabled={!isVisible} />
+        <Tab label="Dashboard" disabled={!isUserLoggedIn()} />
       </Tabs>
       <div style={activeTab === 0 ? {} : hiddenStyle}>
         <GameOptions />
@@ -29,7 +30,7 @@ const PrimaryTabs = ({ isVisible, toggleVisibility }) => {
       <div style={activeTab === 1 ? {} : hiddenStyle}>
         <Replay />
       </div>
-      <div style={activeTab === 2 && isVisible ? {} : hiddenStyle}>
+      <div style={activeTab === 2 && isUserLoggedIn() ? {} : hiddenStyle}>
         <Dashboard />
       </div>
     </Box>
