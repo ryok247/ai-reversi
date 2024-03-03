@@ -1,5 +1,5 @@
 import React from "react";
-import { isUserLoggedIn } from "./manage-game"
+import { isUserLoggedIn } from "../manage-game"
 
 function GameInfo(){
     return (

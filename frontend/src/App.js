@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess, logout } from './actions/authActions';
 import Home from './Home';
 import Logout from './auth/Logout';
-import PastReplay from './PastReplay';
+import PastReplay from './past-replay/PastReplay';
 import './App.css';
 
 function App() {

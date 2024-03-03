@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { gameLogic } from "./game-logic.js"
-import { ReplayAnimator } from './animation.js';
-import { addToHistoryTable, updateGameName } from "./manage-game.js";
-import { getCsrfToken } from './utilities.js'
-import { sharedState } from "./game-shared.js";
-import GameBoard from './primary-tabs/GameBoard.js';
+import { gameLogic } from "../game-logic.js"
+import { ReplayAnimator } from '../animation.js';
+import { addToHistoryTable, updateGameName } from "../manage-game.js";
+import { getCsrfToken } from '../utilities.js'
+import { sharedState } from "../game-shared.js";
+import GameBoard from '../primary-tabs/GameBoard.js';
 import GameInfo from './GameInfo.js';
-import ReplayControls from './primary-tabs/ReplayControls.js';
-import NavigationBar from './navigation-bar/NavigationBar';
+import ReplayControls from './ReplayControls.js';
+import NavigationBar from '../navigation-bar/NavigationBar.js';
 import HistoryReplay from './HistoryReplay.js';
 
 // サーバーに新しい説明を送信する関数

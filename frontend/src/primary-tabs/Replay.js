@@ -1,6 +1,6 @@
 import React from 'react';
-import ReplayControls from './ReplayControls';
-import ReplayHistory from './ReplayHistory';
+import ReplayControls from '../past-replay/ReplayControls';
+import ReplayHistory from '../past-replay/ReplayHistory';
 
 function Replay() {
   return (
