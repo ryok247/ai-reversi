@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import store from '../store.js';
 import LoginModal from '../auth/LoginModal.js';
 import SignupModal from '../auth/SignupModal.js';
-import Logout from '../auth/Logout.js';
 
 function NavigationBar() {
   const isLoggedIn = store.getState().auth.isAuthenticated;
@@ -16,7 +15,7 @@ function NavigationBar() {
   const closeSignupModal = () => setIsSignupModalOpen(false);
 
   return (
-    <Router>
+    <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
           <Link className="navbar-brand" to="/"><h3>AI Reversi</h3></Link>
@@ -37,11 +36,7 @@ function NavigationBar() {
 
       <SignupModal isOpen={isSignupModalOpen} onRequestClose={closeSignupModal} />
       <LoginModal isOpen={isLoginModalOpen} onRequestClose={closeLoginModal} />
-
-      <Routes>
-        <Route path="/logout" element={<Logout />} />
-      </Routes>
-    </Router>
+    </div>
   );
 }
 

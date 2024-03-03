@@ -351,3 +351,10 @@ class CSRFTokenView(CreateView):
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
         return JsonResponse({'detail': 'CSRF cookie set'})
+
+import os
+
+class SPAView(CreateView):
+    def get(self, request, *args, **kwargs):
+        with open(os.path.join(settings.FRONTEND_BUILD_PATH, 'index.html'), 'r') as file:
+            return HttpResponse(file.read())

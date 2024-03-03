@@ -6,7 +6,7 @@ function PastReplay() {
 
   return (
     <div className="container">
-        <h1>Repla</h1>
+        <h1>Replay</h1>
         <input type="hidden" id="game-id" defaultValue="{{ game_id }}" />
         <div className="row">
             <div className="col-md-2 col-12">
