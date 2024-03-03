@@ -23,7 +23,7 @@ function GameOptions() {
             <HighlightOption />
           </div>
           <div className="col-md-5 col-12">
-            <GameBoard />
+            <GameBoard className="board"/>
           </div>
           <div className="col-md-3 col-12">
             <TurnAndScore />

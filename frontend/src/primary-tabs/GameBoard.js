@@ -1,8 +1,8 @@
 import React from 'react';
 
-function GameBoard() {
+function GameBoard({className}) {
   return (
-    <div className="board">
+    <div className={className}>
       {/* ゲームボードがここに生成されます */}
     </div>
   );
