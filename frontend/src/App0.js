@@ -1,28 +1,25 @@
 import React, { useEffect } from 'react';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route
-} from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess, logout } from './actions/authActions';
 import NavigationBar from './navigation-bar/NavigationBar';
 import PrimaryTabs from './primary-tabs/PrimaryTabs';
 import Modal from './modal/Modal';
 import { RecentGames, FavoriteGames } from './games/GameTable';
-import Home from './Home';
-import PastReplay from './PastReplay';
-import PastReplayRoute from './PastReplayRoute.js';
 import './App.css';
 import { sharedState } from './game-shared.js';
 import { 
     initializeGame,
-    loadGames,
+    loadGames, 
     loadRecentGamesFromCookie, 
     isUserLoggedIn,
     updateGameRecordsWithUser,
  } from './manage-game.js';
 
+ import {
+    BrowserRouter as Router,
+    Route,
+    Routes
+  } from 'react-router-dom';
 
 function App() {
 
@@ -34,6 +31,7 @@ function App() {
         if (response.ok) {
           return response.json();
         }
+        console.log(response);
         throw new Error('Authentication check failed');
       })
       .then(data => {
@@ -126,8 +124,11 @@ function App() {
 
   return (
     <div>
-      <Home />
-      <PastReplayRoute />
+      <NavigationBar />
+      <PrimaryTabs />
+      <Modal />
+      <FavoriteGames games={[]} />
+      <RecentGames games={[]} />
     </div>
   );
 }

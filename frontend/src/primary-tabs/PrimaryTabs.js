@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import GameOptions from './GameOptions';
-import Replay from './Replay';
-import Dashboard from './Dashboard';
-import { isUserLoggedIn } from '../manage-game';
+import GameOptions from './GameOptions.js';
+import Replay from './Replay.js';
+import Dashboard from './Dashboard.js';
+import { isUserLoggedIn } from '../manage-game.js';
 
 const PrimaryTabs = () => {
   const [activeTab, setActiveTab] = useState(0);
