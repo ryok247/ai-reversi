@@ -134,7 +134,6 @@ class SaveGameView(CreateView):
 class GameDetailsView(CreateView):
     """View for retrieving game details"""
     def get(self, request: HttpRequest, game_id: int) -> JsonResponse:
-        """Handles GET request to fetch game details"""
         try:
             game: Game = Game.objects.get(id=game_id)
             return JsonResponse(create_game_record(game))
@@ -352,9 +351,7 @@ class CSRFTokenView(CreateView):
     def get(self, request, *args, **kwargs):
         return JsonResponse({'detail': 'CSRF cookie set'})
 
-import os
-
 class SPAView(CreateView):
     def get(self, request, *args, **kwargs):
-        with open(os.path.join(settings.FRONTEND_BUILD_PATH, 'index.html'), 'r') as file:
+        with open(str(settings.FRONTEND_BUILD_PATH / 'index.html'), 'r') as file:
             return HttpResponse(file.read())

@@ -167,4 +167,4 @@ AUTH_USER_MODEL = 'loginApp.CustomUser'
 MAX_TITLE_LENGTH = 50
 MAX_DESCRIPTION_LENGTH = 200
 
-FRONTEND_BUILD_PATH = os.path.join(BASE_DIR, 'frontend', 'build')
+FRONTEND_BUILD_PATH = BASE_DIR / 'frontend' / 'build'

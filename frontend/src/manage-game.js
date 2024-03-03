@@ -368,7 +368,6 @@ export class boardInfo{
             if (data.status === 'success') {
                 this.updateGameHistoryCookie(data.game_id);
             }
-            console.log(data);
         })
         .catch(error => console.error('Error:', error));
     }
@@ -429,8 +428,11 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
 // Function to load games (recent or favorite) and populate the table
 export function loadGames(type = "recent", page = 1) {
     fetch(`/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`, {
-        credentials: 'include'
-        }).then(response => response.json())
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        }}).then(response => response.json())
         .then(data => {
             const gamesList = document.getElementById(`${type == "recent" ? "recent" : "favorite"}-game-table-body`);
 
@@ -480,7 +482,7 @@ export function loadRecentGamesFromCookie() {
 
         // Fetch and process game details
         const gameDetailsPromises = gameIds.map(gameId => 
-            fetch(`/get_game_details/${gameId}`)
+            fetch(`/api/get_game_details/${gameId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Game ID ${gameId} not found`);

@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const gameId = document.getElementById('game-id').value;
 
     // Get game details and display them
-    fetch(`/get_game_details/${gameId}`)
+    fetch(`/api/get_game_details/${gameId}`)
     .then(response => {
         if (!response.ok) {
             throw new Error(`Game ID ${gameId} not found`);
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveDescriptionButton = document.getElementById('save-description-button');
 
     // ゲームの詳細を取得して表示
-    fetch(`/get_game_details/${gameId}`)
+    fetch(`/api/get_game_details/${gameId}`)
     .then(response => response.json())
     .then(game => {
         // タイトルと説明を表示
