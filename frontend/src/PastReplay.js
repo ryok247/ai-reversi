@@ -5,6 +5,7 @@ import { ReplayAnimator } from './animation.js';
 import { addToHistoryTable, updateGameName } from "./manage-game.js";
 import { getCsrfToken } from './utilities.js'
 import { sharedState } from "./game-shared.js";
+import { isUserLoggedIn } from './manage-game.js';
 
 // サーバーに新しい説明を送信する関数
 function updateGameDescription(gameId, description) {
@@ -198,11 +199,11 @@ function PastReplay() {
             <div className="info">
                 <h4>Game Info</h4>
             </div>
-            <div className="info">
+            <div className="info" style={{ display: isUserLoggedIn() ? 'block' : 'none' }}>
                 Title
                 <i id="edit-title-icon" className="fa fa-edit edit-icon" />
             </div>
-            <div id="info-title-container">
+            <div id="info-title-container" style={{ display: isUserLoggedIn() ? 'block' : 'none' }}>
                 <span id="info-title" />
                 {/* Input field for editing and save button (initially hidden) */}
                 <input type="text" id="edit-title-input" style={{ display: "none" }} />
@@ -210,11 +211,11 @@ function PastReplay() {
                 Save
                 </button>
             </div>
-            <div className="info">
+            <div className="info" style={{ display: isUserLoggedIn() ? 'block' : 'none' }}>
                 Description
                 <i id="edit-description-icon" className="fa fa-edit edit-icon" />
             </div>
-            <div id="info-description-container">
+            <div id="info-description-container" style={{ display: isUserLoggedIn() ? 'block' : 'none' }}>
                 <span id="info-description" />
                 <textarea
                 id="edit-description-input"
