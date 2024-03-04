@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import sys
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +39,10 @@ ALLOWED_HOSTS = [
 if LOCAL:
     ALLOWED_HOSTS += ['localhost', '127.0.0.1', '[::1]']
 
-CSRF_TRUSTED_ORIGINS = ['https://ai-reversi.com']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ai-reversi.com',
+    'http://localhost:3000',
+    ]
 
 # Application definition
 
@@ -67,7 +71,7 @@ ROOT_URLCONF = 'loginProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "frontend/build"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -145,7 +149,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "loginApp/static"]
+STATICFILES_DIRS = [
+    BASE_DIR / "loginApp/static",
+    BASE_DIR / "frontend/build/static",
+                    ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -159,3 +166,5 @@ AUTH_USER_MODEL = 'loginApp.CustomUser'
 
 MAX_TITLE_LENGTH = 50
 MAX_DESCRIPTION_LENGTH = 200
+
+FRONTEND_BUILD_PATH = BASE_DIR / 'frontend' / 'build'

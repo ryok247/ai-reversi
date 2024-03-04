@@ -1,5 +1,5 @@
 from . import views
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls.static import static
 from loginProject import settings
 
@@ -12,15 +12,18 @@ urlpatterns = [
     path('user/', views.MyUserView.as_view(), name='user'),
     path('other/', views.MyOtherView.as_view(), name='other'),
     path('save_game/', views.SaveGameView.as_view(), name='save_game'),
-    path('get_game_details/<int:game_id>/', views.GameDetailsView.as_view(), name='game_details'),
+    path('api/get_game_details/<int:game_id>/', views.GameDetailsView.as_view(), name='game_details'),
     path('update_game_records/', views.UpdateGameRecordsView.as_view(), name='update_game_records'),
     path('user_games/', views.UserGamesView.as_view(), name='user_games'),
     path('favorite_games/', views.FavoriteGamesView.as_view(), name='favorite_games'),
     path('toggle_favorite/<int:game_id>/', views.ToggleFavoriteView.as_view(), name='toggle_favorite'),
     path('get_moves/<int:game_id>/', views.GetMovesView.as_view(), name='get_moves'),
-    path('past_replay/<int:game_id>/', views.PastReplayView.as_view(), name='past_replay'),
+    #path('past_replay/<int:game_id>/', views.PastReplayView.as_view(), name='past_replay'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     path('update_game_name/<int:game_id>/', views.UpdateGameNameView.as_view(), name='update_game_name'),
     path('update_game_description/<int:game_id>/', views.UpdateGameDescriptionView.as_view(), name='update_game_description'),
     path('api/settings', views.SettingsView.as_view(), name='api-settings'),
+    path('api/csrf/', views.CSRFTokenView.as_view(), name='csrf'),
+    path('api/check-auth-status/', views.CheckAuthStatusView.as_view(), name='check_auth_status'),
+    re_path(r'^(?!api/).*$', views.SPAView.as_view()),  # すべての未知のパスをSPAViewにリダイレクト
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,19 +1,43 @@
-import { gameLogic } from "./game-logic.js"
-import { ReplayAnimator } from './animation.js';
-import { addToHistoryTable, updateGameName } from "./manage-game.js";
-import { getCsrfToken } from './utilities.js'
-import { sharedState } from "./game-shared.js";
+import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { gameLogic } from "../game-logic.js"
+import { ReplayAnimator } from '../animation.js';
+import { addToHistoryTable, updateGameName } from "../manage-game.js";
+import { getCsrfToken } from '../utilities.js'
+import { sharedState } from "../game-shared.js";
+import GameBoard from '../primary-tabs/GameBoard.js';
+import GameInfo from './GameInfo.js';
+import ReplayControls from './ReplayControls.js';
+import NavigationBar from '../navigation-bar/NavigationBar.js';
+import HistoryReplay from './HistoryReplay.js';
 
-let logic = new gameLogic();
-const progressElement = document.getElementById('progress');
-const animatedBoardElement = document.querySelector(".board.animated");
-const animator = new ReplayAnimator(logic, animatedBoardElement, progressElement);
+// サーバーに新しい説明を送信する関数
+function updateGameDescription(gameId, description) {
+    return fetch(`/update_game_description/${gameId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ description })
+    }).then(response => response.json());
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-    const gameId = document.getElementById('game-id').value;
+function PastReplay() {
+
+  const { gameId } = useParams();
+
+  useEffect(() => {
+
+    let logic = new gameLogic();
+    const progressElement = document.getElementById('progress');
+    const animatedBoardElement = document.querySelector(".board.animated");
+    const animator = new ReplayAnimator(logic, animatedBoardElement, progressElement);
+
+    //gameId = document.getElementById('game-id').value;
 
     // Get game details and display them
-    fetch(`/get_game_details/${gameId}`)
+    fetch(`/api/get_game_details/${gameId}`)
     .then(response => {
         if (!response.ok) {
             throw new Error(`Game ID ${gameId} not found`);
@@ -76,9 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => console.error('Error:', error));
-});
 
-document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("restart-animation-btn").addEventListener("click", () => animator.restartAnimation());
     document.getElementById("backward-step-btn").addEventListener("click", () => animator.backwardStep());
     document.getElementById("start-animation-btn").addEventListener("click", () => animator.startAnimation());
@@ -86,10 +108,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("forward-step-btn").addEventListener("click", () => animator.forwardStep());
     document.getElementById("skip-to-end-btn").addEventListener("click", () => animator.skipToEnd());
     document.getElementById('progress').addEventListener("click", (event) => animator.seek(event));
-});
 
-document.addEventListener('DOMContentLoaded', function() {
-    const gameId = document.getElementById('game-id').value;
+    //gameId = document.getElementById('game-id').value;
     const titleElement = document.getElementById('info-title');
     const editIcon = document.getElementById('edit-title-icon');
     const inputElement = document.getElementById('edit-title-input');
@@ -127,17 +147,15 @@ document.addEventListener('DOMContentLoaded', function() {
         titleElement.style.display = 'block';
         editIcon.style.display = 'block';
     });
-});
 
-document.addEventListener('DOMContentLoaded', function() {
-    const gameId = document.getElementById('game-id').value;
+    //gameId = document.getElementById('game-id').value;
     const descriptionElement = document.getElementById('info-description');
     const editDescriptionIcon = document.getElementById('edit-description-icon');
     const editDescriptionInput = document.getElementById('edit-description-input');
     const saveDescriptionButton = document.getElementById('save-description-button');
 
     // ゲームの詳細を取得して表示
-    fetch(`/get_game_details/${gameId}`)
+    fetch(`/api/get_game_details/${gameId}`)
     .then(response => response.json())
     .then(game => {
         // タイトルと説明を表示
@@ -173,16 +191,33 @@ document.addEventListener('DOMContentLoaded', function() {
             saveDescriptionButton.style.display = 'none';
         });
     });
-});
 
-// サーバーに新しい説明を送信する関数
-function updateGameDescription(gameId, description) {
-    return fetch(`/update_game_description/${gameId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCsrfToken()
-        },
-        body: JSON.stringify({ description })
-    }).then(response => response.json());
+  }, []);
+
+  return (
+    <>
+        <NavigationBar />
+        <div className="container">
+            <h1>Replay: Past Game Highlights</h1>
+            <input type="hidden" id="game-id" defaultValue="{{ game_id }}" />
+            <div className="row">
+                <div className="col-md-2 col-12">
+                    <GameInfo />
+                </div>
+                <div className="col-md-7 col-12">
+                    <GameBoard className="board animated" />
+                    <ReplayControls />
+                    <div className="progress-bar">
+                        <div className="progress" id="progress" />
+                    </div>
+                </div>
+                <div className="col-md-3 col-12">
+                    <HistoryReplay />
+                </div>
+            </div>
+        </div>
+    </>
+  );
 }
+
+export default PastReplay;

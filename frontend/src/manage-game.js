@@ -7,6 +7,9 @@ import { gameSettings } from './game-settings.js';
 import { gameLogic } from './game-logic.js';
 import { ReplayAnimator } from './animation.js';
 
+import store from './store.js';
+
+
 // Function to initialize the game
 export function initializeGame(historyElement){
     const boardElement = document.querySelector(".board");
@@ -365,7 +368,6 @@ export class boardInfo{
             if (data.status === 'success') {
                 this.updateGameHistoryCookie(data.game_id);
             }
-            console.log(data);
         })
         .catch(error => console.error('Error:', error));
     }
@@ -425,17 +427,23 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
 
 // Function to load games (recent or favorite) and populate the table
 export function loadGames(type = "recent", page = 1) {
-    fetch(`/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`)
-        .then(response => response.json())
+    fetch(`/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`, {
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        }}).then(response => response.json())
         .then(data => {
             const gamesList = document.getElementById(`${type == "recent" ? "recent" : "favorite"}-game-table-body`);
 
             // Check if user is logged in
             const loggedIn = isUserLoggedIn();
             const displayStyle = loggedIn ? 'table-cell' : 'none';
-            document.getElementById('favorite-header').style.display = displayStyle;
-            document.getElementById('title-header').style.display = displayStyle;
-            document.getElementById('edit-header').style.display = displayStyle;
+
+            for (const id of ['favorite-header', 'title-header', 'edit-header']){
+                const element = document.getElementById(id);
+                if (element) element.style.display = displayStyle;
+            }
 
             gamesList.innerHTML = '';
 
@@ -474,7 +482,7 @@ export function loadRecentGamesFromCookie() {
 
         // Fetch and process game details
         const gameDetailsPromises = gameIds.map(gameId => 
-            fetch(`/get_game_details/${gameId}`)
+            fetch(`/api/get_game_details/${gameId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Game ID ${gameId} not found`);
@@ -601,7 +609,8 @@ export function createRowFromDatabase(game, loggedIn) {
 
 // Function to check if the user is logged in
 export function isUserLoggedIn() {
-    return document.getElementById('user-status').innerText === 'Logged In';
+    //return document.getElementById('user-status').innerText === 'Logged In';
+    return store.getState().auth.isAuthenticated;
 }
 
 // Function to update game records for the user
