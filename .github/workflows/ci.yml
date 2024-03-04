@@ -33,5 +33,6 @@ jobs:
 
       - name: Unit test
         run: |
+          cd frontend
           npm install
           npm test

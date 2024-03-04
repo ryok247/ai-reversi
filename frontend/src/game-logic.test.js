@@ -1,4 +1,4 @@
-import { gameLogic, pieceColor } from '../loginApp/static/js/game-logic';
+import { gameLogic, pieceColor } from './game-logic.js';
 
 describe('gameLogic class', () => {
   let logic;
