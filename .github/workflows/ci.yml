@@ -17,21 +17,21 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Setup Nodejs
+      - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
       - name: Run Django unit tests
         run: |
-          python3 manage.py test loginApp
+          python manage.py test loginApp
 
-      - name: Unit test
+      - name: Install Node.js dependencies and run tests
         run: |
           cd frontend
           npm install

@@ -3,6 +3,7 @@
 # collect static files
 python manage.py collectstatic --noinput
 
+# Apply database migrations
 python manage.py makemigrations loginApp
 python manage.py migrate
 
