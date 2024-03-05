@@ -1,23 +1,16 @@
-# Node.jsの公式イメージをベースにする
 FROM node:14
 
-# 作業ディレクトリを設定
 WORKDIR /app
 
-# パッケージ.jsonとパッケージロックファイルをコピー
 COPY package*.json ./
 
-# 依存関係をインストール
 RUN npm install
 
-# serveパッケージをグローバルにインストール
-RUN npm install -g serve
+# serveのインストールは不要になる可能性がありますが、必要に応じて
+# RUN npm install -g serve
 
-# ソースコードをコピー
 COPY . .
 
-# Reactアプリケーションをビルド
-RUN npm run build
-
-# ビルドされたアプリケーションをサーブ
-CMD ["serve", "-s", "build"]
+# ビルドコマンドを削除
+# CMD ["serve", "-s", "build"] を変更または削除
+CMD ["npm", "start"]

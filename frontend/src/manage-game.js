@@ -98,7 +98,7 @@ export class boardInfo{
     }
 
     displayTurn(){
-        this.turnElement.textContent = (this.logic.currentPlayer == 0 ? "black" : "white");
+        this.turnElement.textContent = (this.logic.currentPlayer == 0 ? "Black" : "White");
     }
 
     // displays a message if the game is terminated
@@ -512,7 +512,7 @@ export function createRowFromDatabase(game, loggedIn) {
 
     // Favorite column
     const favoriteColumn = document.createElement('td');
-    favoriteColumn.className = 'favorite-column';
+    favoriteColumn.className = 'favorite-column center-align';
     favoriteColumn.setAttribute('data-game-id', game.id);
     favoriteColumn.style.display = loggedIn ? 'table-cell' : 'none';
 
@@ -528,6 +528,7 @@ export function createRowFromDatabase(game, loggedIn) {
 
     // Replay column
     const replayColumn = document.createElement('td');
+    replayColumn.className = 'center-align';
     const replayIcon = document.createElement('i');
     replayIcon.classList.add('fa', 'fa-play-circle', 'replay-icon');
     replayIcon.style.cursor = 'pointer';

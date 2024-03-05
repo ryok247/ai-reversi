@@ -2,6 +2,8 @@ from . import views
 from django.urls import path, re_path
 from django.conf.urls.static import static
 from loginProject import settings
+from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -25,5 +27,12 @@ urlpatterns = [
     path('api/settings', views.SettingsView.as_view(), name='api-settings'),
     path('api/csrf/', views.CSRFTokenView.as_view(), name='csrf'),
     path('api/check-auth-status/', views.CheckAuthStatusView.as_view(), name='check_auth_status'),
-    re_path(r'^(?!api/).*$', views.SPAView.as_view()),  # すべての未知のパスをSPAViewにリダイレクト
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# 開発環境での静的ファイルのサーブ
+urlpatterns += staticfiles_urlpatterns()
+
+# SPA用のキャッチオールルートを最後に追加
+urlpatterns += [
+    re_path(r'^.*$', views.SPAView.as_view()),
+]
