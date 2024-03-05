@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import ProgressBarComponent from './ProgressBarComponent';
 import NavigationBar from './navigation-bar/NavigationBar';
 import PrimaryTabs from './primary-tabs/PrimaryTabs';
 import Modal from './modal/Modal';
@@ -113,6 +114,7 @@ function Home() {
 
   return (
     <div>
+      <ProgressBarComponent />
       <NavigationBar />
       <PrimaryTabs />
       <Modal />

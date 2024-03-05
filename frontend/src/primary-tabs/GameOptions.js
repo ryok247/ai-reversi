@@ -13,7 +13,7 @@ function GameOptions() {
     <div id="Game" className="tab-content active">
       <div className="container">
         <div className="row">
-          <div className="col-md-4 col-12">
+          <div className="col-md-3 col-12">
             <div className="container container-for-options">
               <ModeOption />
               <PlayerOptions />
@@ -25,7 +25,7 @@ function GameOptions() {
           <div className="col-md-5 col-12">
             <GameBoard className="board"/>
           </div>
-          <div className="col-md-3 col-12">
+          <div className="col-md-4 col-12">
             <div className="container">
               <TurnAndScore />
               <GameHistory />
