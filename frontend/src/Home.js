@@ -11,6 +11,7 @@ import {
     loadRecentGamesFromCookie, 
     isUserLoggedIn,
     updateGameRecordsWithUser,
+    enableEditing
  } from './manage-game.js';
 
 function Home() {
@@ -88,8 +89,27 @@ function Home() {
             document.getElementById('game-end-modal').style.display = 'none';
     
         });
+
+  // Example for attaching event listeners
+  document.querySelectorAll('.edit-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+        const gameId = icon.closest('tr').dataset.gameId;
+        const nameColumn = icon.closest('tr').children[2]; // Assuming name is the 3rd column
+        const isFavorite = icon.closest('table').id.includes('favorite');
+        enableEditing(gameId, nameColumn, isFavorite);
+    });
+  });
+
+  fetch('/api/settings')
+      .then(response => response.json())
+      .then(data => {
+          // Use the settings retrieved here
+          sharedState.maxTitleLength = data.max_title_length;
+          sharedState.maxDescriptionLength = data.max_description_length;
+      })
+      .catch(error => console.error('Error:', error));
     
-      }, []);
+  }, []);
 
   return (
     <div>

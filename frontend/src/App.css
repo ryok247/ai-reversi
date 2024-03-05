@@ -125,10 +125,10 @@ body {
 }
 
 /* Styling for the current turn */
-.current-turn {
-  background-color: #ffd700 !important; /* Gold background color example */
-  color: #000 !important; /* Text color example */
-  font-weight: bold !important; /* Bold text example */
+.history-replay table tbody tr.current-turn {
+  background-color: #ffd700 !important;
+  color: #000 !important;
+  font-weight: bold !important;
 }
 
 /* Controls section styling with center-aligned buttons */
@@ -220,23 +220,21 @@ body {
 }
 
 /* Style for arrow and toggle buttons */
+/*
 .arrow-button, .toggle-button {
-  background-color: #007bff; /* Background color */
-  color: white; /* Text color */
-  border: none; /* No border */
-  padding: 0px; /* Padding */
-  border-radius: 5px; /* Border radius */
-  margin-top: 10px; /* Margin to the top edge */
-  margin-left: 5px; /* Margin to the left edge */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0px;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-left: 5px;
   height: 2.5rem;
   width: 2.5rem;
-  cursor: pointer; /* Cursor style */
+  cursor: pointer;
+  font-size: 1.2rem;
 }
-
-/* Style for icons in arrow and toggle buttons */
-.arrow-button i, .toggle-button i {
-  font-size: 1.2rem; /* Icon size */
-}
+*/
 
 .dashboard-element {
   margin-top: 20px;
@@ -261,7 +259,7 @@ body {
 }
 
 .dashboard-table {
-  width: 100%;                /* Table width */
+  width: 85%;              /* Table width */
   border-collapse: collapse;  /* Border style */
   margin-top: 20px;           /* Top margin */
 }
@@ -342,4 +340,12 @@ body {
   display: flex;
   justify-content: center;
   margin-top: 10px;
+}
+
+.center-align {
+  text-align: center;
+}
+
+#highlight-text {
+  margin-left: 5px;
 }

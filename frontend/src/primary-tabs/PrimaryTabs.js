@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock } from '@fortawesome/free-solid-svg-icons';
 import GameOptions from './GameOptions.js';
 import Replay from './Replay.js';
 import Dashboard from './Dashboard.js';
@@ -19,11 +21,23 @@ const PrimaryTabs = () => {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Tabs value={activeTab} onChange={handleChange} aria-label="basic tabs example">
-        <Tab label="Game" />
-        <Tab label="Replay" />
-        <Tab label="Dashboard" disabled={!isUserLoggedIn()} />
-      </Tabs>
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Tabs value={activeTab} onChange={handleChange} aria-label="basic tabs example">
+          <Tab label="Game" />
+          <Tab label="Replay" />
+          {/* ダッシュボードタブにアイコンを追加 */}
+          <Tab 
+            label={
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                Dashboard
+                {/* ユーザーがログインしていない場合にのみアイコンを表示 */}
+                {!isUserLoggedIn() && <FontAwesomeIcon icon={faLock} style={{ marginLeft: 5 }} />}
+              </div>
+            } 
+            disabled={!isUserLoggedIn()}
+          />
+        </Tabs>
+      </Box>
       <div style={activeTab === 0 ? {} : hiddenStyle}>
         <GameOptions />
       </div>
