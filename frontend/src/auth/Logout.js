@@ -9,7 +9,7 @@ function Logout() {
 
     useEffect(() => {
         const logout = async () => {
-            const response = await fetch('/logout/', {
+            const response = await fetch('/api/logout/', {
                 method: 'GET',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),

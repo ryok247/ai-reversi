@@ -358,7 +358,7 @@ export class boardInfo{
         const gameJsonData = this.createGameData(title);
     
         // Send request to the backend
-        return fetch('/save_game/', {
+        return fetch('/api/save_game/', {
             method: 'POST',
             body: gameJsonData,
             headers: {
@@ -430,7 +430,7 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
 
 // Function to load games (recent or favorite) and populate the table
 export function loadGames(type = "recent", page = 1) {
-    fetch(`/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`, {
+    fetch(`/api/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`, {
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
@@ -624,7 +624,7 @@ export function updateGameRecordsWithUser() {
         const gameIds = JSON.parse(gameHistory);
 
         // Send request to the backend
-        fetch('/update_game_records/', {
+        fetch('/api/update_game_records/', {
             method: 'POST',
             body: JSON.stringify({game_ids: gameIds}),
             headers: {
@@ -640,7 +640,7 @@ export function updateGameRecordsWithUser() {
 
 // Function to toggle the favorite status of a game
 export function toggleFavorite(gameId) {
-    fetch(`/toggle_favorite/${gameId}/`, {
+    fetch(`/api/toggle_favorite/${gameId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -744,7 +744,7 @@ export function enableEditing(gameId, nameColumn, inputElement, saveButton) {
 
 // Update game name in both Recent and Favorite Games
 export function updateGameName(gameId, newName, nameColumn, isFavorite) {
-    fetch(`/update_game_name/${gameId}/`, {
+    fetch(`/api/update_game_name/${gameId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

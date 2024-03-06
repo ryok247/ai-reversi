@@ -33,7 +33,7 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
     formData.append('password', password);
   
     // リクエストを送信
-    const response = await fetch('/login/', {
+    const response = await fetch('/api/login/', {
       method: 'POST',
       headers: {
         'X-CSRFToken': getCookie('csrftoken'),

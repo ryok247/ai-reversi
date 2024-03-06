@@ -16,7 +16,7 @@ import OpenAIComment from './OpenAIComment.js';
 
 // サーバーに新しい説明を送信する関数
 function updateGameDescription(gameId, description) {
-    return fetch(`/update_game_description/${gameId}/`, {
+    return fetch(`/api/update_game_description/${gameId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ function PastReplay() {
     })
 
     // Get game moves and display them
-    fetch(`/get_moves/${gameId}/`)
+    fetch(`/api/get_moves/${gameId}/`)
         .then(response => response.json())
         .then(data => {
             const moves = data.moves;

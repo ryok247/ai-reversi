@@ -5,7 +5,7 @@ import TotalResults from './TotalResults';
 
 export async function loadDashboardData() {
   try {
-      const response = await fetch('/dashboard/');
+      const response = await fetch('/api/dashboard/');
       const data = await response.json();
       updateDashboardTable(data);
   } catch (error) {
