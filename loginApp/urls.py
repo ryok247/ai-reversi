@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/settings', views.SettingsView.as_view(), name='api-settings'),
     path('api/csrf/', views.CSRFTokenView.as_view(), name='csrf'),
     path('api/check-auth-status/', views.CheckAuthStatusView.as_view(), name='check_auth_status'),
+    path('api/get-openai-comment/', views.GetOpenAICommentView.as_view(), name='get_openai_comment'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # 開発環境での静的ファイルのサーブ

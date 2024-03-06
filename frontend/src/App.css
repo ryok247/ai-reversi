@@ -372,6 +372,23 @@ body {
   margin-top: 20px;
 }
 
+.flex-container {
+  display: flex;
+  justify-content: center; /* 水平方向の中央寄せ */
+  align-items: center; /* 垂直方向の中央寄せ */
+}
+
+.container-for-openai-comment {
+  background-color: rgb(213, 233, 241);
+  border: 2px solid blue;
+  padding: 10px;
+  font-size: 0.8rem;
+  margin: 0 auto; /* 上下のマージンは0、左右のマージンは自動調整 */
+  margin-bottom: 20px;
+  max-width: 800px; /* 最大幅を指定 */
+  width: 100%; /* 画面幅に合わせて幅を調整 */
+}
+
 /*========= Style for the progress bar showing the loading of the game =========*/
 
 #splash {

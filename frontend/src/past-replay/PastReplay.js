@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { marked } from 'marked';
+
 import { gameLogic } from "../game-logic.js"
 import { ReplayAnimator } from '../animation.js';
 import { addToHistoryTable, updateGameName } from "../manage-game.js";
@@ -10,6 +12,7 @@ import GameInfo from './GameInfo.js';
 import ReplayControls from './ReplayControls.js';
 import NavigationBar from '../navigation-bar/NavigationBar.js';
 import HistoryReplay from './HistoryReplay.js';
+import OpenAIComment from './OpenAIComment.js';
 
 // サーバーに新しい説明を送信する関数
 function updateGameDescription(gameId, description) {
@@ -98,6 +101,45 @@ function PastReplay() {
                     logic.placePiece(moves[i].row, moves[i].col);
                 }
             }
+
+            console.log(document.getElementById("openai-comment"));
+
+            const fetchComment = async () => {
+                try {
+                  const gameData = document.getElementById("past-history-table").outerHTML;
+
+                  const response = await fetch('/api/get-openai-comment/', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({game_data: gameData})
+                  });
+            
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                  }
+            
+                  const data = await response.json();
+                  
+                  // コメントデータを取得
+                  const comment = data.comment;
+                  
+                  // マークダウンをHTMLに変換
+                  const formattedComment = marked(comment);
+                  
+                  // innerHTMLを使用して、変換されたHTMLを要素にセット
+                  document.getElementById("openai-comment").innerHTML = formattedComment;
+
+                } catch (error) {
+                  console.error('Error:', error);
+                  document.getElementById("openai-comment").textContent = "Sorry, AI comment is not available at the moment. Please try again later.";
+                }
+              };
+            
+            fetchComment();
+
         })
         .catch(error => console.error('Error:', error));
 
@@ -218,6 +260,7 @@ function PastReplay() {
                 </div>
             </div>
         </div>
+        <OpenAIComment />
     </>
   );
 }
