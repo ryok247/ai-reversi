@@ -55,14 +55,12 @@ function Home() {
         document.getElementById('progress').addEventListener("click", (event) => sharedState.animator.seek(event));
     
         if (isUserLoggedIn()) {
-            console.log(1);
             document.getElementById('dashboard-tab').style.display = 'block';
             document.getElementById('favorite-games').style.display = 'block';
             loadGames('favorite');
             loadGames('recent');
             updateGameRecordsWithUser();
         } else {
-            console.log(2);
             loadRecentGamesFromCookie();
         }
     
