@@ -197,12 +197,14 @@ function PastReplay() {
   return (
     <>
         <NavigationBar />
-        <div className="container">
+        <div className="container main-contents">
             <h1>Replay: Past Game Highlights</h1>
             <input type="hidden" id="game-id" defaultValue="{{ game_id }}" />
-            <div className="row">
+            <div id="replay-past-history-table-row" className="row">
                 <div className="col-md-2 col-12">
-                    <GameInfo />
+                    <div class="container container-for-gameinfo">
+                        <GameInfo />
+                    </div>
                 </div>
                 <div className="col-md-7 col-12">
                     <GameBoard className="board animated" />

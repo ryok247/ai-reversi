@@ -34,5 +34,5 @@ urlpatterns += staticfiles_urlpatterns()
 
 # SPA用のキャッチオールルートを最後に追加
 urlpatterns += [
-    re_path(r'^.*$', views.SPAView.as_view()),
+    re_path(r'^(?!api/).*$', views.SPAView.as_view(), name='spa'),
 ]

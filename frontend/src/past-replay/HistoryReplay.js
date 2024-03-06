@@ -7,7 +7,7 @@ function HistoryReplay(){
             <h4>History</h4>
         </div>
         <div className="overflow-auto" style={{ maxHeight: 400 }}>
-        <table className="past-history-table table table-striped table-bordered border-primary table-sm">
+        <table className="past-history-table table-striped table-bordered table-sm">
             <thead>
                 <tr>
                     <th scope="col">#</th>
@@ -20,6 +20,9 @@ function HistoryReplay(){
                 {/* 履歴がここに表示されます */}
             </tbody>
         </table>
+        </div>
+        <div className="attention">
+            <h6>Click each row!</h6>
         </div>
     </div>
     );

@@ -1,6 +1,14 @@
 import React from 'react';
 
-function Modal() {
+function EndModal() {
+
+  const clickHander = () => {
+    const modal = document.getElementById('game-end-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
   return (
     <div id="game-end-modal" className="modal">
       <div className="modal-content">
@@ -22,10 +30,10 @@ function Modal() {
           {/*Please <a href="{% url 'login' %}">login</a> or{" "}*/}
           {/*<a href="{% url 'signup' %}">signup</a> to save your game.*/}
         </div>
-        <button id="modal-close-btn">Close</button>
+        <button id="modal-close-btn" onClick={clickHander}>Close</button>
       </div>
     </div>
   );
 }
 
-export default Modal;
+export default EndModal;

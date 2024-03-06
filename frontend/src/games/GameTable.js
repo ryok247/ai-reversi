@@ -9,12 +9,15 @@ function GameTable({ games, type }) {
         <div className="col-12">
           <div id={`${type}-games`} style={type === "favorite" ? { display: "none" } : {}} className="favorite-recent-games">
             <div>
-              <h2 className="toggle-section" data-target={`${type}-games-content`}>
+              <h3 className="toggle-section" data-target={`${type}-games-content`}>
                 <button className="toggle-button btn-sm mx-1 btn-primary">+</button>
-                {type.charAt(0).toUpperCase() + type.slice(1) + " games"}
-              </h2>
+                {type.charAt(0).toUpperCase() + type.slice(1) + (isUserLoggedIn() ? "" : " 10") +  " Games"}
+              </h3>
               <div id={`${type}-games-content`} style={{ display: "none" }}>
-                <table className="table table-striped table-bordered border-primary table-sm">
+                <div className="attention">
+                  <h6>Click "Replay" icons!</h6>
+                </div>
+                <table className="table-striped table-bordered table-sm">
                   <thead>
                     <tr>
                       {isUserLoggedIn() && <th>Favorite</th>}

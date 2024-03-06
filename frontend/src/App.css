@@ -35,6 +35,10 @@ body {
   color: blue;
 }
 
+.attention {
+  color: red;
+}
+
 /* Board styling */
 .board {
   display: grid;
@@ -95,9 +99,10 @@ body {
 }
 
 /* Table styling */
-.table {
+.table-striped {
   font-size: 0.8rem;
   margin-bottom: 0;
+  width: 100%;
 }
 
 /* Subsection styling with bottom margin */
@@ -128,9 +133,9 @@ body {
 
 /* Styling for the current turn */
 .history-replay table tbody tr.current-turn {
-  background-color: #ffd700 !important;
-  color: #000 !important;
-  font-weight: bold !important;
+  background-color: #ffd700;
+  color: #000;
+  font-weight: bold;
 }
 
 /* Controls section styling with center-aligned buttons */
@@ -164,7 +169,7 @@ body {
 
 /* Style for active tab button */
 .tab-button.active {
-  background-color: #fff; /* Background color when active */
+  background-color: var(--primary-color); /* Background color when active */
   border-bottom: 1px solid #fff; /* Bottom border when active */
 }
 
@@ -261,7 +266,7 @@ body {
 }
 
 .dashboard-table {
-  width: 85%;              /* Table width */
+  width: 100%;              /* Table width */
   border-collapse: collapse;  /* Border style */
   margin-top: 20px;           /* Top margin */
 }
@@ -287,10 +292,11 @@ body {
 /* Modal content */
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto;
+  margin: 15% auto; /* 上下のマージンを % にして中央に配置 */
   padding: 20px;
   border: 1px solid #888;
-  width: 80%;
+  width: 50%; /* 幅を 50% に変更してコンパクトに */
+  max-width: 600px; /* 最大幅を設定 */
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   text-align: center;
 }
@@ -299,7 +305,7 @@ body {
 #modal-close-btn {
   margin-top: 20px;
   padding: 10px 20px;
-  background-color: #f44336;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   cursor: pointer;
@@ -344,12 +350,26 @@ body {
   margin-top: 10px;
 }
 
+.container-for-gameinfo {
+  border: 2px solid blue;
+  padding: 10px;
+  width: 100%;
+}
+
 .center-align {
   text-align: center;
 }
 
 #highlight-text {
   margin-left: 5px;
+}
+
+.main-contents {
+  margin-top: 20px;
+}
+
+#replay-past-history-table-row {
+  margin-top: 20px;
 }
 
 /*========= Style for the progress bar showing the loading of the game =========*/
@@ -392,7 +412,6 @@ color: #fff;
   align-items: center;
   text-align: center;
 }
-
 
 a{
   color: #333;
