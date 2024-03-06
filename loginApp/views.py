@@ -19,8 +19,10 @@ from django.contrib.auth.models import User
 
 from typing import Any, Dict, List, Optional
 from datetime import date
-
 import json
+
+from decouple import config
+from openai import OpenAI,RateLimitError
 
 def index(request: HttpRequest) -> HttpResponse:
     """Renders the main index page"""
@@ -355,3 +357,38 @@ class SPAView(CreateView):
     def get(self, request, *args, **kwargs):
         with open(str(settings.FRONTEND_BUILD_PATH / 'index.html'), 'r') as file:
             return HttpResponse(file.read())
+
+class GetOpenAICommentView(CreateView):
+    def post(self, request, *args, **kwargs):
+        # リクエストからリバーシの対局データを取得
+        data = json.loads(request.body)
+        game_data = data.get('game_data')
+
+        print("===game_data===")
+        print(game_data)
+        print("================")
+
+        # OpenAI APIを呼び出し、コメントを取得
+        try:
+            client = OpenAI(
+            api_key=config('OPENAI_API_KEY', default='your_default_api_key'),
+            )
+
+            completion = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a highly skilled reversi player and coach. Your expertise includes providing insightful analysis of reversi games, highlighting strategic positions, suggesting improvements, and teaching advanced tactics."},
+                    {"role": "user", "content": f"Here is a game of reversi I played: {game_data}. Could you analyze the game and provide your insights on the strategic aspects and how I could improve my skills?"}
+                ]
+            )
+
+            print("=== OpenAI Comment ===")
+            print(completion.choices[0].message)
+            print("======================")
+
+            return JsonResponse({'comment': completion.choices[0].message.content})
+        except RateLimitError as e:
+            return JsonResponse({'error': 'OpenAI Comment is currently unavailable.'}, status=500)
+        except:
+            raise
+

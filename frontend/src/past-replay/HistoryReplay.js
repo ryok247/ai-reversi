@@ -7,7 +7,7 @@ function HistoryReplay(){
             <h4>History</h4>
         </div>
         <div className="overflow-auto" style={{ maxHeight: 400 }}>
-        <table className="past-history-table table-striped table-bordered table-sm">
+        <table id="past-history-table" className="past-history-table table-striped table-bordered table-sm">
             <thead>
                 <tr>
                     <th scope="col">#</th>
