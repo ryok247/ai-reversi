@@ -202,7 +202,9 @@ function PastReplay() {
             <input type="hidden" id="game-id" defaultValue="{{ game_id }}" />
             <div className="row">
                 <div className="col-md-2 col-12">
-                    <GameInfo />
+                    <div class="container container-for-gameinfo">
+                        <GameInfo />
+                    </div>
                 </div>
                 <div className="col-md-7 col-12">
                     <GameBoard className="board animated" />

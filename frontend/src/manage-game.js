@@ -22,6 +22,9 @@ export function initializeGame(historyElement){
     sharedState.logic = new gameLogic();
     sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
     sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
+
+    sharedState.board.updateScores();
+    sharedState.board.displayTurn();
 }
 
 export class boardInfo{
@@ -80,7 +83,6 @@ export class boardInfo{
 
         if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
         else if (this.settings.mode == "manual") this.highlightPossibleCells();
-    
     }
 
     // Place a stone
@@ -304,7 +306,8 @@ export class boardInfo{
         this.displayEnd();
         this.saveGameToDatabase().then(() => {
             // ゲームの保存後、Recent Games の更新を行う
-            loadGames("recent", sharedState.nextPage);
+            if (isUserLoggedIn()) loadGames("recent", sharedState.nextPage);
+            //else loadRecentGamesFromCookie();
         });
     
         this.isGameEnd = true;
@@ -558,7 +561,7 @@ export function createRowFromDatabase(game, loggedIn) {
 
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Save';
-            saveButton.className = 'save-button';
+            saveButton.className = 'save-button btn-sm btn-primary';
 
             // enableEditing 関数の修正されたバージョンを呼び出す
             enableEditing(game.id, nameColumn, inputElement, saveButton);

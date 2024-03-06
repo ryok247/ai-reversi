@@ -5,7 +5,7 @@ function GameHistory() {
     <div className="history subsection">
       <div className="info"><h4>History</h4></div>
       <div className="overflow-auto" style={{ maxHeight: '200px' }}>
-        <table className="history-table table table-striped table-bordered border-primary table-sm">
+        <table className="history-table table-striped table-bordered table-sm">
           <thead>
             <tr>
               <th scope="col">#</th>

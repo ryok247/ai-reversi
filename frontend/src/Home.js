@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import ProgressBarComponent from './ProgressBarComponent';
 import NavigationBar from './navigation-bar/NavigationBar';
 import PrimaryTabs from './primary-tabs/PrimaryTabs';
-import Modal from './modal/Modal';
+import Modal from './modal/EndModal.js';
 import { RecentGames, FavoriteGames } from './games/GameTable';
 import './App.css';
 import { sharedState } from './game-shared.js';
@@ -55,12 +55,14 @@ function Home() {
         document.getElementById('progress').addEventListener("click", (event) => sharedState.animator.seek(event));
     
         if (isUserLoggedIn()) {
+            console.log(1);
             document.getElementById('dashboard-tab').style.display = 'block';
             document.getElementById('favorite-games').style.display = 'block';
             loadGames('favorite');
             loadGames('recent');
             updateGameRecordsWithUser();
         } else {
+            console.log(2);
             loadRecentGamesFromCookie();
         }
     
@@ -79,19 +81,7 @@ function Home() {
                 this.textContent = isExpanded ? '+' : '-';
             });
           });
-    
-        // Event listeners for game end modal
-        // Commented out for now because it might make users confused
-        // When this is uncommented, make sure lines to send data to server should be added
-        // When this is uncommented, make sure to uncomment in manage-game.js as well
-        
-        document.getElementById('modal-close-btn').addEventListener('click', function() {
-    
-            document.getElementById('game-end-modal').style.display = 'none';
-    
-        });
 
-  // Example for attaching event listeners
   document.querySelectorAll('.edit-icon').forEach(icon => {
     icon.addEventListener('click', () => {
         const gameId = icon.closest('tr').dataset.gameId;

@@ -48,7 +48,7 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
       onRequestClose(); // モーダルを閉じる
       window.location.href = '/'; // ログイン成功後のリダイレクト
     } else {
-      setError('ログインに失敗しました');
+      setError('Failed Login. Please check your username and password.');
     }
   };
   
@@ -59,10 +59,10 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
     onRequestClose={onRequestClose} 
     contentLabel="Login" 
     style={customStyles}>
-      <h2>ログイン</h2>
+      <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="username">ユーザー名:</label>
+          <label htmlFor="username">Username:</label>
           <input
             id="username"
             type="text"
@@ -72,7 +72,7 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
           />
         </div>
         <div>
-          <label htmlFor="password">パスワード:</label>
+          <label htmlFor="password">Password:</label>
           <input
             id="password"
             type="password"
@@ -81,10 +81,10 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
             required
           />
         </div>
-        <button type="submit">ログイン</button>
+        <button type="submit">Login</button>
         {error && <p>{error}</p>}
       </form>
-      <button onClick={onRequestClose}>閉じる</button>
+      <button onClick={onRequestClose}>Close</button>
     </Modal>
   );
 };

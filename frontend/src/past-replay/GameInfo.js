@@ -15,7 +15,7 @@ function GameInfo(){
                 <span id="info-title" />
                 {/* Input field for editing and save button (initially hidden) */}
                 <input type="text" id="edit-title-input" style={{ display: "none" }} />
-                <button id="save-title-button" style={{ display: "none" }}>
+                <button id="save-title-button" className="btn-sm btn-primary" style={{ display: "none" }}>
                 Save
                 </button>
             </div>
@@ -30,7 +30,7 @@ function GameInfo(){
                 style={{ display: "none" }}
                 defaultValue={""}
                 />
-                <button id="save-description-button" style={{ display: "none" }}>
+                <button id="save-description-button" className="btn-sm btn-primary" style={{ display: "none" }}>
                 Save
                 </button>
             </div>
