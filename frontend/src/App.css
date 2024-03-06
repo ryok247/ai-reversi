@@ -364,6 +364,14 @@ body {
   margin-left: 5px;
 }
 
+.main-contents {
+  margin-top: 20px;
+}
+
+#replay-past-history-table-row {
+  margin-top: 20px;
+}
+
 /*========= Style for the progress bar showing the loading of the game =========*/
 
 #splash {
