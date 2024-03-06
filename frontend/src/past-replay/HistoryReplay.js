@@ -21,6 +21,9 @@ function HistoryReplay(){
             </tbody>
         </table>
         </div>
+        <div className="attention">
+            <h6>Click each row!</h6>
+        </div>
     </div>
     );
 }

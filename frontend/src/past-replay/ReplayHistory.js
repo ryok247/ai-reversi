@@ -3,7 +3,9 @@ import React from 'react';
 function ReplayHistory() {
   return (
     <div className="history-replay">
-      <div className="info"><h4>History</h4></div>
+      <div className="info">
+        <h4>History</h4>
+      </div>
       <div className="overflow-auto" style={{ maxHeight: '400px' }}>
         <table className="history-table table-striped table-bordered table-sm">
           <thead>
@@ -18,6 +20,9 @@ function ReplayHistory() {
             {/* 履歴データがここに挿入されます */}
           </tbody>
         </table>
+      </div>
+      <div className="attention">
+        <h6>Click each row!</h6>
       </div>
     </div>
   );

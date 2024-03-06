@@ -14,6 +14,9 @@ function GameTable({ games, type }) {
                 {type.charAt(0).toUpperCase() + type.slice(1) + (isUserLoggedIn() ? "" : " 10") +  " Games"}
               </h3>
               <div id={`${type}-games-content`} style={{ display: "none" }}>
+                <div className="attention">
+                  <h6>Click "Replay" icons!</h6>
+                </div>
                 <table className="table-striped table-bordered table-sm">
                   <thead>
                     <tr>

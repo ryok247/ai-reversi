@@ -35,6 +35,10 @@ body {
   color: blue;
 }
 
+.attention {
+  color: red;
+}
+
 /* Board styling */
 .board {
   display: grid;
@@ -262,7 +266,7 @@ body {
 }
 
 .dashboard-table {
-  width: 85%;              /* Table width */
+  width: 100%;              /* Table width */
   border-collapse: collapse;  /* Border style */
   margin-top: 20px;           /* Top margin */
 }
