@@ -18,17 +18,18 @@ Visit the [AI Reversi Website](https://ai-reversi.com)
 
 | Category               | Technologies                                                |
 | ---------------------- | ----------------------------------------------------------- |
-| Frontend               | JavaScript (Node.js v18.15.0 / npm v9.5.0)                  |
-| Backend                | Django v4.2.7 (Python v3.12.1), PostgreSQL v16.1 (Debian 16.1-1.pgdg120+1) |
-| Testing                | Jest v29.7.0 (for JavaScript testing), Django's default test framework (Django v4.2.7) |
-| Web Server             | Nginx v1.18.0, Gunicorn v21.2.0                             |
-| Authentication         | Custom User Model with Django's authentication system       |
-| Cloud Platform         | AWS (EC2, RDS, ELB)                                         |
-| Security and Infrastructure | HTTPS enabled via AWS Certificate Manager (ACM) for SSL/TLS certificates |
-| Containerization       | Docker v20.10.11, Docker Compose v1.29.2                    |
-| CI/CD                  | GitHub Actions (actions/checkout@v2, actions/setup-python@v2, actions/setup-node@v1, aws-actions/configure-aws-credentials@v1, webfactory/ssh-agent@v0.5.3), OpenID Connect (OIDC) |
-| Infrastructure as Code (IaC) | Terraform (1.7.3), AWS CloudFormation                                        |
-| Logging and Analysis   | Automatically save AWS Elastic Load Balancer (ELB) access logs to Amazon S3 buckets, with Amazon Athena used for on-demand log data analysis |
+|Frontend                |	React v18.2.0, JavaScript (Node.js v18.15.0 / npm v9.5.0)  |
+|Backend                 |	Django v4.2.7 (Python v3.12.1), PostgreSQL v16.1 (Debian 16.1-1.pgdg120+1)|
+|Testing                 |	Jest v29.7.0 (JavaScript testing), Django's default testing framework (Django v4.2.7)|
+|Web Server	             |  Nginx v1.18.0, Gunicorn v21.2.0                            |
+|Authentication          |	Custom user model in Django for authentication             |
+|Cloud                   |	AWS (EC2, RDS, ELB)                                        |
+|Security & Infrastructure|	HTTPS enabled with SSL/TLS certificates by AWS Certificate Manager (ACM)|
+|Containerization        |	Docker v20.10.11, Docker Compose v1.29.2                   |
+|CI/CD                   |	GitHub Actions, OpenID Connect (OIDC)                      |
+|Infrastructure as Code  |	Terraform v1.7.3, AWS CloudFormation                       |
+|Log Management & Analysis|	ELB access logs stored in S3 bucket and analyzed with Amazon Athena|
+|External API            |	OpenAI API v1 (Chat Completion)                            |
 
 ## Features
 
@@ -96,6 +97,9 @@ DB_NAME=<db-name>
 DB_USER=<db-user>
 DB_PASSWORD=<db-password>
 DB_PORT=5432
+
+# OpenAI API
+OPENAI_API_KEY=<openai-api-key>
 ```
 
 - Use the docker-compose command to launch the local server:
@@ -131,17 +135,18 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
 
 | 分類                   | 技術                                                        |
 | ---------------------- | ----------------------------------------------------------- |
-| フロントエンド         | JavaScript (Node.js v18.15.0 / npm v9.5.0)                  |
-| バックエンド           | Django v4.2.7 (Python v3.12.1), PostgreSQL v16.1 (Debian 16.1-1.pgdg120+1) |
-| テスト                 | Jest v29.7.0 (JavaScriptのテスト), Djangoのデフォルトテストフレームワーク (Django v4.2.7) |
-| Webサーバー            | Nginx v1.18.0, Gunicorn v21.2.0                             |
-| 認証                   | Djangoのカスタムユーザーモデルを使用した認証システム         |
-| クラウド               | AWS (EC2, RDS, ELB)                                         |
-| セキュリティとインフラ | AWS Certificate Manager (ACM) によるSSL/TLS証明書でHTTPS有効化 |
-| コンテナ化             | Docker v20.10.11, Docker Compose v1.29.2                    |
-| CI/CD                  | GitHub Actions (actions/checkout@v2, actions/setup-python@v2, actions/setup-node@v1, aws-actions/configure-aws-credentials@v1, webfactory/ssh-agent@v0.5.3), OpenID Connect (OIDC) |
-| IaC                    | Terraform (1.7.3), AWS CloudFormation                                           |
-| ログ管理と分析         | AWS Elastic Load Balancer (ELB) のアクセスログをS3バケットに保存し、Amazon Athenaを使用して解析 |
+|フロントエンド            |    React v18.2.0, JavaScript (Node.js v18.15.0 / npm v9.5.0)|
+|バックエンド              |	Django v4.2.7 (Python v3.12.1), PostgreSQL v16.1 (Debian 16.1-1.pgdg120+1)|
+|テスティング              |	Jest v29.7.0 (JavaScriptのテスト), Djangoのデフォルトテストフレームワーク (Django v4.2.7)|
+|Webサーバー              |	    Nginx v1.18.0, Gunicorn v21.2.0|
+|認証                     |     Djangoのカスタムユーザーモデルを使用した認証システム|
+|クラウド                 |	    AWS (EC2, RDS, ELB)|
+|セキュリティとインフラ      |	    AWS Certificate Manager (ACM) によるSSL/TLS証明書を使用したHTTPS化|
+|コンテナ化                |	Docker v20.10.11, Docker Compose v1.29.2|
+|CI/CD                   |	GitHub Actions, OpenID Connect (OIDC)|
+|Infrastructure as Code  |	Terraform v1.7.3, AWS CloudFormation|
+|ログ管理と分析            |	AWS ELBのアクセスログをS3バケットに保存し、Amazon Athenaで分析|
+|外部API                  |	OpenAI API v1 (Chat Completion)|
 
 ## 特徴と機能
 
