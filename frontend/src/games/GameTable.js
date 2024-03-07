@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { isUserLoggedIn } from "../manage-game";
 
 function GameTable({ games, type }) {
+  const language = useSelector((state) => state.language.language);
   return (
     <div className="container">
       <div className="row">
@@ -15,23 +16,23 @@ function GameTable({ games, type }) {
               </h3>
               <div id={`${type}-games-content`} style={{ display: "none" }}>
                 <div className="attention">
-                  <h6>Click "Replay" icons!</h6>
+                  <h6>{language==="en" ? 'Click "Replay" icons!' : '「リプレイ」アイコンをクリックするとリプレイウインドウが開きます'}</h6>
                 </div>
                 <table className="table-striped table-bordered table-sm">
                   <thead>
                     <tr>
-                      {isUserLoggedIn() && <th>Favorite</th>}
-                      <th>Replay</th>
-                      {isUserLoggedIn() && <th>Title</th>}
-                      {isUserLoggedIn() && <th>Edit</th>}
-                      <th>Date</th>
-                      <th>Time</th>
-                      <th>You</th>
-                      <th>Result</th>
-                      <th>Black</th>
-                      <th>White</th>
-                      <th>AI Level</th>
-                      <th>Total Duration</th>
+                      {isUserLoggedIn() && <th>{language==="en" ? "Favorite" : "お気に入り"}</th>}
+                      <th>{language==="en" ? "Replay" : "リプレイ"}</th>
+                      {isUserLoggedIn() && <th>{language==="en" ? "Title" : "タイトル"}</th>}
+                      {isUserLoggedIn() && <th>{language==="en" ? "Edit" : "編集"}</th>}
+                      <th>{language==="en" ? "Date" : "年月日"}</th>
+                      <th>{language==="en" ? "Time" : "時刻"}</th>
+                      <th>{language==="en" ? "You" : "ユーザー"}</th>
+                      <th>{language==="en" ? "Result" : "結果"}</th>
+                      <th>{language==="en" ? "Black" : "黒"}</th>
+                      <th>{language==="en" ? "White" : "白"}</th>
+                      <th>{language==="en" ? "AI Level" : "AIのレベル"}</th>
+                      <th>{language==="en" ? "Total Duration": "合計時間"}</th>
                     </tr>
                   </thead>
                   <tbody id={`${type}-game-table-body`}>

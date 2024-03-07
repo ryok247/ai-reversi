@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess } from '../actions/authActions';
 import { getCookie } from '../utilities';
 
@@ -43,6 +43,7 @@ const SignupModal = ({ isOpen, onRequestClose }) => {
   });
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
+  const language = useSelector((state) => state.language.language);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -77,28 +78,28 @@ const SignupModal = ({ isOpen, onRequestClose }) => {
       contentLabel="Sign Up" 
       style={customStyles}
     >
-      <h2>Sign Up</h2>
+      <h2>{language==="en" ? "Sign Up" : "新規登録"}</h2>
       <form onSubmit={handleSubmit} style={formStyle}>
         <div>
-          <label style={labelStyle}>Username:</label>
+          <label style={labelStyle}>{language==="en" ? "Username:" : "ユーザー名:"}</label>
           <input type="text" name="username" value={formData.username} onChange={handleChange} required style={inputStyle} />
         </div>
         <div>
-          <label style={labelStyle}>Email:</label>
+          <label style={labelStyle}>{language==="en" ? "Email:" : "メールアドレス:"}</label>
           <input type="email" name="email" value={formData.email} onChange={handleChange} required style={inputStyle} />
         </div>
         <div>
-          <label style={labelStyle}>Password:</label>
+          <label style={labelStyle}>{language==="en" ? "Password:" : "パスワード:"}</label>
           <input type="password" name="password1" value={formData.password1} onChange={handleChange} required style={inputStyle} />
         </div>
         <div>
-          <label style={labelStyle}>Confirm Password:</label>
+          <label style={labelStyle}>{language==="en" ? "Confirm Password:" : "パスワードの確認:"}</label>
           <input type="password" name="password2" value={formData.password2} onChange={handleChange} required style={inputStyle} />
         </div>
-        <button type="submit">Register</button>
+        <button type="submit">{language==="en" ? "Sign Up" : "新規登録"}</button>
       </form>
       {errors.form && <p>{errors.form}</p>}
-      <button onClick={onRequestClose}>Close</button>
+      <button onClick={onRequestClose}>{language==="en" ? "Close" : "閉じる"}</button>
     </Modal>
   );
 };

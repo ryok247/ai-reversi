@@ -1,9 +1,11 @@
 // LoginModal.js
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Modal from 'react-modal';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../actions/authActions';
 import { getCookie } from '../utilities';
+
 
 const customStyles = {
   content: {
@@ -23,6 +25,7 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const dispatch = useDispatch();
+  const language = useSelector((state) => state.language.language);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,10 +62,10 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
     onRequestClose={onRequestClose} 
     contentLabel="Login" 
     style={customStyles}>
-      <h2>Login</h2>
+      <h2>{language==="en" ? "Login" : "ログイン"}</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="username">Username:</label>
+          <label htmlFor="username">{language==="en" ? "Username:" : "ユーザー名"}</label>
           <input
             id="username"
             type="text"
@@ -72,7 +75,7 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
           />
         </div>
         <div>
-          <label htmlFor="password">Password:</label>
+          <label htmlFor="password">{language==="en" ? "Password:" : "パスワード"}</label>
           <input
             id="password"
             type="password"
@@ -81,10 +84,10 @@ const LoginModal = ({ isOpen, onRequestClose }) => {
             required
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit">{language==="en" ? "Login" : "ログイン"}</button>
         {error && <p>{error}</p>}
       </form>
-      <button onClick={onRequestClose}>Close</button>
+      <button onClick={onRequestClose}>{language==="en" ? "Close" : "閉じる"}</button>
     </Modal>
   );
 };

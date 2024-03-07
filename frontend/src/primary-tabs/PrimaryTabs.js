@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
@@ -11,6 +12,7 @@ import { isUserLoggedIn } from '../manage-game.js';
 
 const PrimaryTabs = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const language = useSelector((state) => state.language.language);
 
   const handleChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -23,13 +25,13 @@ const PrimaryTabs = () => {
     <Box sx={{ width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <Tabs value={activeTab} onChange={handleChange} aria-label="basic tabs example">
-          <Tab label="Game" />
-          <Tab label="Replay" />
+          <Tab label={language==="en" ? "Game" : "ゲーム"} />
+          <Tab label={language==="en" ? "Replay" : "リプレイ"} />
           {/* ダッシュボードタブにアイコンを追加 */}
           <Tab 
             label={
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                Dashboard
+                {language==="en" ? "Dashboard" : "ダッシュボード"}
                 {/* ユーザーがログインしていない場合にのみアイコンを表示 */}
                 {!isUserLoggedIn() && <FontAwesomeIcon icon={faLock} style={{ marginLeft: 5 }} />}
               </div>
