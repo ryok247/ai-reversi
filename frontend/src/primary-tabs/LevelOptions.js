@@ -1,13 +1,17 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 function LevelOptions() {
+
+  const language = useSelector((state) => state.language.language);
+
   return (
     <>
-      <div className="question"><h4>Level</h4></div>
+      <div className="question"><h4>{language==="en" ? "Level" : "レベル"}</h4></div>
       <div className="container-for-levels">
-        <label><input type="radio" name="level" value="1" defaultChecked /> Very Easy</label>
-        <label><input type="radio" name="level" value="2" /> Easy</label>
-        <label><input type="radio" name="level" value="3" /> Medium</label>
+        <label><input type="radio" name="level" value="1" defaultChecked />{language==="en" ? "Very Easy" : "とてもやさしい"}</label>
+        <label><input type="radio" name="level" value="2" />{language==="en" ? "Easy" : "やさしい"}</label>
+        <label><input type="radio" name="level" value="3" />{language==="en" ? "Medium" : "普通"}</label>
       </div>
     </>
   );

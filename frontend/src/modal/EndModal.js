@@ -1,6 +1,9 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 function EndModal() {
+
+  const language = useSelector((state) => state.language.language);
 
   const clickHander = () => {
     const modal = document.getElementById('game-end-modal');
@@ -30,7 +33,7 @@ function EndModal() {
           {/*Please <a href="{% url 'login' %}">login</a> or{" "}*/}
           {/*<a href="{% url 'signup' %}">signup</a> to save your game.*/}
         </div>
-        <button id="modal-close-btn" onClick={clickHander}>Close</button>
+        <button id="modal-close-btn" onClick={clickHander}>{language==="en" ? "Close": "閉じる"}</button>
       </div>
     </div>
   );

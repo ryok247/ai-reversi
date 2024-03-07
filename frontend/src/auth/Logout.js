@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { getCookie } from '../utilities';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout as logoutAction } from '../actions/authActions';
 
 function Logout() {
 
     const dispatch = useDispatch();
+    const language = useSelector((state) => state.language.language);
 
     useEffect(() => {
         const logout = async () => {
@@ -27,7 +28,7 @@ function Logout() {
 
     return (
         <div>
-            Logging out...
+            {language==="en" ? "Logging out..." : "ログアウト中..."}
         </div>
     );
 }

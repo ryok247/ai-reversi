@@ -1,8 +1,11 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { initializeGame } from '../manage-game';
 import { sharedState } from '../game-shared';
 
 function StartButton() {
+
+  const language = useSelector((state) => state.language.language);
 
   const clickHander = async () => {
     const historyElement = document.getElementById("history");
@@ -14,7 +17,7 @@ function StartButton() {
 
   return (
     <div className="container-for-button">
-      <button type="button" className="btn btn-primary" id="confirmed-btn" onClick={clickHander}>START</button>
+      <button type="button" className="btn btn-primary" id="confirmed-btn" onClick={clickHander}>{language==="en" ? "START" : "スタート"}</button>
     </div>
   );
 }

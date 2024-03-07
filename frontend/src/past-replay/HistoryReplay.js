@@ -1,19 +1,23 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 function HistoryReplay(){
+
+    const language = useSelector((state) => state.language.language);
+
     return (
     <div className="history-replay">
         <div className="info">
-            <h4>History</h4>
+            <h4>{language==="en" ? "History": "履歴"}</h4>
         </div>
         <div className="overflow-auto" style={{ maxHeight: 400 }}>
         <table id="past-history-table" className="past-history-table table-striped table-bordered table-sm">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Player</th>
-                    <th scope="col">Position</th>
-                    <th scope="col">Time</th>
+                    <th scope="col">No.</th>
+                    <th scope="col">{language==="en" ? "Player" : "プレイヤー"}</th>
+                    <th scope="col">{language==="en" ? "Position" : "位置"}</th>
+                    <th scope="col">{language==="en" ? "Time" : "時間"}</th>
                 </tr>
             </thead>
             <tbody id="replay-table-body">
@@ -22,7 +26,7 @@ function HistoryReplay(){
         </table>
         </div>
         <div className="attention">
-            <h6>Click each row!</h6>
+            <h6>{language==="en" ? "Click on a row to see the board state at that point in the game." : "行をクリックするとその時点の盤面を再現できます"}</h6>
         </div>
     </div>
     );

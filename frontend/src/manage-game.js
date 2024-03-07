@@ -105,10 +105,11 @@ export class boardInfo{
 
     // displays a message if the game is terminated
     displayEnd() {
+        const language = store.getState().language.language;
         let resultMessage = '';
-        if (this.logic.score[0] > this.logic.score[1]) resultMessage = 'Black Wins!';
-        else if (this.logic.score[0] < this.logic.score[1]) resultMessage = 'White Wins!';
-        else resultMessage = 'Draw!';
+        if (this.logic.score[0] > this.logic.score[1]) resultMessage = (language==="en" ? 'Black Wins!' : '黒の勝ち！');
+        else if (this.logic.score[0] < this.logic.score[1]) resultMessage = (language==="en" ? 'White Wins!' : '白の勝ち！');
+        else resultMessage = (language==="en" ? 'Draw!' : '引き分け！');
     
         document.getElementById('game-end-modal').style.display = 'block';
         document.getElementById('game-result').textContent = resultMessage;
@@ -389,6 +390,8 @@ export class boardInfo{
 }
 
 export function addToHistoryTable(animator, row, col, turnNumber, duration, historyTableClass) {
+
+    const language = store.getState().language.language;
     
     const toReversiCol = {
         0: "A",
@@ -415,9 +418,14 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
         let cell4 = newRow.insertCell(3);
 
         // Set content for each cell (you can modify this as needed)
+
+        const black = language==="en" ? "Black" : "黒";
+        const white = language==="en" ? "White" : "白";
+        const pass = language==="en" ? " Pass" : " パス";
+
         cell1.textContent = turnNumber;
-        cell2.textContent = animator.gameLogic.currentPlayer == 0 ? "Black" : "White";
-        cell3.textContent = (row == -1 && col == -1) ? " Pass" : ` ${toReversiCol[col]}${row + 1} `;
+        cell2.textContent = animator.gameLogic.currentPlayer == 0 ? black : white;
+        cell3.textContent = (row == -1 && col == -1) ? pass : ` ${toReversiCol[col]}${row + 1} `;
         cell4.textContent = duration != -1 ? (duration / 1000).toFixed(3) : "-";
 
         if (tableBody.id == "replay-table-body") {
@@ -510,6 +518,9 @@ export function loadRecentGamesFromCookie() {
 
 // Function to create a table row from game data
 export function createRowFromDatabase(game, loggedIn) {
+
+    const language = store.getState().language.language;
+
     const row = document.createElement('tr');
     row.setAttribute('data-game-id', game.id);
 
@@ -560,7 +571,7 @@ export function createRowFromDatabase(game, loggedIn) {
             inputElement.value = nameColumn.textContent;
 
             const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save';
+            saveButton.textContent = language=="en" ? 'Save' : '保存';
             saveButton.className = 'save-button btn-sm btn-primary';
 
             // enableEditing 関数の修正されたバージョンを呼び出す
@@ -581,14 +592,20 @@ export function createRowFromDatabase(game, loggedIn) {
     row.appendChild(timeColumn);
 
     const colorColumn = document.createElement('td');
-    colorColumn.textContent = game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1);
+    const black = language==="en" ? 'Black' : '黒';
+    const white = language==="en" ? 'White' : '白';
+    colorColumn.textContent = game.player_color == "black" ? black : white;
     row.appendChild(colorColumn);
 
     const resultColumn = document.createElement('td');
+    const win = language==="en" ? 'Win' : '勝ち';
+    const lose = language==="en" ? 'Lose' : '負け';
+    const draw = language==="en" ? 'Draw' : '引き分け';
+
     if (game.player_color == "black"){
-        resultColumn.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+        resultColumn.textContent = game.black_score > game.white_score ? win : game.black_score < game.white_score ? lose : draw;
     } else {
-        resultColumn.textContent = game.black_score > game.white_score ? 'Lose' : game.black_score < game.white_score ? 'Win' : 'Draw';
+        resultColumn.textContent = game.black_score > game.white_score ? lose : game.black_score < game.white_score ? win : draw;
     }
     row.appendChild(resultColumn);
 

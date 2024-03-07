@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { marked } from 'marked';
 
@@ -29,6 +30,7 @@ function updateGameDescription(gameId, description) {
 function PastReplay() {
 
   const { gameId } = useParams();
+  const language = useSelector((state) => state.language.language);
 
   useEffect(() => {
 
@@ -59,13 +61,18 @@ function PastReplay() {
         timeElement.textContent = new Date(game.game_datetime).toLocaleTimeString();
     
         const colorElement = document.getElementById('info-color');
-        colorElement.textContent = game.player_color.charAt(0).toUpperCase() + game.player_color.slice(1);
+        const black = language==="en" ? "Black" : "黒";
+        const white = language==="en" ? "White" : "白";
+        colorElement.textContent = game.player_color == "black" ? black : white;
     
         const resultElement = document.getElementById('info-result');
+        const win = language==="en" ? "Win" : "勝ち";
+        const lose = language==="en" ? "Lose" : "負け";
+        const draw = language==="en" ? "Draw" : "引き分け";
         if (game.player_color == "black"){
-            resultElement.textContent = game.black_score > game.white_score ? 'Win' : game.black_score < game.white_score ? 'Lose' : 'Draw';
+            resultElement.textContent = game.black_score > game.white_score ? win : game.black_score < game.white_score ? lose : draw;
         } else {
-            resultElement.textContent = game.black_score > game.white_score ? 'Lose' : game.black_score < game.white_score ? 'Win' : 'Draw';
+            resultElement.textContent = game.black_score > game.white_score ? lose : game.black_score < game.white_score ? win : draw;
         }
     
         const blackScoreElement = document.getElementById('info-black-score');
@@ -76,9 +83,8 @@ function PastReplay() {
     
         const ailevelElement = document.getElementById('info-ai-level');
         ailevelElement.textContent = 'Level ' + game.ai_level;
-
         const durationElement = document.getElementById('info-duration');
-        durationElement.textContent = `${game.total_user_duration / 1000} seconds`;
+        durationElement.textContent = `${game.total_user_duration / 1000} ` + (language==="en" ? "seconds" : "秒"); 
     })
     .catch(error => {
         console.error('Error:', error);
@@ -114,7 +120,10 @@ function PastReplay() {
                       'Content-Type': 'application/json',
                       'X-CSRFToken': getCsrfToken()
                     },
-                    body: JSON.stringify({game_data: gameData})
+                    body: JSON.stringify({
+                        game_data: gameData,
+                        language: language
+                    })
                   });
             
                   if (!response.ok) {
@@ -240,7 +249,7 @@ function PastReplay() {
     <>
         <NavigationBar />
         <div className="container main-contents">
-            <h1>Replay: Past Game Highlights</h1>
+            <h1>{language==="en" ? "Replay: Past Game Highlights" : "過去の対戦のリプレイ"}</h1>
             <input type="hidden" id="game-id" defaultValue="{{ game_id }}" />
             <div id="replay-past-history-table-row" className="row">
                 <div className="col-md-2 col-12">

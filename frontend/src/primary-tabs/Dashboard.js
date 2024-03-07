@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import TodayResults from './TodayResults';
 import MonthResults from './MonthResults';
 import TotalResults from './TotalResults';
@@ -57,6 +58,8 @@ export function updateTable(tableBody, results) {
 
 function Dashboard() {
 
+  const language = useSelector((state) => state.language.language);
+
   useEffect(() => {
     const dashboardTab = document.getElementById('dashboard-tab');
     dashboardTab.addEventListener('click', loadDashboardData);
@@ -67,7 +70,7 @@ function Dashboard() {
       <div class="row">
         <div class="col-12">
           <div id="Dashboard" className="tab-content">
-            <h2>Performance</h2>
+            <h2>{language==="en" ? "Performance" : "パフォーマンス"}</h2>
             <div id="dashboard-tab" style={{ overflowX: 'auto' }}>
               <TodayResults />
               <MonthResults />
