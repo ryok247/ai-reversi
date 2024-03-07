@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLanguage } from '../actions/languageActions';
@@ -15,6 +15,24 @@ function NavigationBar() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsLanguageDropdownOpen(false);
+      }
+    };
+
+    if (isLanguageDropdownOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [isLanguageDropdownOpen]);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const openSignupModal = () => setIsSignupModalOpen(true);
@@ -53,7 +71,7 @@ function NavigationBar() {
                   </button>
                 </>
               )}
-              <div className="nav-item dropdown">
+              <div className="nav-item dropdown" ref={dropdownRef}>
                 <button className="nav-link dropdown-toggle" onClick={toggleLanguageDropdown}>
                   <FontAwesomeIcon icon={faGlobe} /> {language === 'en' ? 'Language' : '言語'}
                 </button>
