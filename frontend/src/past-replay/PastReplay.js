@@ -121,7 +121,10 @@ function PastReplay() {
                       'Content-Type': 'application/json',
                       'X-CSRFToken': getCsrfToken()
                     },
-                    body: JSON.stringify({game_data: gameData})
+                    body: JSON.stringify({
+                        game_data: gameData,
+                        language: language
+                    })
                   });
             
                   if (!response.ok) {

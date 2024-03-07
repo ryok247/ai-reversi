@@ -341,6 +341,19 @@ class GetOpenAICommentView(CreateView):
         # リクエストからリバーシの対局データを取得
         data = json.loads(request.body)
         game_data = data.get('game_data')
+        language = data.get('language')
+
+        system_prompt = ""
+        user_prompt = ""
+
+        if language == "en":
+            system_prompt = "As a highly accomplished reversi player and an insightful coach, your expertise lies in providing in-depth analysis of reversi games, pinpointing critical strategic positions, offering astute recommendations for improvement, and imparting advanced tactical knowledge to help players elevate their skills."
+            user_prompt = f"I would like to present a reversi game I recently played, detailed in the following game data: {game_data}. Would you be so kind as to analyze the game from a strategic perspective, sharing your insights and wisdom on how I might refine my play and take my abilities to the next level? Your expert guidance would be greatly appreciated."
+        elif language == "ja":
+            system_prompt = "あなたは、リバーシにおいて非常に優れた実力を持つプレイヤーであり、洞察力に富んだコーチです。あなたの専門知識は、リバーシの試合に関する深い分析、重要な戦略的局面の特定、改善のための鋭い提言、そしてプレイヤーのスキルを向上させるための高度な戦術知識の伝授にあります。"
+            user_prompt = f"私が最近行ったリバーシの対局データを提示させていただきます: {game_data}。この対局を戦略的な観点から分析していただき、私のプレイを磨き、能力を次のレベルに引き上げるためのご見解と知恵を共有していただけませんでしょうか？あなたの専門的なご指導に深く感謝いたします。"
+        else:
+            assert False, "Unsupported language"
 
         # OpenAI APIを呼び出し、コメントを取得
         try:
@@ -351,8 +364,8 @@ class GetOpenAICommentView(CreateView):
             completion = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a highly skilled reversi player and coach. Your expertise includes providing insightful analysis of reversi games, highlighting strategic positions, suggesting improvements, and teaching advanced tactics."},
-                    {"role": "user", "content": f"Here is a game of reversi I played: {game_data}. Could you analyze the game and provide your insights on the strategic aspects and how I could improve my skills?"}
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
                 ]
             )
 
