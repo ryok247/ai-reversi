@@ -1,12 +1,10 @@
-from .models import CustomUser, Game, Move
+from .models import Game, Move
 from .forms import SignupForm
 from django.db.models import Count, Case, When, IntegerField, F, Min
 from django.shortcuts import render
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -72,26 +70,6 @@ class MyLogoutView(CreateView):
     def get(self, request, *args, **kwargs):
         logout(request)
         return JsonResponse({"status": "success"}, status=200)
-    
-class MyUserView(LoginRequiredMixin, TemplateView):
-    """View for displaying user-related data"""
-    template_name: str = 'user.html'
-
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        """Adds user context to the view"""
-        context: Dict[str, Any] = super().get_context_data(**kwargs)
-        context['user'] = self.request.user
-        return context
-
-class MyOtherView(LoginRequiredMixin, TemplateView):
-    """View for displaying data related to other users"""
-    template_name: str = 'other.html'
-
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        """Adds other users' context to the view"""
-        context: Dict[str, Any] = super().get_context_data(**kwargs)
-        context['users'] = CustomUser.objects.exclude(username=self.request.user.username)
-        return context
 
 #@method_decorator(csrf_exempt, name='dispatch')
 class SaveGameView(CreateView):
@@ -364,10 +342,6 @@ class GetOpenAICommentView(CreateView):
         data = json.loads(request.body)
         game_data = data.get('game_data')
 
-        print("===game_data===")
-        print(game_data)
-        print("================")
-
         # OpenAI APIを呼び出し、コメントを取得
         try:
             client = OpenAI(
@@ -382,13 +356,9 @@ class GetOpenAICommentView(CreateView):
                 ]
             )
 
-            print("=== OpenAI Comment ===")
-            print(completion.choices[0].message)
-            print("======================")
-
             return JsonResponse({'comment': completion.choices[0].message.content})
         except RateLimitError as e:
             return JsonResponse({'error': 'OpenAI Comment is currently unavailable.'}, status=500)
         except:
-            raise
+            return JsonResponse({'error': 'OpenAI Comment is currently unavailable.'}, status=500)
 
