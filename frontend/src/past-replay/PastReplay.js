@@ -83,9 +83,8 @@ function PastReplay() {
     
         const ailevelElement = document.getElementById('info-ai-level');
         ailevelElement.textContent = 'Level ' + game.ai_level;
-
         const durationElement = document.getElementById('info-duration');
-        durationElement.textContent = `${game.total_user_duration / 1000} seconds`;
+        durationElement.textContent = `${game.total_user_duration / 1000} ` + (language==="en" ? "seconds" : "秒"); 
     })
     .catch(error => {
         console.error('Error:', error);
