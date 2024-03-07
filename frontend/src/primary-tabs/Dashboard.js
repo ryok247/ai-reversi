@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import TodayResults from './TodayResults';
 import MonthResults from './MonthResults';
 import TotalResults from './TotalResults';
+import store from '../store';
 
 export async function loadDashboardData() {
   try {
@@ -27,6 +28,9 @@ function updateDashboardTable(data) {
 }
 
 export function updateTable(tableBody, results) {
+
+  const language = store.getState().language.language;
+
   tableBody.innerHTML = ''; // Clear table body
 
   // Make sure there is a result for each AI level
@@ -40,9 +44,9 @@ export function updateTable(tableBody, results) {
   results.sort((a, b) => a.ai_level - b.ai_level); 
 
   const levelToText = {
-      1: 'Very Easy',
-      2: 'Easy',
-      3: 'Medium',
+      1: language==="en" ? 'Very Easy' : 'とてもやさしい',
+      2: language==="en" ? 'Easy' : 'やさしい',
+      3: language==="en" ? 'Medium': '普通'
   };
 
   // Add results to table
@@ -61,8 +65,7 @@ function Dashboard() {
   const language = useSelector((state) => state.language.language);
 
   useEffect(() => {
-    const dashboardTab = document.getElementById('dashboard-tab');
-    dashboardTab.addEventListener('click', loadDashboardData);
+    loadDashboardData();
   }, []);
 
   return (
