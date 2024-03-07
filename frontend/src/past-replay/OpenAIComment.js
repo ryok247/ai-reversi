@@ -8,7 +8,7 @@ function OpenAIComment() {
     return (
         <div class="flex-container">
             <div className = "container-for-openai-comment">
-                <h4>{language==="en" ? "Comment powered by GPT3.5 Turbo" : "GPT3.5 Turboによるコメント"}</h4>
+                <h4>{language==="en" ? "Comment by GPT" : "AI(GPT)によるコメント"}</h4>
                 <div id="openai-comment"></div>
             </div>
         </div>

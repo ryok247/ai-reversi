@@ -4,6 +4,18 @@ import { isUserLoggedIn } from "../manage-game";
 
 function GameTable({ games, type }) {
   const language = useSelector((state) => state.language.language);
+
+  let labelTable = "";
+  if (language==="en"){
+    if (type === "favorite") labelTable = "Favorite Games";
+    else if (isUserLoggedIn()) labelTable = "Recent Games";
+    else labelTable = "Recent 10 Games";
+  } else if (language==="ja"){
+    if (type === "favorite") labelTable = "お気に入りの対局";
+    else if (isUserLoggedIn()) labelTable = "最近の対局";
+    else labelTable = "最近の10局";
+  } else console.assert(false, "Invalid language: " + language);
+
   return (
     <div className="container">
       <div className="row">
@@ -12,7 +24,7 @@ function GameTable({ games, type }) {
             <div>
               <h3 className="toggle-section" data-target={`${type}-games-content`}>
                 <button className="toggle-button btn-sm mx-1 btn-primary">+</button>
-                {type.charAt(0).toUpperCase() + type.slice(1) + (isUserLoggedIn() ? "" : " 10") +  " Games"}
+                {labelTable}
               </h3>
               <div id={`${type}-games-content`} style={{ display: "none" }}>
                 <div className="attention">

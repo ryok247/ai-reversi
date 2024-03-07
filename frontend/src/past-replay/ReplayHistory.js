@@ -26,7 +26,7 @@ function ReplayHistory() {
         </table>
       </div>
       <div className="attention">
-        <h6>{language==="en" ? "Click each row!" : "行をクリックしてみましょう！"}</h6>
+      <h6>{language==="en" ? "Click on a row to see the board state at that point in the game." : "行をクリックするとその時点の盤面を再現できます"}</h6>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLanguage } from '../actions/languageActions';
 import LoginModal from '../auth/LoginModal.js';
 import SignupModal from '../auth/SignupModal.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 
 function NavigationBar() {
   const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
@@ -12,6 +14,7 @@ function NavigationBar() {
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const openSignupModal = () => setIsSignupModalOpen(true);
@@ -20,6 +23,11 @@ function NavigationBar() {
 
   const handleLanguageChange = (selectedLanguage) => {
     dispatch(setLanguage(selectedLanguage));
+    setIsLanguageDropdownOpen(false);
+  };
+
+  const toggleLanguageDropdown = () => {
+    setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
   };
 
   return (
@@ -41,16 +49,25 @@ function NavigationBar() {
                     {language === 'en' ? 'Login' : 'ログイン'}
                   </button>
                   <button className="nav-item nav-link" onClick={openSignupModal}>
-                    {language === 'en' ? 'Signup' : '登録'}
+                    {language === 'en' ? 'Signup' : '新規登録'}
                   </button>
                 </>
               )}
-              <button
-                className="nav-item nav-link"
-                onClick={() => handleLanguageChange(language === 'en' ? 'ja' : 'en')}
-              >
-                {language === 'en' ? '日本語' : 'English'}
-              </button>
+              <div className="nav-item dropdown">
+                <button className="nav-link dropdown-toggle" onClick={toggleLanguageDropdown}>
+                  <FontAwesomeIcon icon={faGlobe} /> {language === 'en' ? 'Language' : '言語'}
+                </button>
+                {isLanguageDropdownOpen && (
+                  <div className="dropdown-menu show">
+                    <button className="dropdown-item" onClick={() => handleLanguageChange('en')}>
+                      <span className="flag-icon">🇬🇧</span> English
+                    </button>
+                    <button className="dropdown-item" onClick={() => handleLanguageChange('ja')}>
+                      <span className="flag-icon">🇯🇵</span> 日本語
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
