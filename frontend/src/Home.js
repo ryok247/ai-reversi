@@ -14,10 +14,13 @@ import {
     updateGameRecordsWithUser,
     enableEditing
  } from './manage-game.js';
+import { loadModel } from './tensorflow/tensorflow.js';
 
 function Home() {
 
     useEffect(() => {
+
+      loadModel();
 
         // CSRFトークンを取得してステートに保存する処理
         fetch('/api/csrf/', {
