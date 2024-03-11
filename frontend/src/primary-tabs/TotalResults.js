@@ -7,7 +7,7 @@ function TotalResults() {
 
   return (
     <div className="dashboard-element">
-      <h3>{language==="en" ? "Total" : "今日"}</h3>
+      <h3>{language==="en" ? "Total" : "全期間"}</h3>
       <table id="ai-results-table-total" className="dashboard-table">
         <thead>
           <tr>

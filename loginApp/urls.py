@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from loginProject import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.static import serve
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -26,6 +27,7 @@ urlpatterns = [
     path('api/csrf/', views.CSRFTokenView.as_view(), name='csrf'),
     path('api/check-auth-status/', views.CheckAuthStatusView.as_view(), name='check_auth_status'),
     path('api/get-openai-comment/', views.GetOpenAICommentView.as_view(), name='get_openai_comment'),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # 開発環境での静的ファイルのサーブ
