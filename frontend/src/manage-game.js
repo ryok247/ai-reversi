@@ -1,17 +1,18 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent} from './agents.js'
+import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent, neuralNetAgent} from './agents.js'
 import { getCookie, setCookie, getCsrfToken, makeAsync } from './utilities.js'
 import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
 import { gameLogic } from './game-logic.js';
 import { ReplayAnimator } from './animation.js';
+import { loadModel } from './tensorflow/tensorflow.js';
 
 import store from './store.js';
 
 
 // Function to initialize the game
-export function initializeGame(historyElement){
+export async function initializeGame(historyElement){
     const boardElement = document.querySelector(".board");
     const turnElement = document.getElementById("turn");
 
@@ -21,10 +22,22 @@ export function initializeGame(historyElement){
     sharedState.settings = new gameSettings("mode", "color", "level", "highlight");
     sharedState.logic = new gameLogic();
     sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
-    sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
+    //sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
+    sharedState.board = await createAndInitializeBoard(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
 
     sharedState.board.updateScores();
     sharedState.board.displayTurn();
+}
+
+async function initializeAgent(settings) {
+    if (settings.level == 1) return new randomAgent();
+    else if (settings.level == 2) return new simpleGreedyAgent();
+    else if (settings.level == 3) return new nTurnMinimaxLastExausiveAgent(6,10);
+    else if (settings.level == 4){
+        const model = await loadModel();
+        return new neuralNetAgent(model, true);
+    }
+    else console.assert(false);
 }
 
 export class boardInfo{
@@ -37,18 +50,19 @@ export class boardInfo{
 
         this.historyElement = historyElement;
 
-        let tableBodyAll = document.querySelectorAll(".history-table tbody");
+        this.isGameEnd = false;
+    }
 
+    async initialize() {
+
+        let tableBodyAll = document.querySelectorAll(".history-table tbody");
         tableBodyAll.forEach((tableBody) => {
             tableBody.innerHTML = "";
         });
 
-        this.isGameEnd = false;
-
-        if (this.settings.level == 1) this.agent = new randomAgent();
-        else if (this.settings.level == 2) this.agent = new simpleGreedyAgent();
-        else if (this.settings.level == 3) this.agent = new nTurnMinimaxLastExausiveAgent(6,10);
-        else console.assert(false);
+        // 非同期処理をここで実行
+        this.agent = await initializeAgent(this.settings);
+        this.asyncMove = makeAsync(this.agent.move);
 
         // Make the AI's move function asynchronous since it may take a long time
         this.asyncMove = makeAsync(this.agent.move);
@@ -83,6 +97,7 @@ export class boardInfo{
 
         if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
         else if (this.settings.mode == "manual") this.highlightPossibleCells();
+
     }
 
     // Place a stone
@@ -387,6 +402,13 @@ export class boardInfo{
 
         setCookie('game_history', JSON.stringify(gameHistory), 365);
     }
+}
+
+// インスタンス化と初期化のための非同期関数
+async function createAndInitializeBoard(logic, settings, boardElement, turnElement, historyElement) {
+    const board = new boardInfo(logic, settings, boardElement, turnElement, historyElement);
+    await board.initialize();
+    return board;
 }
 
 export function addToHistoryTable(animator, row, col, turnNumber, duration, historyTableClass) {

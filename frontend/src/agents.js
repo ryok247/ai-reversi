@@ -120,3 +120,63 @@ function le(a, b){
 function ge(a, b){
     return a >= b;
 }
+
+export class neuralNetAgent extends Agent{
+    constructor(model, debug=false){
+        super();
+        this.model = model;
+        this.debug = debug;
+    }
+
+    async move(logic){
+        let possibleCells = logic.getPossibleMoves();
+        if (possibleCells.length === 0) return [-1, -1];
+        this.aiPlayer = logic.currentPlayer;
+
+        const MyBoard = [];
+        const OpponentBoard = [];
+        for (let i = 0; i < 8; i++){
+            MyBoard.push([]);
+            OpponentBoard.push([]);
+            for (let j = 0; j < 8; j++){
+                if (logic.board[i][j] == this.aiPlayer) {
+                    MyBoard[i].push(1);
+                    OpponentBoard[i].push(0);
+                }
+                else if (logic.board[i][j] == (this.aiPlayer^1)) {
+                    OpponentBoard[i].push(1);
+                    MyBoard[i].push(0);
+                }
+                else {
+                    MyBoard[i].push(0);
+                    OpponentBoard[i].push(0);
+                }
+            }
+        }
+
+        let inputTensor = window.tf.tensor([[MyBoard, OpponentBoard]]);
+        inputTensor = inputTensor.transpose([0, 2, 3, 1]);
+        const predictObj = await this.model.predict(inputTensor);
+        const output = predictObj.arraySync();
+
+        let MAX = -Infinity;
+        let argmax = [-1,-1];
+        possibleCells.forEach(([row, col]) => {
+            if (output[0][row*8+col] > MAX){
+                MAX = output[0][row*8+col];
+                argmax = [row, col];
+            }
+        });
+
+        if (this.debug){
+            console.log("board:")
+            logic.debugPrint();
+            console.log("inputTensor: ", inputTensor.arraySync());
+            console.log("output: ", output);
+            console.log("argmax: ", argmax);
+        }
+
+        return argmax;
+    }
+
+}
