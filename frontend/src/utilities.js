@@ -59,3 +59,16 @@ export function makeAsync(syncFunction) {
         return syncFunction.apply(this, args);
     };
 }
+
+export function convertRowColToA1(row, col) {
+    if (row == -1 && col == -1) return "pass";
+    const a1 = String.fromCharCode('A'.charCodeAt(0) + col) + (row + 1);
+    return a1;
+}
+
+export function convertA1ToRowCol(a1) {
+    if (a1 == "pass") return [-1,-1];
+    const row = parseInt(a1[1]) - 1;
+    const col = a1.charCodeAt(0) - 'A'.charCodeAt(0);
+    return [row, col];
+}

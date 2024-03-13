@@ -333,6 +333,8 @@ class CSRFTokenView(CreateView):
 
 class SPAView(CreateView):
     def get(self, request, *args, **kwargs):
+        #from subprocess import run
+        #run("ls " + str(settings.FRONTEND_BUILD_PATH), shell=True)
         with open(str(settings.FRONTEND_BUILD_PATH / 'index.html'), 'r') as file:
             return HttpResponse(file.read())
 

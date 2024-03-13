@@ -34,7 +34,7 @@ export function updateTable(tableBody, results) {
   tableBody.innerHTML = ''; // Clear table body
 
   // Make sure there is a result for each AI level
-  for (let level = 1; level <= 3; level++) {
+  for (let level = 1; level <= 4; level++) {
       if (!results.some(result => result.ai_level === level)) {
           results.push({ai_level: level, wins: 0, losses: 0, draws: 0, fastest_win: null});
       }
@@ -46,7 +46,8 @@ export function updateTable(tableBody, results) {
   const levelToText = {
       1: language==="en" ? 'Very Easy' : 'とてもやさしい',
       2: language==="en" ? 'Easy' : 'やさしい',
-      3: language==="en" ? 'Medium': '普通'
+      3: language==="en" ? 'Medium': '普通',
+      4: language==="en" ? 'Hard' : '難しい'
   };
 
   // Add results to table

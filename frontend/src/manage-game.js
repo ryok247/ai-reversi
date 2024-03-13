@@ -1,17 +1,18 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent} from './agents.js'
-import { getCookie, setCookie, getCsrfToken, makeAsync } from './utilities.js'
+import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent, neuralNetAgent, mockAgent} from './agents.js'
+import { getCookie, setCookie, getCsrfToken, makeAsync, convertRowColToA1, convertA1ToRowCol } from './utilities.js'
 import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
 import { gameLogic } from './game-logic.js';
 import { ReplayAnimator } from './animation.js';
+import { loadModel } from './tensorflow/tensorflow.js';
 
 import store from './store.js';
 
 
 // Function to initialize the game
-export function initializeGame(historyElement){
+export async function initializeGame(historyElement){
     const boardElement = document.querySelector(".board");
     const turnElement = document.getElementById("turn");
 
@@ -21,10 +22,27 @@ export function initializeGame(historyElement){
     sharedState.settings = new gameSettings("mode", "color", "level", "highlight");
     sharedState.logic = new gameLogic();
     sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
-    sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
+    //sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
+    sharedState.board = await createAndInitializeBoard(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
 
     sharedState.board.updateScores();
     sharedState.board.displayTurn();
+}
+
+async function initializeAgent(settings) {
+
+    if (sharedState.debug) return new mockAgent(sharedState.debugMoves);
+    else {
+        if (settings.level == 1) return new randomAgent();
+        else if (settings.level == 2) return new simpleGreedyAgent();
+        else if (settings.level == 3) return new nTurnMinimaxLastExausiveAgent(6,10);
+        else if (settings.level == 4){
+            const model = await loadModel();
+            return new neuralNetAgent(model, true);
+        }
+    }
+
+    console.assert(false);
 }
 
 export class boardInfo{
@@ -37,18 +55,18 @@ export class boardInfo{
 
         this.historyElement = historyElement;
 
-        let tableBodyAll = document.querySelectorAll(".history-table tbody");
+        this.isGameEnd = false;
+    }
 
+    async initialize(aiFirst) {
+
+        let tableBodyAll = document.querySelectorAll(".history-table tbody");
         tableBodyAll.forEach((tableBody) => {
             tableBody.innerHTML = "";
         });
 
-        this.isGameEnd = false;
-
-        if (this.settings.level == 1) this.agent = new randomAgent();
-        else if (this.settings.level == 2) this.agent = new simpleGreedyAgent();
-        else if (this.settings.level == 3) this.agent = new nTurnMinimaxLastExausiveAgent(6,10);
-        else console.assert(false);
+        // 非同期処理をここで実行
+        this.agent = await initializeAgent(this.settings);
 
         // Make the AI's move function asynchronous since it may take a long time
         this.asyncMove = makeAsync(this.agent.move);
@@ -81,8 +99,11 @@ export class boardInfo{
             }
         }
 
-        if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
-        else if (this.settings.mode == "manual") this.highlightPossibleCells();
+        if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") await this.makeComputerMove();
+
+        if (sharedState.debug) this.debugHighlight();
+        else this.highlightPossibleCells();
+
     }
 
     // Place a stone
@@ -155,7 +176,7 @@ export class boardInfo{
             addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
             this.timeHistory.push(-1);
 
-            let twoPass = this.logic.pass()
+            let twoPass = this.logic.pass();
 
             if (twoPass) {
                 this.endGame();
@@ -163,6 +184,7 @@ export class boardInfo{
             }
 
             this.displayTurn();
+
             return;
         }
     
@@ -171,7 +193,9 @@ export class boardInfo{
             this.timeHistory.push(moveDuration);
 
             this.placePiece(row, col);
-            this.removeHighlight();
+
+            if (sharedState.debug) this.removeDebugHighlight();
+            else this.removeHighlight();
     
             // update the number of stones
             this.updateScores();
@@ -202,7 +226,8 @@ export class boardInfo{
                     return;
                 }
     
-                this.highlightPossibleCells();
+                if (sharedState.debug) this.debugHighlight();
+                else this.highlightPossibleCells();
     
                 return;
             }
@@ -224,7 +249,7 @@ export class boardInfo{
 
                 let possibleCells = this.logic.getPossibleMoves();
 
-                if (possibleCells.length == 0){
+                while (possibleCells.length == 0){
     
                     addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
                     this.timeHistory.push(-1);
@@ -237,12 +262,24 @@ export class boardInfo{
                         this.endGame();
                         return;
                     }
+
+                    await this.makeComputerMove();
+                    
+                    // check if terminated
+                    if (this.logic.isFull()) {
+                        this.endGame();
+                        return;
+                    }
+
+                    possibleCells = this.logic.getPossibleMoves();
                 }
 
-                this.highlightPossibleCells();
+                if (sharedState.debug) this.debugHighlight()
+                else this.highlightPossibleCells();
     
             }
 
+            if (sharedState.debug) this.debugHighlight()
             else this.highlightPossibleCells();
 
             this.lastMoveTime = Date.now();
@@ -293,11 +330,23 @@ export class boardInfo{
         });
     }
 
+    debugHighlight(){
+        const currentTrunIndex = sharedState.logic.history.length - 1;
+        const [row, col] = convertA1ToRowCol(sharedState.debugMoves[currentTrunIndex]);
+        this.cells[row * 8 + col].classList.add("debug");
+    }
+
     // Remove the highlight
     removeHighlight(){
 
         this.cells.forEach((cell) => {
             cell.classList.remove("possible");
+        });
+    }
+
+    removeDebugHighlight(){
+        this.cells.forEach((cell) => {
+            cell.classList.remove("debug");
         });
     }
 
@@ -389,20 +438,16 @@ export class boardInfo{
     }
 }
 
+// インスタンス化と初期化のための非同期関数
+async function createAndInitializeBoard(logic, settings, boardElement, turnElement, historyElement) {
+    const board = new boardInfo(logic, settings, boardElement, turnElement, historyElement);
+    await board.initialize();
+    return board;
+}
+
 export function addToHistoryTable(animator, row, col, turnNumber, duration, historyTableClass) {
 
     const language = store.getState().language.language;
-    
-    const toReversiCol = {
-        0: "A",
-        1: "B",
-        2: "C",
-        3: "D",
-        4: "E",
-        5: "F",
-        6: "G",
-        7: "H"
-    }
 
     const tableBodyAll = document.querySelectorAll(`.${historyTableClass} tbody`);
 
@@ -425,7 +470,7 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
 
         cell1.textContent = turnNumber;
         cell2.textContent = animator.gameLogic.currentPlayer == 0 ? black : white;
-        cell3.textContent = (row == -1 && col == -1) ? pass : ` ${toReversiCol[col]}${row + 1} `;
+        cell3.textContent = (row == -1 && col == -1) ? pass : convertRowColToA1(row, col);
         cell4.textContent = duration != -1 ? (duration / 1000).toFixed(3) : "-";
 
         if (tableBody.id == "replay-table-body") {
