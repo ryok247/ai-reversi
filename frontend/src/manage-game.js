@@ -1,7 +1,7 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent, neuralNetAgent} from './agents.js'
-import { getCookie, setCookie, getCsrfToken, makeAsync } from './utilities.js'
+import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent, neuralNetAgent, mockAgent} from './agents.js'
+import { getCookie, setCookie, getCsrfToken, makeAsync, convertRowColToA1, convertA1ToRowCol } from './utilities.js'
 import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
 import { gameLogic } from './game-logic.js';
@@ -9,6 +9,7 @@ import { ReplayAnimator } from './animation.js';
 import { loadModel } from './tensorflow/tensorflow.js';
 
 import store from './store.js';
+import { current } from '@reduxjs/toolkit';
 
 
 // Function to initialize the game
@@ -30,14 +31,19 @@ export async function initializeGame(historyElement){
 }
 
 async function initializeAgent(settings) {
-    if (settings.level == 1) return new randomAgent();
-    else if (settings.level == 2) return new simpleGreedyAgent();
-    else if (settings.level == 3) return new nTurnMinimaxLastExausiveAgent(6,10);
-    else if (settings.level == 4){
-        const model = await loadModel();
-        return new neuralNetAgent(model, true);
+
+    if (sharedState.debug) return new mockAgent(sharedState.aiMoves);
+    else {
+        if (settings.level == 1) return new randomAgent();
+        else if (settings.level == 2) return new simpleGreedyAgent();
+        else if (settings.level == 3) return new nTurnMinimaxLastExausiveAgent(6,10);
+        else if (settings.level == 4){
+            const model = await loadModel();
+            return new neuralNetAgent(model, true);
+        }
     }
-    else console.assert(false);
+
+    console.assert(false);
 }
 
 export class boardInfo{
@@ -95,8 +101,14 @@ export class boardInfo{
             }
         }
 
-        if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
-        else if (this.settings.mode == "manual") this.highlightPossibleCells();
+        if (sharedState.debug){
+            if (this.settings.mode == "cp" && this.settings.color == "black") this.debugHighlight();
+            else if (this.settings.mode == "manual") this.debugHighlight();
+        }
+        else {
+            if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
+            else if (this.settings.mode == "manual") this.highlightPossibleCells();
+        }
 
     }
 
@@ -186,7 +198,9 @@ export class boardInfo{
             this.timeHistory.push(moveDuration);
 
             this.placePiece(row, col);
-            this.removeHighlight();
+
+            if (sharedState.debug) this.removeDebugHighlight();
+            else this.removeHighlight();
     
             // update the number of stones
             this.updateScores();
@@ -217,7 +231,8 @@ export class boardInfo{
                     return;
                 }
     
-                this.highlightPossibleCells();
+                if (sharedState.debug) this.debugHighlight();
+                else this.highlightPossibleCells();
     
                 return;
             }
@@ -254,10 +269,12 @@ export class boardInfo{
                     }
                 }
 
-                this.highlightPossibleCells();
+                if (sharedState.debug) this.debugHighlight()
+                else this.highlightPossibleCells();
     
             }
 
+            if (sharedState.debug) this.debugHighlight()
             else this.highlightPossibleCells();
 
             this.lastMoveTime = Date.now();
@@ -308,11 +325,23 @@ export class boardInfo{
         });
     }
 
+    debugHighlight(){
+        const currentTrunIndex = sharedState.logic.history.length - 1;
+        const [row, col] = convertA1ToRowCol(sharedState.aiMoves[currentTrunIndex]);
+        this.cells[row * 8 + col].classList.add("debug");
+    }
+
     // Remove the highlight
     removeHighlight(){
 
         this.cells.forEach((cell) => {
             cell.classList.remove("possible");
+        });
+    }
+
+    removeDebugHighlight(){
+        this.cells.forEach((cell) => {
+            cell.classList.remove("debug");
         });
     }
 
@@ -414,17 +443,6 @@ async function createAndInitializeBoard(logic, settings, boardElement, turnEleme
 export function addToHistoryTable(animator, row, col, turnNumber, duration, historyTableClass) {
 
     const language = store.getState().language.language;
-    
-    const toReversiCol = {
-        0: "A",
-        1: "B",
-        2: "C",
-        3: "D",
-        4: "E",
-        5: "F",
-        6: "G",
-        7: "H"
-    }
 
     const tableBodyAll = document.querySelectorAll(`.${historyTableClass} tbody`);
 
@@ -447,7 +465,7 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
 
         cell1.textContent = turnNumber;
         cell2.textContent = animator.gameLogic.currentPlayer == 0 ? black : white;
-        cell3.textContent = (row == -1 && col == -1) ? pass : ` ${toReversiCol[col]}${row + 1} `;
+        cell3.textContent = (row == -1 && col == -1) ? pass : convertRowColToA1(row, col);
         cell4.textContent = duration != -1 ? (duration / 1000).toFixed(3) : "-";
 
         if (tableBody.id == "replay-table-body") {

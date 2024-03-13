@@ -1,11 +1,26 @@
 "use strict";
 
-import { getRandomInt, NotImplementedError, } from './utilities.js';
+import { convertA1ToRowCol, getRandomInt, NotImplementedError, } from './utilities.js';
 
 export class Agent{
     move(logic){
         // should be implemented explicitly in each sub-class.
         throw new NotImplementedError("Agent class is an abstract class.");
+    }
+}
+
+// mock agent that returns the same moves in the given hard-coded list.
+export class mockAgent extends Agent{
+    constructor(moves){
+        // `moves` include both the opponent's move and the agent's move
+        super();
+        this.moves = moves;
+    }
+
+    move(logic){
+        const currentTurnIndex = logic.history.length-1;
+        const moveString = this.moves[currentTurnIndex];
+        return convertA1ToRowCol(moveString);
     }
 }
 

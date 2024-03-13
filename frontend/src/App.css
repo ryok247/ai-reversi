@@ -84,6 +84,10 @@ body {
   background-color: #00ff00;
 }
 
+.debug {
+  background-color: yellow;
+}
+
 /* Styling for the progress bar */
 .progress-bar {
   width: 100%;
