@@ -9,7 +9,6 @@ import { ReplayAnimator } from './animation.js';
 import { loadModel } from './tensorflow/tensorflow.js';
 
 import store from './store.js';
-import { current } from '@reduxjs/toolkit';
 
 
 // Function to initialize the game
@@ -59,7 +58,7 @@ export class boardInfo{
         this.isGameEnd = false;
     }
 
-    async initialize() {
+    async initialize(aiFirst) {
 
         let tableBodyAll = document.querySelectorAll(".history-table tbody");
         tableBodyAll.forEach((tableBody) => {
@@ -68,7 +67,6 @@ export class boardInfo{
 
         // 非同期処理をここで実行
         this.agent = await initializeAgent(this.settings);
-        this.asyncMove = makeAsync(this.agent.move);
 
         // Make the AI's move function asynchronous since it may take a long time
         this.asyncMove = makeAsync(this.agent.move);
@@ -101,14 +99,10 @@ export class boardInfo{
             }
         }
 
-        if (sharedState.debug){
-            if (this.settings.mode == "cp" && this.settings.color == "black") this.debugHighlight();
-            else if (this.settings.mode == "manual") this.debugHighlight();
-        }
-        else {
-            if (this.settings.mode == "cp" && this.settings.color == "black") this.highlightPossibleCells();
-            else if (this.settings.mode == "manual") this.highlightPossibleCells();
-        }
+        if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") await this.makeComputerMove();
+
+        if (sharedState.debug) this.debugHighlight();
+        else this.highlightPossibleCells();
 
     }
 

@@ -14,13 +14,10 @@ import {
     updateGameRecordsWithUser,
     enableEditing
  } from './manage-game.js';
-import { loadModel } from './tensorflow/tensorflow.js';
 
 function Home() {
 
     useEffect(() => {
-
-      loadModel();
 
         // CSRFトークンを取得してステートに保存する処理
         fetch('/api/csrf/', {
@@ -34,15 +31,15 @@ function Home() {
         const confirmedBtnElement = document.getElementById("confirmed-btn");
         const historyElement = document.getElementById("history");
     
-    
         // Initialize game on page load
         confirmedBtnElement.addEventListener("click", async () => {
-            initializeGame(historyElement);
             // Check game mode and make a computer move if necessary
-            if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") await sharedState.board.makeComputerMove();
+            initializeGame(historyElement); 
+
             // Highlight possible cells
             sharedState.board.highlightPossibleCells();
         });
+
         initializeGame(historyElement);
         
         document.getElementById('highlight').addEventListener('change', () => {

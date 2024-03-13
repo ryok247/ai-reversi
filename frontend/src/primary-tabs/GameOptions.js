@@ -11,7 +11,7 @@ import TurnAndScore from './TurnAndScore';
 function GameOptions() {
   return (
     <div id="Game" className="tab-content active">
-      <div className="container main-contents">
+      <div className="container">
         <div className="row">
           <div className="col-md-3 col-12">
             <div className="container container-for-options">
