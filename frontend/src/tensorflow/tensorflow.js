@@ -1,6 +1,7 @@
 export function loadModel() {
   try {
-    const model = window.tf.loadLayersModel('/static/tfjs_model/model.json');
+    const modelPath = window.location.origin + '/static/tfjs_model/model.json';
+    const model = window.tf.loadLayersModel(modelPath);
     
     /*
     const inputData = window.tf.tensor([[
