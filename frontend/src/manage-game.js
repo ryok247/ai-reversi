@@ -32,7 +32,7 @@ export async function initializeGame(historyElement){
 
 async function initializeAgent(settings) {
 
-    if (sharedState.debug) return new mockAgent(sharedState.aiMoves);
+    if (sharedState.debug) return new mockAgent(sharedState.debugMoves);
     else {
         if (settings.level == 1) return new randomAgent();
         else if (settings.level == 2) return new simpleGreedyAgent();
@@ -182,7 +182,7 @@ export class boardInfo{
             addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
             this.timeHistory.push(-1);
 
-            let twoPass = this.logic.pass()
+            let twoPass = this.logic.pass();
 
             if (twoPass) {
                 this.endGame();
@@ -190,6 +190,7 @@ export class boardInfo{
             }
 
             this.displayTurn();
+
             return;
         }
     
@@ -254,7 +255,7 @@ export class boardInfo{
 
                 let possibleCells = this.logic.getPossibleMoves();
 
-                if (possibleCells.length == 0){
+                while (possibleCells.length == 0){
     
                     addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
                     this.timeHistory.push(-1);
@@ -267,6 +268,16 @@ export class boardInfo{
                         this.endGame();
                         return;
                     }
+
+                    await this.makeComputerMove();
+                    
+                    // check if terminated
+                    if (this.logic.isFull()) {
+                        this.endGame();
+                        return;
+                    }
+
+                    possibleCells = this.logic.getPossibleMoves();
                 }
 
                 if (sharedState.debug) this.debugHighlight()
@@ -327,7 +338,7 @@ export class boardInfo{
 
     debugHighlight(){
         const currentTrunIndex = sharedState.logic.history.length - 1;
-        const [row, col] = convertA1ToRowCol(sharedState.aiMoves[currentTrunIndex]);
+        const [row, col] = convertA1ToRowCol(sharedState.debugMoves[currentTrunIndex]);
         this.cells[row * 8 + col].classList.add("debug");
     }
 
