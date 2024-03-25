@@ -9,7 +9,7 @@ function HighlightOption() {
   const changeHandler = () => {
     sharedState.settings.updateSettings("highlight");
 
-    if (sharedState.settings.highlight == "checked") sharedState.board.highlightPossibleCells();
+    if (sharedState.settings.highlight === "checked") sharedState.board.highlightPossibleCells();
     else sharedState.board.removeHighlight();
 
   }

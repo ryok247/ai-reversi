@@ -43,7 +43,7 @@ export class gameLogic {
         let flip = [];
         for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) continue;
+                if (dx === 0 && dy === 0) continue;
                 if (!this.isValidDirection(x, y, dx, dy)) continue;
                 flip = [...flip, ...this.flipDirection(x, y, dx, dy, actualMove)];
             }
@@ -63,7 +63,7 @@ export class gameLogic {
 
     // Handles a pass move when no valid moves are available.
     pass() {
-        console.assert(this.getPossibleMoves().length == 0);
+        console.assert(this.getPossibleMoves().length === 0);
         
         // Updates history and board history for the pass.
         this.history.push([-1, -1]);
@@ -73,7 +73,7 @@ export class gameLogic {
         this.currentPlayer ^= 1;
 
         // Two consecutive passes mean game over.
-        if (this.history[this.history.length - 2][0] == -1) {
+        if (this.history[this.history.length - 2][0] === -1) {
             return true;
         }
 
@@ -86,7 +86,7 @@ export class gameLogic {
         let ny = y + dy;
         let flip = [];
         if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8) return flip;
-        if (this.board[nx][ny] != (this.currentPlayer ^ 1)) return flip;
+        if (this.board[nx][ny] !== (this.currentPlayer ^ 1)) return flip;
         flip.push([nx, ny]);
         while (true) {
             nx += dx;
@@ -95,12 +95,12 @@ export class gameLogic {
                 flip.pop();
                 return flip;
             };
-            if (this.board[nx][ny] == -1) {
+            if (this.board[nx][ny] === -1) {
                 flip.pop();
                 return flip;
             
             };
-            if (this.board[nx][ny] == this.currentPlayer) {
+            if (this.board[nx][ny] === this.currentPlayer) {
                 if (!actualFlip) return flip;
                 for (let i = 0; i < flip.length; i++) {
                     this.board[flip[i][0]][flip[i][1]] = this.currentPlayer;
@@ -127,10 +127,10 @@ export class gameLogic {
     // Checks if a move is valid for the current player.
     isValidMove(x, y) {
         if (x < 0 || x >= 8 || y < 0 || y >= 8) return false;
-        if (this.board[x][y] != -1) return false;
+        if (this.board[x][y] !== -1) return false;
         for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) continue;
+                if (dx === 0 && dy === 0) continue;
                 if (this.isValidDirection(x, y, dx, dy)) return true;
             }
         }
@@ -142,22 +142,22 @@ export class gameLogic {
         let nx = x + dx;
         let ny = y + dy;
         if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8) return false;
-        if (this.board[nx][ny] != (this.currentPlayer ^ 1)) return false;
+        if (this.board[nx][ny] !== (this.currentPlayer ^ 1)) return false;
         while (true) {
             nx += dx;
             ny += dy;
             if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8) return false;
-            if (this.board[nx][ny] == -1) return false;
-            if (this.board[nx][ny] == this.currentPlayer) return true;
+            if (this.board[nx][ny] === -1) return false;
+            if (this.board[nx][ny] === this.currentPlayer) return true;
         }
     }
 
     // Checks if the board is full.
-    isFull() { return this.score[0] + this.score[1] == 64; }
+    isFull() { return this.score[0] + this.score[1] === 64; }
 
     // Undoes moves up to a certain turn index.
     undo(turnIdx=-1) {
-        if (turnIdx == -1){
+        if (turnIdx === -1){
             this.history.pop();
             this.boardHistory.pop();
             this.currentPlayer ^= 1;
@@ -172,7 +172,7 @@ export class gameLogic {
         this.score = [0, 0];
         for (let x = 0; x < 8; x++) {
             for (let y = 0; y < 8; y++) {
-                if (this.board[x][y] == -1) continue;
+                if (this.board[x][y] === -1) continue;
                 this.score[this.board[x][y]]++;
             }
         }
@@ -199,7 +199,7 @@ export class gameLogic {
         let boardString = "\n";
         for (let x = 0; x < 8; x++) {
             for (let y = 0; y < 8; y++) {
-                boardString += (this.board[x][y] == -1 ? "-": this.board[x][y] == 0 ? "B" : "W") + " ";
+                boardString += (this.board[x][y] === -1 ? "-": this.board[x][y] === 0 ? "B" : "W") + " ";
             }
             boardString += "\n";
         }

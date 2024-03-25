@@ -63,13 +63,13 @@ function PastReplay() {
         const colorElement = document.getElementById('info-color');
         const black = language==="en" ? "Black" : "黒";
         const white = language==="en" ? "White" : "白";
-        colorElement.textContent = game.player_color == "black" ? black : white;
+        colorElement.textContent = game.player_color === "black" ? black : white;
     
         const resultElement = document.getElementById('info-result');
         const win = language==="en" ? "Win" : "勝ち";
         const lose = language==="en" ? "Lose" : "負け";
         const draw = language==="en" ? "Draw" : "引き分け";
-        if (game.player_color == "black"){
+        if (game.player_color === "black"){
             resultElement.textContent = game.black_score > game.white_score ? win : game.black_score < game.white_score ? lose : draw;
         } else {
             resultElement.textContent = game.black_score > game.white_score ? lose : game.black_score < game.white_score ? win : draw;
@@ -98,7 +98,7 @@ function PastReplay() {
             const moves = data.moves;
 
             for (let i=1; i<moves.length; i++){
-                if (moves[i].row == 9 && moves[i].col == 9){
+                if (moves[i].row === 9 && moves[i].col === 9){
                     addToHistoryTable(animator, -1, -1, logic.history.length, -1, "past-history-table");
                     logic.pass();
                 }

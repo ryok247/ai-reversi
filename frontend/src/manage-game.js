@@ -33,10 +33,10 @@ async function initializeAgent(settings) {
 
     if (sharedState.debug) return new mockAgent(sharedState.debugMoves);
     else {
-        if (settings.level == 1) return new randomAgent();
-        else if (settings.level == 2) return new simpleGreedyAgent();
-        else if (settings.level == 3) return new nTurnMinimaxLastExausiveAgent(6,10);
-        else if (settings.level == 4){
+        if (settings.level === "1") return new randomAgent();
+        else if (settings.level === "2") return new simpleGreedyAgent();
+        else if (settings.level === "3") return new nTurnMinimaxLastExausiveAgent(6,10);
+        else if (settings.level === "4"){
             const model = await loadModel();
             return new neuralNetAgent(model, true);
         }
@@ -86,9 +86,9 @@ export class boardInfo{
                 cell.dataset.col = col;
                 this.boardElement.appendChild(cell);
 
-                if (this.logic.board[row][col] != -1){
+                if (this.logic.board[row][col] !== -1){
                     const newPiece = document.createElement("div");
-                    newPiece.classList.add("piece", (this.logic.board[row][col] == 0 ? "black": "white"));
+                    newPiece.classList.add("piece", (this.logic.board[row][col] === 0 ? "black": "white"));
                     cell.appendChild(newPiece);
                 }
 
@@ -99,7 +99,7 @@ export class boardInfo{
             }
         }
 
-        if (sharedState.settings.mode == "cp" && sharedState.settings.color == "white") await this.makeComputerMove();
+        if (sharedState.settings.mode === "cp" && sharedState.settings.color === "white") await this.makeComputerMove();
 
         if (sharedState.debug) this.debugHighlight();
         else this.highlightPossibleCells();
@@ -110,7 +110,7 @@ export class boardInfo{
     placePiece(row, col) {
 
         const newPiece = document.createElement("div");
-        newPiece.classList.add("piece", (this.logic.currentPlayer == 0 ? "black": "white"));
+        newPiece.classList.add("piece", (this.logic.currentPlayer === 0 ? "black": "white"));
         this.cells[row * 8 + col].appendChild(newPiece);
 
         let flip = this.logic.placePiece(row, col);
@@ -121,7 +121,7 @@ export class boardInfo{
     }
 
     displayTurn(){
-        this.turnElement.textContent = (this.logic.currentPlayer == 0 ? "Black" : "White");
+        this.turnElement.textContent = (this.logic.currentPlayer === 0 ? "Black" : "White");
     }
 
     // displays a message if the game is terminated
@@ -165,13 +165,13 @@ export class boardInfo{
         const endTime = Date.now();
 
         let moveDuration = -1;
-        if (this.lastMoveTime != -1) moveDuration = endTime - this.lastMoveTime; // Compute the elapsed time
+        if (this.lastMoveTime !== -1) moveDuration = endTime - this.lastMoveTime; // Compute the elapsed time
 
         this.lastMoveTime = endTime;
 
         const possibleCells = this.logic.getPossibleMoves();
     
-        if (possibleCells.length == 0){
+        if (possibleCells.length === 0){
 
             addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
             this.timeHistory.push(-1);
@@ -211,7 +211,7 @@ export class boardInfo{
 
             let possibleCells = this.logic.getPossibleMoves();
 
-            if (possibleCells.length == 0){
+            if (possibleCells.length === 0){
 
                 addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
                 this.timeHistory.push(-1);
@@ -237,7 +237,7 @@ export class boardInfo{
             await new Promise(resolve => setTimeout(resolve, 0));
     
             // execute ai player's action
-            if (this.settings.mode == "cp") {
+            if (this.settings.mode === "cp") {
     
                 await this.makeComputerMove();
                 
@@ -249,7 +249,7 @@ export class boardInfo{
 
                 let possibleCells = this.logic.getPossibleMoves();
 
-                while (possibleCells.length == 0){
+                while (possibleCells.length === 0){
     
                     addToHistoryTable(sharedState.animator, -1, -1, this.logic.history.length, -1, "history-table");
                     this.timeHistory.push(-1);
@@ -296,13 +296,13 @@ export class boardInfo{
     // AI's move
     async makeComputerMove(){
 
-        this.lastMoveTime = this.lastMoveTime != -1 ? Date.now() : -1;
+        this.lastMoveTime = this.lastMoveTime !== -1 ? Date.now() : -1;
 
         //const aiMove = await this.agent.move(this.logic);
         const aiMove = await this.asyncMove.call(this.agent, this.logic);
 
         const endTime = Date.now();
-        const moveDuration = this.lastMoveTime != -1 ? endTime - this.lastMoveTime: -1; // Compute the elapsed time
+        const moveDuration = this.lastMoveTime !== -1 ? endTime - this.lastMoveTime: -1; // Compute the elapsed time
 
         this.lastMoveTime = Date.now();
 
@@ -321,7 +321,7 @@ export class boardInfo{
     // Highlight places where the current player can place a stone
     highlightPossibleCells(){
 
-        if (this.settings.highlight != "checked") return;
+        if (this.settings.highlight !== "checked") return;
 
         //const possibleCells = this.getPossibleCells();
         const possibleCells = this.logic.getPossibleMoves();
@@ -375,10 +375,10 @@ export class boardInfo{
 
         for (let i=0; i<this.logic.history.length; i++){
             let row = this.logic.history[i][0];
-            if (row == -1) row = 9;
+            if (row === -1) row = 9;
             let col = this.logic.history[i][1]
-            if (col == -1) col = 9;
-            let is_pass = (row == 9 && col == 9);
+            if (col === -1) col = 9;
+            let is_pass = (row === 9 && col === 9);
             let comment = "";
             moves.push({
                 move_number: i+1,
@@ -469,11 +469,11 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
         const pass = language==="en" ? " Pass" : " パス";
 
         cell1.textContent = turnNumber;
-        cell2.textContent = animator.gameLogic.currentPlayer == 0 ? black : white;
-        cell3.textContent = (row == -1 && col == -1) ? pass : convertRowColToA1(row, col);
-        cell4.textContent = duration != -1 ? (duration / 1000).toFixed(3) : "-";
+        cell2.textContent = animator.gameLogic.currentPlayer === 0 ? black : white;
+        cell3.textContent = (row === -1 && col === -1) ? pass : convertRowColToA1(row, col);
+        cell4.textContent = duration !== -1 ? (duration / 1000).toFixed(3) : "-";
 
-        if (tableBody.id == "replay-table-body") {
+        if (tableBody.id === "replay-table-body") {
             newRow.addEventListener("click", (event)=>{
                 animator.fromHistoryRowDisplayBoard(event);
             });
@@ -483,14 +483,14 @@ export function addToHistoryTable(animator, row, col, turnNumber, duration, hist
 
 // Function to load games (recent or favorite) and populate the table
 export function loadGames(type = "recent", page = 1) {
-    fetch(`/api/${type == "recent" ? "user" : "favorite"}_games/?page=${page}`, {
+    fetch(`/api/${type === "recent" ? "user" : "favorite"}_games/?page=${page}`, {
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCsrfToken()
         }}).then(response => response.json())
         .then(data => {
-            const gamesList = document.getElementById(`${type == "recent" ? "recent" : "favorite"}-game-table-body`);
+            const gamesList = document.getElementById(`${type === "recent" ? "recent" : "favorite"}-game-table-body`);
 
             // Check if user is logged in
             const loggedIn = isUserLoggedIn();
@@ -509,7 +509,7 @@ export function loadGames(type = "recent", page = 1) {
             });
 
             if (data.has_next) {
-                if (type == "recent") {
+                if (type === "recent") {
                     sharedState.nextPage = sharedState.currentPage + 1;
                 } else {
                     // Handle the next page for favorite games
@@ -616,7 +616,7 @@ export function createRowFromDatabase(game, loggedIn) {
             inputElement.value = nameColumn.textContent;
 
             const saveButton = document.createElement('button');
-            saveButton.textContent = language=="en" ? 'Save' : '保存';
+            saveButton.textContent = language==="en" ? 'Save' : '保存';
             saveButton.className = 'save-button btn-sm btn-primary';
 
             // enableEditing 関数の修正されたバージョンを呼び出す
@@ -639,7 +639,7 @@ export function createRowFromDatabase(game, loggedIn) {
     const colorColumn = document.createElement('td');
     const black = language==="en" ? 'Black' : '黒';
     const white = language==="en" ? 'White' : '白';
-    colorColumn.textContent = game.player_color == "black" ? black : white;
+    colorColumn.textContent = game.player_color === "black" ? black : white;
     row.appendChild(colorColumn);
 
     const resultColumn = document.createElement('td');
@@ -647,7 +647,7 @@ export function createRowFromDatabase(game, loggedIn) {
     const lose = language==="en" ? 'Lose' : '負け';
     const draw = language==="en" ? 'Draw' : '引き分け';
 
-    if (game.player_color == "black"){
+    if (game.player_color === "black"){
         resultColumn.textContent = game.black_score > game.white_score ? win : game.black_score < game.white_score ? lose : draw;
     } else {
         resultColumn.textContent = game.black_score > game.white_score ? lose : game.black_score < game.white_score ? win : draw;
