@@ -31,19 +31,103 @@ Visit the [AI Reversi Website](https://ai-reversi.com)
 |Log Management & Analysis|	ELB access logs stored in S3 bucket and analyzed with Amazon Athena|
 |External API            |	OpenAI API v1 (Chat Completion)                            |
 
-## Features
+## Features and Functions
 
-- Compete against AIs with different levels of difficulty:
-    - Very Easy: AI that selects moves randomly.
-    - Easy: AI that reads one move ahead and chooses the move that flips the most pieces.
-    - Medium: AI that reads up to 6 moves ahead (all moves for the last 10 moves) and selects the best move using [Minimax algorithm](https://en.wikipedia.org/wiki/Minimax).
-- Replay past games feature:
-    - Save and replay the last 10 games (unlimited for registered users).
-    - In the replay screen, you can automatically play, move to the next or previous move by buttons, and jump to any move by clicking on the move list.
-    - Registered users can create titles and notes for each game.
-    - Registered users can also favorite games.
-- User dashboard
-- Responsive design
+<table>
+    <tr>
+        <td>
+            <img src="images/level.png" alt="Various Levels" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>AI Strength</h3>
+            Very Easy: AI that chooses moves randomly.
+            <br>Easy: Reads only the next move and selects the move that flips the most stones.
+            <br>Medium: Reads up to 6 moves ahead (the last 10 moves are all read), selecting the optimal move using the <a href="https://en.wikipedia.org/wiki/Minimax">Minimax method</a>.
+        </td>
+        <td>
+            <img src="images/nn.gif" alt="Deep Learning" width="200" height="auto">
+        </td>
+        <td width="200">
+            Hard: Compete against a deep learning model (CNN) trained with tens of thousands of data points. This model uses the same SL Policy Network as described in the <a href="https://www.nature.com/articles/nature16961">AlphaGo paper</a>.
+        </td>
+    </tr>
+    <tr>
+       <td>
+            <img src="images/replay.gif" alt="Replay" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>Replay Feature</h3>
+            You can view replays of current matches. In addition to automatic replays, you can fast forward or rewind one move at a time.
+        </td>
+        <td>
+            <img src="images/replay2.gif" alt="Replay 2" width="200" height="auto">
+        </td>
+        <td width="200">
+            In the replay screen, you can also recreate any board position with a single click.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/highlight.gif" alt="Highlight Feature" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>Highlight Feature</h3>
+            You can change the color of squares where stones can be placed.
+        </td>
+        <td>
+            <img src="images/history.gif" alt="History Feature" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>History Feature</h3>
+            Displays a list of moves made so far and updates in real-time.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/dashboard.gif" alt="Dashboard" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>Dashboard (Members Only)</h3>
+            You can view user performance over different periods.
+        </td>
+        <td>
+            <img src="images/favorite.gif" alt="Favorites" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>Favorites Feature (Members Only)</h3>
+            You can favorite past matches and assign your own titles to them.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/gpt_comment_en.png" alt="GPT Comments" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>AI Advice Feature</h3>
+            AI (GPT) analyzes past matches and offers advice for improvement.
+        </td>
+        <td>
+            <img src="images/language.gif" alt="Multilingual Support" width="200" height="auto">
+        </td>
+        <td width="200">
+            Supports both English and Japanese languages.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/responsive.gif" alt="Responsive" width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>Responsive Design</h3>
+            You can play seamlessly from mobile devices.
+        </td>
+        <td width="200">
+        </td>
+        <td width="200">
+        </td>
+    </tr>
+</table>
+
 
 ## Architecture
 
@@ -150,17 +234,100 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
 
 ## 特徴と機能
 
-- さまざまな強さのAIとの対戦
-    - Very Easy: ランダムな手を選択するAI
-    - Easy: 次の1手のみを読み、最も多くの石をひっくり返すことができる手を選択するAI
-    - Medium: 6手先（最後の10手は全ての手）まで読み、[Minimax法](https://en.wikipedia.org/wiki/Minimax)によって最適な手を選択するAI
-- 過去のゲームのリプレイ機能
-    - 最新10件（会員登録すると無制限）のゲームを保存、対戦内容をリプレイで見ることができる
-    - リプレイ画面では自動再生のほか、次の手や一つ前の手を直感的にボタンを操作して見ることができるほか、手の一覧画面をクリックするとその手に飛ぶことが可能
-    - 会員登録した場合は各ゲームのタイトルやメモを作成することが可能
-    - 会員登録した場合はゲームのお気に入り登録も可能
-- ユーザーダッシュボード
-- レスポンシブデザイン
+<table>
+    <tr>
+        <td>
+            <img src="images/level.png" alt="さまざまなレベル"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>AIの強さ</h3>
+            Very Easy: ランダムな手を選択するAI
+            <br>Easy: 次の1手のみを読み、最も多くの石をひっくり返すことができる手を選択するAI
+            <br>Medium: 6手先（最後の10手は全ての手）まで読み、<a href="https://en.wikipedia.org/wiki/Minimax">Minimax法</a>によって最適な手を選択するAI
+        </td>
+        <td>
+            <img src="images/nn.gif" alt="ディープラーニング"  width="200" height="auto">
+        </td>
+        <td width="200">
+            Hard: 数万もの学習データを用いて訓練したディープラーニングモデル(CNN)と対戦することができます。このモデルは<a href="https://www.nature.com/articles/nature16961">Alpha Goの論文</a>で使われているSL Policy Networkと同じものです。
+        </td>
+    </tr>
+    <tr>
+       <td>
+            <img src="images/replay.gif" alt="リプレイ"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>リプレイ機能</h3>
+            現在の対局のリプレイを見ることができます。自動リプレイのほか、１手ずつ先送りしたり巻き戻したりできます。
+        </td>
+        <td>
+            <img src="images/replay2.gif" alt="リプレイ２"  width="200" height="auto">
+        </td>
+        <td width="200">
+            また、リプレイ画面では、任意の手番の盤面を１クリックで再現することができます。
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/highlight.gif" alt="ハイライト機能"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>ハイライト機能</h3>
+            石を置けるマスの色を変えることができます。
+        </td>
+        <td>
+            <img src="images/history.gif" alt="履歴機能"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>履歴機能</h3>
+            今まで打った手の一覧が表示され、随時更新されます。
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/dashboard.gif" alt="ダッシュボード"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>ダッシュボード（会員限定機能）</h3>
+            ユーザーの期間ごとの成績を見ることができます。
+        </td>
+        <td>
+            <img src="images/favorite.gif" alt="お気に入り"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>お気に入り機能（会員限定機能）</h3>
+            過去の対局をお気に入りに登録したり、自分の好きなタイトルをつけることができます。
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/gpt_comment_ja.png" alt="GPTコメント"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>AIアドバイス機能</h3>
+            過去の対局に対してAI(GPT)が分析をしたり、改善点をアドバイスしたりしてくれます。
+        </td>
+        <td>
+            <img src="images/language.gif" alt="他言語対応"  width="200" height="auto">
+        </td>
+        <td width="200">
+            英語と日本語の２言語に対応しています。
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <img src="images/responsive.gif" alt="レスポンシブ"  width="200" height="auto">
+        </td>
+        <td width="200">
+            <h3>レスポンシブデザイン</h3>
+            モバイルからもストレスなくプレイできます。
+        </td>
+        <td width="200">
+        </td>
+        <td width="200">
+        </td>
+    </tr>
+</table>
 
 ## アーキテクチャ
 
