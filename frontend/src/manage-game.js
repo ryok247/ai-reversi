@@ -19,7 +19,7 @@ export async function initializeGame(historyElement){
     const progressElement = document.getElementById('progress');
     const animatedBoardElement = document.querySelector(".board.animated");
 
-    sharedState.settings = new gameSettings("mode", "color", "level", "highlight");
+    sharedState.settings = new gameSettings("mode", "color", "level", "highlight", "aiscore");
     sharedState.logic = new gameLogic();
     sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
     //sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
@@ -47,8 +47,6 @@ async function initializeAgent(settings) {
     }
 
     return [agent, model];
-
-    console.assert(false);
 }
 
 export class boardInfo{
@@ -73,8 +71,6 @@ export class boardInfo{
 
         // 非同期処理をここで実行
         [this.agent, this.model] = await initializeAgent(this.settings);
-
-        console.log(this.model);
 
         // Make the AI's move function asynchronous since it may take a long time
         this.asyncMove = makeAsync(this.agent.move);
@@ -375,7 +371,7 @@ export class boardInfo{
 
     highlightAIScore(){
 
-        //if (this.settings.aiscore !== "checked") return;
+        if (this.settings.aiscore !== "checked") return;
 
         const player = (this.settings.color === "black" ? 0 : 1);
 
