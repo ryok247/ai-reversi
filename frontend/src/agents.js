@@ -1,6 +1,7 @@
 "use strict";
 
 import { convertA1ToRowCol, getRandomInt, NotImplementedError, } from './utilities.js';
+import { constructInputTensor } from './tensorflow/tensorflow.js';
 
 export class Agent{
     move(logic){
@@ -148,6 +149,7 @@ export class neuralNetAgent extends Agent{
         if (possibleCells.length === 0) return [-1, -1];
         this.aiPlayer = logic.currentPlayer;
 
+        /*
         const MyBoard = [];
         const OpponentBoard = [];
         for (let i = 0; i < 8; i++){
@@ -171,6 +173,10 @@ export class neuralNetAgent extends Agent{
 
         let inputTensor = window.tf.tensor([[MyBoard, OpponentBoard]]);
         inputTensor = inputTensor.transpose([0, 2, 3, 1]);
+        */
+
+        const inputTensor = constructInputTensor(logic, this.aiPlayer);
+
         const predictObj = await this.model.predict(inputTensor);
         const output = predictObj.arraySync();
 
