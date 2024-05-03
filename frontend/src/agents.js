@@ -58,6 +58,7 @@ export class simpleGreedyAgent extends Agent{
 
 // minimax agent that looks n turns ahead
 export class nTurnMinimaxAgent extends Agent{
+
     constructor(n){
         super();
         this.n = n;
@@ -69,48 +70,53 @@ export class nTurnMinimaxAgent extends Agent{
         this.aiPlayer = logic.currentPlayer;
         const result = {};
         this.maxDepth = 0;
-        this.calcNTurnScoreDFS(logic, 0, result);
-        const [optimal, [row, col]] = this.calcOptimalDFS(0, result);
+        const [optimal, [row, col]] = this.DFS(logic, 0, result);
 
         return [row, col];
     }
 
-    calcNTurnScoreDFS(logic, depth, result){
+    DFS(logic, depth, result){
+
+        let optimal, func;
+        let ans = [-1, -1];
+        if (depth%2 === this.aiPlayer) [optimal, func] = [-Infinity, ge];
+        else [optimal, func] = [Infinity, le];
+
         let possibleCells = logic.getPossibleMoves();
         possibleCells.forEach(([row, col]) => {
             const flippedCells = logic.placePiece(row, col, true);
             const key = `${row},${col}`
             if (!([row, col] in result)) result[key] = {};
-            if (depth === this.n-1) {
-                result[key] = logic.getScore();
-                this.maxDepth = Math.max(this.maxDepth, depth);
-            }
+
+            let tmp, tmpans;
+
+            let terminated = false;
+            if (depth == this.n-1) { terminated = true; }
             else {
                 let possibleCellsTmp = logic.getPossibleMoves();
-                if (possibleCellsTmp.length === 0) {
-                    result[key] = logic.getScore();
-                    this.maxDepth = Math.max(this.maxDepth, depth);
-                }
-                else this.calcNTurnScoreDFS(logic, depth+1, result[key]);
+                if (possibleCellsTmp.length === 0) { terminated = true; }
             }
-            logic.undo();
-        });
-    }
 
-    calcOptimalDFS(depth, result){
-        let optimal, func;
-        let ans = [-1, -1];
-        if (depth%2 === this.aiPlayer) [optimal, func] = [-Infinity, ge];
-        else [optimal, func] = [Infinity, le];
-        Object.keys(result).forEach((key) => {
-            let tmp, tmpans;
-            if (depth === this.maxDepth) tmp = result[key][0] - result[key][1];
-            else [tmp, tmpans] = this.calcOptimalDFS(depth+1, result[key]);
+            if (terminated) {
+                const score = logic.getScore();
+                result[key] = score;
+
+                this.maxDepth = Math.max(this.maxDepth, depth);
+
+                tmp = score[0] - score[1];
+            }
+            else {
+                [tmp, tmpans] = this.DFS(logic, depth+1, result[key]);
+            }
+
+            logic.undo();
+
             if (func(tmp, optimal)){
                 optimal = tmp;
                 ans = key.split(',').map((x) => parseInt(x));
             }
         });
+
         return [optimal, ans];
     }
 }

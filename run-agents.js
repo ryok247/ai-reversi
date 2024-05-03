@@ -1,7 +1,13 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent, nTurnMinimaxAgent, nTurnMinimaxLastExausiveAgent } from "./loginApp/static/js/agents.js";
-import { gameLogic } from "./loginApp/static/js/game-logic.js";
+import { 
+    randomAgent, 
+    simpleGreedyAgent, 
+    nTurnMinimaxAgent, 
+    nTurnMinimaxLastExausiveAgent,
+    nTurnAlphaBetaAgent
+} from "./frontend/src/agents.js";
+import { gameLogic } from "./frontend/src/game-logic.js";
 
 class Game {
     constructor(ai1, ai2, args1, args2) {
@@ -57,7 +63,12 @@ game.playGames(1000);
 game.printResults();
 */
 
+/*
 const game = new Game(nTurnMinimaxLastExausiveAgent, randomAgent, [3, 10], []);
 //const game = new Game(randomAgent, nTurnMinimaxAgent, [], [3]);
 game.playGames(1000);
 game.printResults();
+*/
+
+const game = new Game(nTurnAlphaBetaAgent, randomAgent, [3], []);
+game.playGames(1);
