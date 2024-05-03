@@ -68,14 +68,12 @@ export class nTurnMinimaxAgent extends Agent{
         let possibleCells = logic.getPossibleMoves();
         if (possibleCells.length === 0) return [-1, -1];
         this.aiPlayer = logic.currentPlayer;
-        const result = {};
-        this.maxDepth = 0;
-        const [optimal, [row, col]] = this.DFS(logic, 0, result);
+        const [optimal, [row, col]] = this.DFS(logic, 0);
 
         return [row, col];
     }
 
-    DFS(logic, depth, result){
+    DFS(logic, depth){
 
         let optimal, func;
         let ans = [-1, -1];
@@ -85,8 +83,6 @@ export class nTurnMinimaxAgent extends Agent{
         let possibleCells = logic.getPossibleMoves();
         possibleCells.forEach(([row, col]) => {
             const flippedCells = logic.placePiece(row, col, true);
-            const key = `${row},${col}`
-            if (!([row, col] in result)) result[key] = {};
 
             let tmp, tmpans;
 
@@ -94,26 +90,22 @@ export class nTurnMinimaxAgent extends Agent{
             if (depth == this.n-1) { terminated = true; }
             else {
                 let possibleCellsTmp = logic.getPossibleMoves();
-                if (possibleCellsTmp.length === 0) { terminated = true; }
+                if (possibleCellsTmp.length === 0) terminated = true;
             }
 
             if (terminated) {
                 const score = logic.getScore();
-                result[key] = score;
-
-                this.maxDepth = Math.max(this.maxDepth, depth);
-
                 tmp = score[0] - score[1];
             }
             else {
-                [tmp, tmpans] = this.DFS(logic, depth+1, result[key]);
+                [tmp, tmpans] = this.DFS(logic, depth+1);
             }
 
             logic.undo();
 
             if (func(tmp, optimal)){
                 optimal = tmp;
-                ans = key.split(',').map((x) => parseInt(x));
+                ans = [row, col];
             }
         });
 
