@@ -6,7 +6,7 @@ import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
 import { gameLogic } from './game-logic.js';
 import { ReplayAnimator } from './animation.js';
-import { loadModel } from './tensorflow/tensorflow.js';
+import { constructInputTensor, loadModel } from './tensorflow/tensorflow.js';
 
 import store from './store.js';
 
@@ -19,7 +19,7 @@ export async function initializeGame(historyElement){
     const progressElement = document.getElementById('progress');
     const animatedBoardElement = document.querySelector(".board.animated");
 
-    sharedState.settings = new gameSettings("mode", "color", "level", "highlight");
+    sharedState.settings = new gameSettings("mode", "color", "level", "highlight", "aiscore");
     sharedState.logic = new gameLogic();
     sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
     //sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
@@ -31,18 +31,22 @@ export async function initializeGame(historyElement){
 
 async function initializeAgent(settings) {
 
-    if (sharedState.debug) return new mockAgent(sharedState.debugMoves);
+    // tensorflow model for the opponent player and evaluator as well
+    const model = await loadModel();
+    let agent;
+
+    if (sharedState.debug) agent = new mockAgent(sharedState.debugMoves);
     else {
-        if (settings.level === "1") return new randomAgent();
-        else if (settings.level === "2") return new simpleGreedyAgent();
-        else if (settings.level === "3") return new nTurnMinimaxLastExausiveAgent(6,10);
+        if (settings.level === "1") agent = new randomAgent();
+        else if (settings.level === "2") agent = new simpleGreedyAgent();
+        else if (settings.level === "3") agent =  new nTurnMinimaxLastExausiveAgent(6,10);
         else if (settings.level === "4"){
-            const model = await loadModel();
-            return new neuralNetAgent(model, true);
+            //const model = await loadModel();
+            agent =  new neuralNetAgent(model, true);
         }
     }
 
-    console.assert(false);
+    return [agent, model];
 }
 
 export class boardInfo{
@@ -66,7 +70,7 @@ export class boardInfo{
         });
 
         // 非同期処理をここで実行
-        this.agent = await initializeAgent(this.settings);
+        [this.agent, this.model] = await initializeAgent(this.settings);
 
         // Make the AI's move function asynchronous since it may take a long time
         this.asyncMove = makeAsync(this.agent.move);
@@ -102,7 +106,10 @@ export class boardInfo{
         if (sharedState.settings.mode === "cp" && sharedState.settings.color === "white") await this.makeComputerMove();
 
         if (sharedState.debug) this.debugHighlight();
-        else this.highlightPossibleCells();
+        else {
+            this.highlightPossibleCells();
+            this.highlightAIScore()
+        }
 
     }
 
@@ -192,10 +199,15 @@ export class boardInfo{
             addToHistoryTable(sharedState.animator, row, col, this.logic.history.length, moveDuration, "history-table");
             this.timeHistory.push(moveDuration);
 
-            this.placePiece(row, col);
+            //this.placePiece(row, col);
 
             if (sharedState.debug) this.removeDebugHighlight();
-            else this.removeHighlight();
+            else {
+                this.removeHighlight();
+                this.removeAIScore();
+            }
+
+            this.placePiece(row, col);
     
             // update the number of stones
             this.updateScores();
@@ -227,7 +239,10 @@ export class boardInfo{
                 }
     
                 if (sharedState.debug) this.debugHighlight();
-                else this.highlightPossibleCells();
+                else {
+                    this.highlightPossibleCells();
+                    this.highlightAIScore();
+                }
     
                 return;
             }
@@ -275,12 +290,17 @@ export class boardInfo{
                 }
 
                 if (sharedState.debug) this.debugHighlight()
-                else this.highlightPossibleCells();
-    
+                else {
+                    this.highlightPossibleCells();
+                    this.highlightAIScore();
+                }
             }
 
             if (sharedState.debug) this.debugHighlight()
-            else this.highlightPossibleCells();
+            else {
+                this.highlightPossibleCells();
+                this.highlightAIScore();
+            }
 
             this.lastMoveTime = Date.now();
         }
@@ -318,12 +338,25 @@ export class boardInfo{
         this.displayTurn();
     }
 
+    updateCellColor(cellElement, score) {
+        // スコアに基づいて色を計算する（0が最悪で1が最良）
+        const red = score < 0.5 ? 0 : Math.round((score - 0.5) * 2 * 255); // スコアが0.5以上で赤色が増加
+        const green = score < 0.5 ? Math.round(score * 2 * 255) : Math.round((1.0 - score) * 2 * 255); // 中間の値で緑色が最大
+        const blue = score < 0.5 ? Math.round((0.5 - score) * 2 * 255) : 0; // スコアが0.5以下で青色が増加
+    
+        // 背景色のRGB値をCSS変数に設定
+        cellElement.style.setProperty('--score-color', `rgb(${red}, ${green}, ${blue})`);
+    
+        // テキストの色を設定（背景が暗い場合は白、明るい場合は黒）
+        const textColor = (red * 0.299 + green * 0.587 + blue * 0.114) > 186 ? 'black' : 'white';
+        cellElement.style.setProperty('--text-color', textColor);
+    }    
+
     // Highlight places where the current player can place a stone
     highlightPossibleCells(){
 
         if (this.settings.highlight !== "checked") return;
 
-        //const possibleCells = this.getPossibleCells();
         const possibleCells = this.logic.getPossibleMoves();
         possibleCells.forEach((cell) => {
             this.cells[cell[0] * 8 + cell[1]].classList.add("possible");
@@ -334,6 +367,27 @@ export class boardInfo{
         const currentTrunIndex = sharedState.logic.history.length - 1;
         const [row, col] = convertA1ToRowCol(sharedState.debugMoves[currentTrunIndex]);
         this.cells[row * 8 + col].classList.add("debug");
+    }
+
+    highlightAIScore(){
+
+        if (this.settings.aiscore !== "checked") return;
+
+        const player = (this.settings.color === "black" ? 0 : 1);
+
+        const inputTensor = constructInputTensor(this.logic, player);
+        const vals = this.model.predict(inputTensor).arraySync();
+        const probs = window.tf.softmax(vals).arraySync();
+
+        const possibleCells = this.logic.getPossibleMoves();
+        possibleCells.forEach(([row, col]) => {
+            const cellElement = this.cells[row * 8 + col];
+            cellElement.classList.add("aiscore");
+            const p = probs[0][row*8 + col];
+            this.updateCellColor(cellElement, p);
+            cellElement.textContent = p.toFixed(3);
+        });
+
     }
 
     // Remove the highlight
@@ -347,6 +401,16 @@ export class boardInfo{
     removeDebugHighlight(){
         this.cells.forEach((cell) => {
             cell.classList.remove("debug");
+        });
+    }
+
+    removeAIScore(){
+        this.cells.forEach((cell) => {
+            if (!cell.classList.contains("aiscore")) return;
+
+            cell.textContent = "";
+            cell.style.removeProperty('--score-color');
+            cell.classList.remove("aiscore");
         });
     }
 

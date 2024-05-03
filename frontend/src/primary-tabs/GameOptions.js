@@ -3,6 +3,7 @@ import ModeOption from './ModeOption';
 import PlayerOptions from './PlayerOptions';
 import LevelOptions from './LevelOptions';
 import HighlightOption from './HighlightOption';
+import AIScoreOption from './AIScoreOption';
 import StartButton from './StartButton';
 import GameBoard from './GameBoard';
 import GameHistory from './GameHistory';
@@ -21,6 +22,7 @@ function GameOptions() {
               <StartButton />
             </div>
             <HighlightOption />
+            <AIScoreOption />
           </div>
           <div className="col-md-5 col-12">
             <GameBoard className="board"/>
