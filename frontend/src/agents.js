@@ -3,6 +3,14 @@
 import { convertA1ToRowCol, getRandomInt, NotImplementedError, } from './utilities.js';
 import { constructInputTensor } from './tensorflow/tensorflow.js';
 
+function le(a, b){
+    return a <= b;
+}
+
+function ge(a, b){
+    return a >= b;
+}
+
 export class Agent{
     move(logic){
         // should be implemented explicitly in each sub-class.
@@ -127,12 +135,65 @@ export class nTurnMinimaxLastExausiveAgent extends nTurnMinimaxAgent{
     }
 }
 
-function le(a, b){
-    return a <= b;
+// alpha-beta pruning agent that looks n turns ahead
+export class nTurnAlphaBetaAgent extends nTurnMinimaxAgent{
+    DFS(logic, depth, alpha=-Infinity, beta=Infinity){
+
+        let optimal, func;
+        let ans = [-1, -1];
+        if (depth%2 === this.aiPlayer) [optimal, func] = [-Infinity, ge];
+        else [optimal, func] = [Infinity, le];
+
+        let possibleCells = logic.getPossibleMoves();
+        possibleCells.forEach(([row, col]) => {
+            const flippedCells = logic.placePiece(row, col, true);
+
+            let tmp, tmpans;
+
+            let terminated = false;
+            if (depth == this.n-1) { terminated = true; }
+            else {
+                let possibleCellsTmp = logic.getPossibleMoves();
+                if (possibleCellsTmp.length === 0) terminated = true;
+            }
+
+            if (terminated) {
+                const score = logic.getScore();
+                tmp = score[0] - score[1];
+            }
+            else {
+                [tmp, tmpans] = this.DFS(logic, depth+1, alpha, beta);
+            }
+
+            logic.undo();
+
+            if (func(tmp, optimal)){
+                optimal = tmp;
+                ans = [row, col];
+            }
+
+            if (depth%2 === this.aiPlayer) alpha = Math.max(alpha, optimal);
+            else beta = Math.min(beta, optimal);
+
+            if (beta <= alpha) return[optimal, ans];
+        });
+
+        return [optimal, ans];
+    }
 }
 
-function ge(a, b){
-    return a >= b;
+// alpha-beta pruning agent that looks n turns ahead or does exhaustive search if the game is almost over (64 - scoreSum <= k)
+export class nTurnAlphaBetaLastExausiveAgent extends nTurnAlphaBetaAgent{
+    constructor(n, k){
+        super(n);
+        this.k = k;
+    }
+
+    move(logic){
+        const scoreSum = logic.score[0] + logic.score[1];
+        if (scoreSum >= 64 - this.k) this.n = 64 - scoreSum;
+        return super.move(logic);
+    }
 }
 
 export class neuralNetAgent extends Agent{

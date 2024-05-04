@@ -9,6 +9,8 @@ import {
 } from "./frontend/src/agents.js";
 import { gameLogic } from "./frontend/src/game-logic.js";
 
+// To avoid import errors, please add "type": "module" to frontend/package.json
+
 class Game {
     constructor(ai1, ai2, args1, args2) {
         this.ai1 = ai1;
