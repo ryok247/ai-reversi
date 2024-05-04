@@ -30,6 +30,7 @@ Visit the [AI Reversi Website](https://ai-reversi.com)
 |Infrastructure as Code  |	Terraform v1.7.3, AWS CloudFormation                       |
 |Log Management & Analysis|	ELB access logs stored in S3 bucket and analyzed with Amazon Athena|
 |External API            |	OpenAI API v1 (Chat Completion)                            |
+|AI Model              | Tensorflow v2.15.0, tensorflow/tfjs-node v4.17.0 |
 
 ## Features and Functions
 
@@ -42,7 +43,7 @@ Visit the [AI Reversi Website](https://ai-reversi.com)
             <h3>AI Strength</h3>
             Very Easy: AI that chooses moves randomly.
             <br>Easy: Reads only the next move and selects the move that flips the most stones.
-            <br>Medium: Reads up to 6 moves ahead (the last 10 moves are all read), selecting the optimal move using the <a href="https://en.wikipedia.org/wiki/Minimax">Minimax method</a>.
+            <br>Medium: Reads up to 6 moves ahead (the last 10 moves are all read), selecting the optimal move using the <a href="https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning">Alpha–beta pruning</a>.
         </td>
         <td>
             <img src="images/nn.gif" alt="Deep Learning" width="200" height="auto">
@@ -234,6 +235,7 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
 |Infrastructure as Code  |	Terraform v1.7.3, AWS CloudFormation|
 |ログ管理と分析            |	AWS ELBのアクセスログをS3バケットに保存し、Amazon Athenaで分析|
 |外部API                  |	OpenAI API v1 (Chat Completion)|
+|AIモデル              | Tensorflow v2.15.0, tensorflow/tfjs-node v4.17.0 |
 
 ## 特徴と機能
 
@@ -246,7 +248,7 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
             <h3>AIの強さ</h3>
             Very Easy: ランダムな手を選択するAI
             <br>Easy: 次の1手のみを読み、最も多くの石をひっくり返すことができる手を選択するAI
-            <br>Medium: 6手先（最後の10手は全ての手）まで読み、<a href="https://en.wikipedia.org/wiki/Minimax">Minimax法</a>によって最適な手を選択するAI
+            <br>Medium: 6手先（最後の10手は全ての手）まで読み、<a href="https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning">アルファ・ベータ法</a>によって最適な手を選択するAI
         </td>
         <td>
             <img src="images/nn.gif" alt="ディープラーニング"  width="200" height="auto">
