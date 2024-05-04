@@ -1,6 +1,6 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent, nTurnMinimaxLastExausiveAgent, neuralNetAgent, mockAgent} from './agents.js'
+import { randomAgent, simpleGreedyAgent, neuralNetAgent, mockAgent, nTurnAlphaBetaLastExausiveAgent} from './agents.js'
 import { getCookie, setCookie, getCsrfToken, makeAsync, convertRowColToA1, convertA1ToRowCol } from './utilities.js'
 import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
@@ -22,7 +22,6 @@ export async function initializeGame(historyElement){
     sharedState.settings = new gameSettings("mode", "color", "level", "highlight", "aiscore");
     sharedState.logic = new gameLogic();
     sharedState.animator = new ReplayAnimator(sharedState.logic, animatedBoardElement, progressElement);
-    //sharedState.board = new boardInfo(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
     sharedState.board = await createAndInitializeBoard(sharedState.logic, sharedState.settings, boardElement, turnElement, historyElement);
 
     sharedState.board.updateScores();
@@ -39,11 +38,9 @@ async function initializeAgent(settings) {
     else {
         if (settings.level === "1") agent = new randomAgent();
         else if (settings.level === "2") agent = new simpleGreedyAgent();
-        else if (settings.level === "3") agent =  new nTurnMinimaxLastExausiveAgent(6,10);
-        else if (settings.level === "4"){
-            //const model = await loadModel();
-            agent =  new neuralNetAgent(model, true);
-        }
+        else if (settings.level === "3") agent =  new nTurnAlphaBetaLastExausiveAgent(6,10);
+        else if (settings.level === "4") agent =  new neuralNetAgent(model, true);
+        else console.error("Invalid level");
     }
 
     return [agent, model];
