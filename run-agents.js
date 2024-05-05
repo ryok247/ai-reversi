@@ -5,7 +5,9 @@ import {
     simpleGreedyAgent, 
     nTurnMinimaxAgent, 
     nTurnMinimaxLastExausiveAgent,
-    nTurnAlphaBetaAgent
+    nTurnAlphaBetaAgent,
+    MCTSAgent,
+    neuralNetAgent,
 } from "./frontend/src/agents.js";
 import { gameLogic } from "./frontend/src/game-logic.js";
 
@@ -72,5 +74,13 @@ game.playGames(1000);
 game.printResults();
 */
 
-const game = new Game(nTurnAlphaBetaAgent, randomAgent, [3], []);
-game.playGames(1);
+//const game = new Game(nTurnAlphaBetaAgent, randomAgent, [3], []);
+/*
+const game = new Game(MCTSAgent, randomAgent, [100], []);
+game.playGames(100);
+game.printResults();
+*/
+
+const game = new Game(randomAgent, MCTSAgent, [], [100]);
+game.playGames(100);
+game.printResults();

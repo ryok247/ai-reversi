@@ -196,6 +196,115 @@ export class nTurnAlphaBetaLastExausiveAgent extends nTurnAlphaBetaAgent{
     }
 }
 
+// Monte Carlo Tree Search agent
+class Node{
+    constructor(move, depth, parent=null){
+        this.move = move;
+        this.visits = 0;
+        this.value = 0;
+        this.children = [];
+        this.depth = depth;
+        this.parent = parent;
+    }
+}
+
+export class MCTSAgent extends Agent{
+    constructor(n, debug=false){
+        super();
+        this.n = n;
+        this.debug = debug;
+    }
+
+    move(logic){
+        let possibleCells = logic.getPossibleMoves();
+        if (possibleCells.length === 0) return [-1, -1];
+        this.aiPlayer = logic.currentPlayer;
+        this.root = new Node(null, 0);
+        for (let i = 0; i < this.n; i++){
+            this.simulate(logic, this.root);
+        }
+        
+        let MAX = -Infinity;
+        let bestChild = null;
+        this.root.children.forEach(child => {
+            if (child.visits > MAX){
+                MAX = child.visits;
+                bestChild = child;
+            }
+        });
+
+        return bestChild.move;
+    }
+
+    simulate(logic, node){
+
+        const rootNode = node;
+
+        while (true){
+
+            const score = logic.getScore();
+            if (score[0] + score[1] === 64) break;
+            else if (Math.min(score[0], score[1]) === 0) break;
+
+            if (node.visits === 0){
+                const possibleCells = logic.getPossibleMoves();
+                possibleCells.forEach(([row, col]) => {
+                    node.children.push(new Node([row, col], node.depth+1, node));
+                });
+            }
+            node.visits++;
+
+            let pass = false;
+            pass |= (node.children.length === 0);
+            pass |= (node.children.length === 1 && node.children[0].move[0] === -1 && node.children[0].move[1] === -1);
+
+            if (pass){
+                // Two consecutive passes mean game over.
+                if (node.move[0] === -1 && node.move[1] === -1) break;
+    
+                if (node.children.length === 0){
+                    node.children.push(new Node([-1, -1], node.depth+1, node));
+                }
+                logic.pass();
+                node = node.children[0];
+                continue;
+            }
+
+            // select the child node with the maximum (or minimum) UCB
+            let [optimal, func] = [node.depth%2 === 0 ? -Infinity : Infinity, node.depth%2 === 0 ? ge : le];
+            let bestChild = null;
+            node.children.forEach(child => {
+                const UCB = child.value / (child.visits + 1e-10) + Math.sqrt(2*Math.log(node.visits + 1e-10)/(child.visits + 1e-10));
+                if (func(UCB, optimal)){
+                    optimal = UCB;
+                    bestChild = child;
+                }
+            });
+            node = bestChild;
+            logic.placePiece(node.move[0], node.move[1], true);
+        }
+
+        const score = logic.getScore();
+        let result;
+
+        if (score[this.aiPlayer] > score[this.aiPlayer^1]) result = 1;
+        else if (score[this.aiPlayer] < score[this.aiPlayer^1]) result = -1;
+        else result = 0;
+
+        while (node !== rootNode){
+            node.value += result;
+            node = node.parent;
+            logic.undo();
+        }
+
+        node.value += result;
+
+        return;
+    }
+}
+
+
+// Neural Network agent
 export class neuralNetAgent extends Agent{
     constructor(model, debug=false){
         super();
