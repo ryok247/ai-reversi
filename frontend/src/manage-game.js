@@ -1,6 +1,6 @@
 "use strict";
 
-import { randomAgent, simpleGreedyAgent, neuralNetAgent, mockAgent, nTurnAlphaBetaLastExausiveAgent} from './agents.js'
+import { randomAgent, simpleGreedyAgent, neuralNetAgent, mockAgent, nTurnAlphaBetaLastExausiveAgent, MCTSAgent} from './agents.js'
 import { getCookie, setCookie, getCsrfToken, makeAsync, convertRowColToA1, convertA1ToRowCol } from './utilities.js'
 import { sharedState } from './game-shared.js';
 import { gameSettings } from './game-settings.js';
@@ -38,8 +38,9 @@ async function initializeAgent(settings) {
     else {
         if (settings.level === "1") agent = new randomAgent();
         else if (settings.level === "2") agent = new simpleGreedyAgent();
-        else if (settings.level === "3") agent =  new nTurnAlphaBetaLastExausiveAgent(6,10);
-        else if (settings.level === "4") agent =  new neuralNetAgent(model, true);
+        else if (settings.level === "3") agent =  new nTurnAlphaBetaLastExausiveAgent(6,10); 
+        else if (settings.level === "4") agent = new MCTSAgent(3000);
+        else if (settings.level === "5") agent =  new neuralNetAgent(model, true);
         else console.error("Invalid level");
     }
 
