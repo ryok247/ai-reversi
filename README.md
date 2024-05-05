@@ -49,7 +49,9 @@ Visit the [AI Reversi Website](https://ai-reversi.com)
             <img src="images/nn.gif" alt="Deep Learning" width="200" height="auto">
         </td>
         <td width="200">
-            Hard: Compete against a deep learning model (CNN) trained with tens of thousands of data points. This model uses the same SL Policy Network as described in the <a href="https://www.nature.com/articles/nature16961">AlphaGo paper</a>.
+            <h3>AI Strength (continued)</h3>
+            Hard: Utilizes the <a href="https://en.wikipedia.org/wiki/Monte_Carlo_tree_search">Monte Carlo Tree Search (MCTS) algorithm</a> to efficiently find a nearly most probable winning moves. The number of samples is 3,000.
+            <br>Very Hard: You can play against a deep learning model (Convolutional Neural Network, CNN) trained with about 70,000 game records. This model uses an architecture similar to the SL Policy Network described in the <a href="https://www.nature.com/articles/nature16961">Alpha Go paper</a>.
         </td>
     </tr>
     <tr>
@@ -255,7 +257,8 @@ AI Reversiでは、さまざまな強さなAIを相手にリバーシをプレ�
         </td>
         <td width="200">
             <h3>AIの強さ（続き）</h3>
-            Hard: 数万もの学習データを用いて訓練したディープラーニングモデル(CNN)と対戦することができます。このモデルは<a href="https://www.nature.com/articles/nature16961">Alpha Goの論文</a>で使われているSL Policy Networkと同じものです。
+            Hard: <a href="https://en.wikipedia.org/wiki/Monte_Carlo_tree_search">モンテカルロ木探索(MCTS)アルゴリズム</a>を用いて勝つ確率の高い手を効率良く見つけます。サンプリング回数は3000回です。
+            <br>Very Hard: 約7万もの棋譜データを用いて訓練したディープラーニングモデル(畳み込みニューラルネットワーク(CNN))と対戦することができます。このモデルは<a href="https://www.nature.com/articles/nature16961">Alpha Goの論文</a>で使われているSL Policy Networkと同種のアーキテクチャです。
         </td>
     </tr>
     <tr>
