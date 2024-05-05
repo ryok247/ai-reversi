@@ -13,6 +13,7 @@ function LevelOptions() {
         <label><input type="radio" name="level" value="2" />{language==="en" ? "Easy" : "やさしい"}</label>
         <label><input type="radio" name="level" value="3" />{language==="en" ? "Medium" : "普通"}</label>
         <label><input type="radio" name="level" value="4" />{language==="en" ? "Hard" : "難しい"}</label>
+        <label><input type="radio" name="level" value="5" />{language==="en" ? "Very Hard" : "とても難しい"}</label>
       </div>
     </>
   );
