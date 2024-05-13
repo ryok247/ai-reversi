@@ -19,6 +19,7 @@ function AIScoreOption() {
       <form action="">
         <input type="checkbox" id="aiscore" name="aiscore" value="checked" onChange={changeHandler} />
         <label htmlFor="aiscore"><h5 id="highlight-text">{language==="en" ? "Show AI Score" : "AI評価値を表示"}</h5></label>
+        <br/><h7 className="attention">{language==="en" ? "May take a few seconds to initialize" : "初期化に数秒かかる場合があります"}</h7>
       </form>
     </div>
   );
