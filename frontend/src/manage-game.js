@@ -28,25 +28,6 @@ export async function initializeGame(historyElement){
     sharedState.board.displayTurn();
 }
 
-async function initializeAgent(settings) {
-
-    // tensorflow model for the opponent player and evaluator as well
-    const model = await loadModel();
-    let agent;
-
-    if (sharedState.debug) agent = new mockAgent(sharedState.debugMoves);
-    else {
-        if (settings.level === "1") agent = new randomAgent();
-        else if (settings.level === "2") agent = new simpleGreedyAgent();
-        else if (settings.level === "3") agent =  new nTurnAlphaBetaLastExausiveAgent(6,10); 
-        else if (settings.level === "4") agent = new MCTSAgent(3000);
-        else if (settings.level === "5") agent =  new neuralNetAgent(model, true);
-        else console.error("Invalid level");
-    }
-
-    return [agent, model];
-}
-
 export class boardInfo{
     constructor(logic, settings, boardElement, turnElement, historyElement){
 
@@ -68,7 +49,7 @@ export class boardInfo{
         });
 
         // 非同期処理をここで実行
-        [this.agent, this.model] = await initializeAgent(this.settings);
+        await this.initializeAgent();
 
         // Make the AI's move function asynchronous since it may take a long time
         this.asyncMove = makeAsync(this.agent.move);
@@ -106,9 +87,27 @@ export class boardInfo{
         if (sharedState.debug) this.debugHighlight();
         else {
             this.highlightPossibleCells();
-            this.highlightAIScore()
+            await this.highlightAIScore()
         }
 
+    }
+
+    async initializeAgent() {
+
+        // tensorflow model for the opponent player and evaluator as well
+    
+        if (sharedState.debug) this.agent = new mockAgent(sharedState.debugMoves);
+        else {
+            if (this.settings.level === "1") this.agent = new randomAgent();
+            else if (this.settings.level === "2") this.agent = new simpleGreedyAgent();
+            else if (this.settings.level === "3") this.agent =  new nTurnAlphaBetaLastExausiveAgent(6,10); 
+            else if (this.settings.level === "4") this.agent = new MCTSAgent(3000);
+            else if (this.settings.level === "5"){
+                this.model = this.model || await loadModel();
+                this.agent =  new neuralNetAgent(this.model, true);
+            } 
+            else console.error("Invalid level");
+        }
     }
 
     // Place a stone
@@ -239,7 +238,7 @@ export class boardInfo{
                 if (sharedState.debug) this.debugHighlight();
                 else {
                     this.highlightPossibleCells();
-                    this.highlightAIScore();
+                    await this.highlightAIScore();
                 }
     
                 return;
@@ -290,14 +289,14 @@ export class boardInfo{
                 if (sharedState.debug) this.debugHighlight()
                 else {
                     this.highlightPossibleCells();
-                    this.highlightAIScore();
+                    await this.highlightAIScore();
                 }
             }
 
             if (sharedState.debug) this.debugHighlight()
             else {
                 this.highlightPossibleCells();
-                this.highlightAIScore();
+                await this.highlightAIScore();
             }
 
             this.lastMoveTime = Date.now();
@@ -367,9 +366,11 @@ export class boardInfo{
         this.cells[row * 8 + col].classList.add("debug");
     }
 
-    highlightAIScore(){
+    async highlightAIScore(){
 
         if (this.settings.aiscore !== "checked") return;
+
+        this.model = this.model || await loadModel();
 
         const player = (this.settings.color === "black" ? 0 : 1);
 
