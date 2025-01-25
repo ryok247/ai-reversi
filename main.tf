@@ -72,7 +72,6 @@ provider "aws" {
     allocated_storage      = 10
     storage_type           = "gp2"
     engine                 = "postgres"
-    engine_version         = "15.4"
     instance_class         = "db.t3.micro"
     identifier             = "ai-reversi-postgre"
     username               = "db_rds_admin"
@@ -162,9 +161,9 @@ provider "aws" {
   resource "aws_autoscaling_group" "ai_reversi_asg" {
     launch_configuration = aws_launch_configuration.ai_reversi_lc.name
     min_size             = 1
-    max_size             = 2
+    max_size             = 1
     desired_capacity     = 1
-    vpc_zone_identifier  = [aws_subnet.my_subnet_a.id, aws_subnet.my_subnet_b.id]
+    vpc_zone_identifier  = [aws_subnet.my_subnet_a.id]  # サブネットを1つに制限
     target_group_arns    = [aws_lb_target_group.ai_reversi_tg.arn]
   }
   
