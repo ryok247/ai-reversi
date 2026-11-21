@@ -42,3 +42,9 @@ secrets.tfvars
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# 2026-11-21: prevent credentials and local bulk artifacts entering snapshots
+.env.*
+!.env.example
+/history_ec2.txt
+/infra-snapshots/
+/tf-debug.log
